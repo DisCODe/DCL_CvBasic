@@ -14,5 +14,5 @@ OpenCV >= 2.1.0
 Maintainer
 ----------
 
-Maciej Stefańczyk [maciek-slon](https://github.com/maciek-slon)
+[Maciej Stefańczyk](https://github.com/maciek-slon)
 
