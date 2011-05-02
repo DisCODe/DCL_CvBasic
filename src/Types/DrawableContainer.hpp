@@ -20,7 +20,7 @@ namespace Types {
 
 class DrawableContainer : public Drawable {
 public:
-	~DrawableContainer() {}
+	virtual ~DrawableContainer() {}
 
 	virtual void draw(cv::Mat & image, CvScalar color, int offsetX = 0, int offsetY = 0) {
 		BOOST_FOREACH(Drawable * item, items) {
