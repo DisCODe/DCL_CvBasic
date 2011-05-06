@@ -20,7 +20,7 @@ namespace Types {
 
 class DrawableContainer : public Drawable {
 public:
-	virtual ~DrawableContainer() {}
+	~DrawableContainer() {}
 
 	virtual void draw(cv::Mat & image, CvScalar color, int offsetX = 0, int offsetY = 0) {
 		BOOST_FOREACH(Drawable * item, items) {
@@ -30,6 +30,10 @@ public:
 
 	void add(Drawable * it) {
 		items.push_back(it);
+	}
+
+	void clear() {
+		items.clear();
 	}
 
 	virtual Drawable * clone() {
