@@ -37,13 +37,14 @@ public:
 	}
 
 	virtual Line * clone()
-	{
-		return new Line(*this);
+	{	Line * ret = new Line(*this);
+		ret->setCol(m_col);
+		return ret;
 	}
 
 	virtual void draw(cv::Mat& image, CvScalar color, int offsetX = 0, int offsetY = 0)
 	{
-		cv::line(image, p1, p2, color);
+		cv::line(image, p1, p2, getCol(),2);
 	}
 
 	double getDistanceFromPoint(cv::Point p)
