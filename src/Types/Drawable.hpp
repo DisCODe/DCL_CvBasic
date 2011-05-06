@@ -2,6 +2,7 @@
 #define DRAWABLE_HPP_
 
 #include <cv.h>
+#include <iostream>
 
 namespace Types {
 
@@ -16,6 +17,10 @@ namespace Types {
  */
 class Drawable {
 public:
+	Drawable() {
+		m_col = CV_RGB(255,0,0);
+	}
+
 	virtual ~Drawable() {}
 
 	virtual void draw(cv::Mat& image, CvScalar color, int offsetX = 0, int offsetY = 0) = 0;
@@ -23,6 +28,17 @@ public:
 	virtual Drawable * clone() {
 		return NULL;
 	}
+
+	void setCol(CvScalar col) {
+		m_col = col;
+	}
+
+	CvScalar getCol() {
+		return m_col;
+	}
+
+protected:
+	CvScalar m_col;
 };
 
 } //: namespace Types
