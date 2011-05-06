@@ -84,6 +84,8 @@ struct Props : public Base::Props {
 
 	bool triggered;
 
+	bool loop;
+
 
 	void load(const ptree & pt) {
 		directory = pt.get("directory", ".");
@@ -92,7 +94,10 @@ struct Props : public Base::Props {
 		sort = pt.get("sort", true);
 		prefetch = pt.get("prefetch", false);
 
+
 		triggered = pt.get("triggered", false);
+
+		loop = pt.get("loop", false);
 	}
 
 	void save(ptree & pt) {
@@ -101,6 +106,7 @@ struct Props : public Base::Props {
 		pt.put("sort", sort);
 		pt.put("prefetch", prefetch);
 		pt.put("triggered", triggered);
+		pt.put("loop", loop);
 	}
 };
 
@@ -195,6 +201,7 @@ private:
 	Props props;
 
 	bool trig;
+
 };
 
 }//: namespace Sequence
