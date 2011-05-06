@@ -14,9 +14,14 @@
 namespace Processors {
 namespace CvMorphology {
 
-CvMorphology_Processor::CvMorphology_Processor(const std::string & name) : Base::Component(name)
+CvMorphology_Processor::CvMorphology_Processor(const std::string & name) : Base::Component(name),
+		iterations("iterations", 1, "range")
 {
 	LOG(LTRACE) << "Hello CvMorphology_Processor\n";
+
+	iterations.addConstraint("0");
+	iterations.addConstraint("255");
+	registerProperty(iterations);
 }
 
 CvMorphology_Processor::~CvMorphology_Processor()
@@ -69,7 +74,7 @@ void CvMorphology_Processor::onNewImage()
 	try {
 		cv::Mat img = in_img.read();
 		//cv::Mat out = img.clone();
-		cv::morphologyEx(img, img, props.type, cv::Mat(), Point(-1, -1), props.iterations);
+		cv::morphologyEx(img, img, props.type, cv::Mat(), Point(-1, -1), iterations);
 		out_img.write(img);
 		newImage->raise();
 	} catch (...) {

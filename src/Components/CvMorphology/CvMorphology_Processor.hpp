@@ -13,6 +13,7 @@
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Props.hpp"
+#include "Property.hpp"
 
 #include <cv.h>
 #include <highgui.h>
@@ -191,6 +192,13 @@ protected:
 
 	/// Threshold properties
 	Props props;
+
+private:
+	Base::Property<int> iterations;
+
+
+
+
 };
 
 }//: namespace CvMorphology
