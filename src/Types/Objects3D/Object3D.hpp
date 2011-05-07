@@ -10,7 +10,7 @@
 
 #include <stdexcept>
 
-#include "Drawable.hpp"
+#include "Types/Drawable.hpp"
 
 namespace Types {
 

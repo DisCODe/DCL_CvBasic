@@ -16,8 +16,8 @@
 #include "Props.hpp"
 #include "EventHandler.hpp"
 #include "DataStream.hpp"
-#include "Objects3D/Object3D.hpp"
-#include "HomogMatrix.hpp"
+#include "Types/Objects3D/Object3D.hpp"
+#include "Types/HomogMatrix.hpp"
 
 
 /**

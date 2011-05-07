@@ -12,9 +12,9 @@
 #include <boost/shared_ptr.hpp>
 #include "Component_Aux.hpp"
 #include "Panel_Empty.hpp"
-#include "Objects3D/Chessboard.hpp"
-#include "ImagePosition.hpp"
-#include "Drawable.hpp"
+#include "Types/Objects3D/Chessboard.hpp"
+#include "Types/ImagePosition.hpp"
+#include "Types/Drawable.hpp"
 #include "Timer.hpp"
 
 #include "Property.hpp"
