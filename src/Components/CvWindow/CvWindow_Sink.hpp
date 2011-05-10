@@ -12,7 +12,6 @@
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
 #include "Logger.hpp"
 
 #include "EventHandler2.hpp"
