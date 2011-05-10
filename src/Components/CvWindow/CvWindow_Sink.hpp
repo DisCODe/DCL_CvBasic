@@ -105,6 +105,8 @@ public:
 	 */
 	virtual ~CvWindow_Sink();
 
+	virtual void configure();
+
 protected:
 
 	/*!

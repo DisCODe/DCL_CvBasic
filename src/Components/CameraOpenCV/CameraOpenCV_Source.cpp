@@ -36,15 +36,7 @@ CameraOpenCV_Source::CameraOpenCV_Source(const std::string & name) : Base::Compo
 
 	registerProperty(m_triggered);
 
-	valid = false;
-}
 
-CameraOpenCV_Source::~CameraOpenCV_Source() {
-	LOG(LTRACE) << "CameraOpenCV_Source::~CameraOpenCV_Source()\n";
-}
-
-bool CameraOpenCV_Source::onInit() {
-	LOG(LTRACE) << "CameraOpenCV_Source::initialize()\n";
 	newImage = registerEvent("newImage");
 
 
@@ -54,6 +46,18 @@ bool CameraOpenCV_Source::onInit() {
 
 
 	registerStream("out_img", &out_img);
+
+
+
+	valid = false;
+}
+
+CameraOpenCV_Source::~CameraOpenCV_Source() {
+	LOG(LTRACE) << "CameraOpenCV_Source::~CameraOpenCV_Source()\n";
+}
+
+bool CameraOpenCV_Source::onInit() {
+	LOG(LTRACE) << "CameraOpenCV_Source::initialize()\n";
 
 	cap.open(m_device);
 

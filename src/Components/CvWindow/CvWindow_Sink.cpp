@@ -26,9 +26,9 @@ CvWindow_Sink::CvWindow_Sink(const std::string & name) : Base::Component(name),
 	LOG(LTRACE)<<"Hello CvWindow_Sink\n";
 
 	registerProperty(title);
-	registerProperty(count);
 
 	count.setToolTip("Total number of displayed windows");
+	registerProperty(count);
 
 	firststep = true;
 }
@@ -39,6 +39,29 @@ CvWindow_Sink::~CvWindow_Sink() {
 
 bool CvWindow_Sink::onInit() {
 	LOG(LTRACE) << "CvWindow_Sink::initialize\n";
+
+	for (int i = 0; i < count; ++i) {
+		char id = '0' + i;
+		cv::namedWindow( std::string(title) + id);
+	}
+	return true;
+}
+
+bool CvWindow_Sink::onFinish() {
+	LOG(LTRACE) << "CvWindow_Sink::finish\n";
+
+#if OpenCV_MAJOR<2 || OpenCV_MINOR<2
+	for (int i = 0; i < count; ++i) {
+		char id = '0' + i;
+		cv::destroyWindow( std::string(title) + id);
+	}
+#endif
+
+	return true;
+}
+
+void CvWindow_Sink::configure() {
+	LOG(LTRACE) << "CvWindow_Sink::configure\n";
 
 	Base::EventHandler2 * hand;
 	for (int i = 0; i < count; ++i) {
@@ -53,11 +76,7 @@ bool CvWindow_Sink::onInit() {
 
 		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>);
 		registerStream(std::string("in_draw")+id, in_draw[i]);
-
-		//cv::namedWindow(props.title + id);
-
 	}
-	//waitKey( 1000 );
 
 	// register aliases for first handler and streams
 	registerHandler("onNewImage", handlers[0]);
@@ -67,27 +86,11 @@ bool CvWindow_Sink::onInit() {
 	img.resize(count);
 	to_draw.resize(count);
 
-	return true;
-}
-
-bool CvWindow_Sink::onFinish() {
-	LOG(LTRACE) << "CvWindow_Sink::finish\n";
-
-	return true;
 }
 
 bool CvWindow_Sink::onStep()
 {
 	LOG(LTRACE)<<"CvWindow_Sink::step\n";
-
-	if (firststep) {
-		firststep = false;
-		for (int i = 0; i < count; ++i) {
-			char id = '0' + i;
-			cv::namedWindow( std::string(title) + id);
-		}
-		return true;
-	}
 
 	try {
 		for (int i = 0; i < count; ++i) {
@@ -112,11 +115,13 @@ bool CvWindow_Sink::onStep()
 
 bool CvWindow_Sink::onStop()
 {
+	LOG(LTRACE) << name() << "::onStop";
 	return true;
 }
 
 bool CvWindow_Sink::onStart()
 {
+	LOG(LTRACE) << name() << "::onStart";
 	return true;
 }
 
