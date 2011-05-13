@@ -82,6 +82,10 @@
  * @}
  */
 
+namespace Types {
+	class Drawable;
+}
+
 namespace Sinks {
 namespace CvVideoWriter {
 
@@ -201,6 +205,8 @@ protected:
 	/// Image to be drawn
 	Base::DataStreamIn<Mat> in_img;
 
+	Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex> in_draw;
+	boost::shared_ptr<Types::Drawable> to_draw;
 
 	/// Window properties
 	Props props;

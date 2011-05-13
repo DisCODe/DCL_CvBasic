@@ -33,6 +33,8 @@ bool CvVideoWriter_Sink::onInit() {
 
 	registerStream("in_img", &in_img);
 
+	registerStream("in_draw", &in_draw);
+
 	writer.open(props.filename, props.fourcc, props.fps, props.size);
 
 	if (writer.isOpened())
@@ -70,6 +72,15 @@ void CvVideoWriter_Sink::onNewImage() {
 
 	try {
 		cv::Mat img = in_img.read().clone();
+
+		if (!in_draw.empty()) {
+			to_draw = in_draw.read();
+		}
+
+		if (to_draw) {
+			to_draw->draw(img, CV_RGB(255,0,255));
+			to_draw = boost::shared_ptr<Types::Drawable>();
+		}
 
 		writer << img;
 	}
