@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include <boost/bind.hpp>
+
 #include "CameraOpenCV_Source.hpp"
 #include "Logger.hpp"
 
@@ -86,8 +88,6 @@ bool CameraOpenCV_Source::onStep() {
 	if (!valid)
 		return true;
 
-	if (props.triggered && !trig)
-		return true;
 
 	trig = false;
 	cap >> frame;

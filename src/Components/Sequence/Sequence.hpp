@@ -191,6 +191,8 @@ private:
 	/// list of files in sequence
 	std::vector<std::string> files;
 
+	std::vector<cv::Mat> images;
+
 	/// current frame
 	cv::Mat img;
 

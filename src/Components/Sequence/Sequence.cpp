@@ -42,6 +42,12 @@ bool Sequence::onInit() {
 		return false;
 	}
 
+	if (props.prefetch) {
+		for (int i = 0; i < files.size(); ++i) {
+			images.push_back(cv::imread(files[i], -1));
+		}
+	}
+
 	return true;
 }
 
@@ -60,11 +66,11 @@ bool Sequence::onStep() {
 	trig = false;
 
 	if (frame >= files.size()) {
-			LOG(LNOTICE) << "Sequence loop";
-			LOG(LNOTICE) << props.loop;
+			LOG(LDEBUG) << "Sequence loop";
+			LOG(LDEBUG) << props.loop;
 			if (props.loop) {
 	                frame = 0;
-	                LOG(LNOTICE) << "Sequence loop2";
+	                LOG(LDEBUG) << "Sequence loop2";
 	        } else {
 	                LOG(LINFO) << name() << ": end of sequence\n";
 	                endOfSequence->raise();
@@ -74,7 +80,10 @@ bool Sequence::onStep() {
 
 	LOG(LTRACE) << "Sequence: reading image " << files[frame];
 	try {
-		img = cv::imread(files[frame++], -1);
+		if (props.prefetch)
+			img = images[frame++];
+		else
+			img = cv::imread(files[frame++], -1);
 	}
 	catch(...) {
 		LOG(LWARNING) << name() << ": image reading failed! [" << files[frame-1] << "]";
