@@ -40,6 +40,9 @@ public:
 	 */
 	virtual ~CameraOpenCV_Source();
 
+
+	virtual void prepareInterface();
+
 protected:
 
 	/*!

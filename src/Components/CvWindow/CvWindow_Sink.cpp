@@ -23,7 +23,7 @@ CvWindow_Sink::CvWindow_Sink(const std::string & name) : Base::Component(name),
 		title("title", boost::bind(&CvWindow_Sink::onTitleCahnged, this, _1, _2), name),
 		count("count", 1)
 {
-	LOG(LTRACE)<<"Hello CvWindow_Sink\n";
+	CLOG(LTRACE)<<"Hello CvWindow_Sink\n";
 
 	registerProperty(title);
 
@@ -34,34 +34,12 @@ CvWindow_Sink::CvWindow_Sink(const std::string & name) : Base::Component(name),
 }
 
 CvWindow_Sink::~CvWindow_Sink() {
-	LOG(LTRACE)<<"Good bye CvWindow_Sink\n";
+	CLOG(LTRACE)<<"Good bye CvWindow_Sink\n";
 }
 
-bool CvWindow_Sink::onInit() {
-	LOG(LTRACE) << "CvWindow_Sink::initialize\n";
 
-	for (int i = 0; i < count; ++i) {
-		char id = '0' + i;
-		cv::namedWindow( std::string(title) + id);
-	}
-	return true;
-}
-
-bool CvWindow_Sink::onFinish() {
-	LOG(LTRACE) << "CvWindow_Sink::finish\n";
-
-#if OpenCV_MAJOR<2 || OpenCV_MINOR<2
-	for (int i = 0; i < count; ++i) {
-		char id = '0' + i;
-		cv::destroyWindow( std::string(title) + id);
-	}
-#endif
-
-	return true;
-}
-
-void CvWindow_Sink::configure() {
-	LOG(LTRACE) << "CvWindow_Sink::configure\n";
+void CvWindow_Sink::prepareInterface() {
+	CLOG(LTRACE) << "CvWindow_Sink::configure\n";
 
 	Base::EventHandler2 * hand;
 	for (int i = 0; i < count; ++i) {
@@ -88,16 +66,39 @@ void CvWindow_Sink::configure() {
 
 }
 
+bool CvWindow_Sink::onInit() {
+	CLOG(LTRACE) << "CvWindow_Sink::initialize\n";
+
+	for (int i = 0; i < count; ++i) {
+		char id = '0' + i;
+		cv::namedWindow( std::string(title) + id);
+	}
+	return true;
+}
+
+bool CvWindow_Sink::onFinish() {
+	CLOG(LTRACE) << "CvWindow_Sink::finish\n";
+
+#if OpenCV_MAJOR<2 || OpenCV_MINOR<2
+	for (int i = 0; i < count; ++i) {
+		char id = '0' + i;
+		cv::destroyWindow( std::string(title) + id);
+	}
+#endif
+
+	return true;
+}
+
 bool CvWindow_Sink::onStep()
 {
-	LOG(LTRACE)<<"CvWindow_Sink::step\n";
+	CLOG(LTRACE)<<"CvWindow_Sink::step\n";
 
 	try {
 		for (int i = 0; i < count; ++i) {
 			char id = '0' + i;
 
 			if (img[i].empty()) {
-				LOG(LWARNING) << name() << ": image " << i << " empty";
+				CLOG(LWARNING) << name() << ": image " << i << " empty";
 			} else {
 				// Refresh image.
 				imshow( std::string(title) + id, img[i] );
@@ -107,7 +108,7 @@ bool CvWindow_Sink::onStep()
 
 	}
 	catch(...) {
-		LOG(LERROR) << "CvWindow::onStep failed\n";
+		CLOG(LERROR) << "CvWindow::onStep failed\n";
 	}
 
 	return true;
@@ -115,18 +116,18 @@ bool CvWindow_Sink::onStep()
 
 bool CvWindow_Sink::onStop()
 {
-	LOG(LTRACE) << name() << "::onStop";
+	CLOG(LTRACE) << name() << "::onStop";
 	return true;
 }
 
 bool CvWindow_Sink::onStart()
 {
-	LOG(LTRACE) << name() << "::onStart";
+	CLOG(LTRACE) << name() << "::onStart";
 	return true;
 }
 
 void CvWindow_Sink::onNewImageN(int n) {
-	LOG(LTRACE) << name() << "::onNewImage(" << n << ")";
+	CLOG(LTRACE) << name() << "::onNewImage(" << n << ")";
 
 	try {
 		if(!in_img[n]->empty()){
@@ -146,7 +147,7 @@ void CvWindow_Sink::onNewImageN(int n) {
 		onStep();
 	}
 	catch(std::exception &ex) {
-		LOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
+		CLOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
 	}
 }
 

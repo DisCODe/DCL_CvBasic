@@ -11,7 +11,7 @@
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+#include "Property.hpp"
 
 #include <vector>
 #include <string>
@@ -74,42 +74,6 @@
 namespace Sources {
 namespace Sequence {
 
-struct Props : public Base::Props {
-
-	std::string directory;
-	std::string pattern;
-
-	bool sort;
-	bool prefetch;
-
-	bool triggered;
-
-	bool loop;
-
-
-	void load(const ptree & pt) {
-		directory = pt.get("directory", ".");
-		pattern = pt.get("pattern", ".*\\.(jpg|png|bmp)");
-
-		sort = pt.get("sort", true);
-		prefetch = pt.get("prefetch", false);
-
-
-		triggered = pt.get("triggered", false);
-
-		loop = pt.get("loop", false);
-	}
-
-	void save(ptree & pt) {
-		pt.put("directory", directory);
-		pt.put("pattern", pattern);
-		pt.put("sort", sort);
-		pt.put("prefetch", prefetch);
-		pt.put("triggered", triggered);
-		pt.put("loop", loop);
-	}
-};
-
 /*!
  * \class Sequence
  * \brief Class responsible for retrieving images from image sequences.
@@ -127,12 +91,7 @@ public:
 	 */
 	virtual ~Sequence();
 
-	/*!
-	 * Return sequence properties
-	 */
-	Base::Props * getProperties() {
-		return &props;
-	}
+	virtual void prepareInterface();
 
 protected:
 
@@ -197,10 +156,14 @@ private:
 	/// index of current frame
 	int frame;
 
-	/// sequence properties
-	Props props;
-
 	bool trig;
+
+	Base::Property<std::string> prop_directory;
+	Base::Property<std::string> prop_pattern;
+	Base::Property<bool> prop_sort;
+	Base::Property<bool> prop_prefetch;
+	Base::Property<bool> prop_triggered;
+	Base::Property<bool> prop_loop;
 
 };
 

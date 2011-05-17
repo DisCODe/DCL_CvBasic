@@ -15,20 +15,34 @@
 namespace Sources {
 namespace Sequence {
 
-Sequence::Sequence(const std::string & name) : Base::Component(name) {
-	LOG(LTRACE) << "Hello Sequence from dl\n";
+Sequence::Sequence(const std::string & n) :
+	Base::Component(n),
+	prop_directory("directory", std::string(".")),
+	prop_pattern("pattern", std::string(".*\\.(jpg|png|bmp)")),
+	prop_sort("sort", true),
+	prop_prefetch("prefetch", false),
+	prop_triggered("triggered", false),
+	prop_loop("loop", false)
+{
+	registerProperty(prop_directory);
+	registerProperty(prop_pattern);
+	registerProperty(prop_sort);
+	registerProperty(prop_prefetch);
+	registerProperty(prop_triggered);
+	registerProperty(prop_loop);
 
 	frame = 0;
 	trig = true;
+
+	CLOG(LTRACE) << name() << ": constructed";
 }
 
 Sequence::~Sequence() {
-	LOG(LTRACE) << "Goodbye Sequence from dl\n";
+	CLOG(LTRACE) << name() << ": destroyed";
 }
 
-bool Sequence::onInit() {
-	LOG(LTRACE) << "Sequence::initialize\n";
 
+void Sequence::prepareInterface() {
 	h_onTrigger.setup(this, &Sequence::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
 
@@ -36,9 +50,14 @@ bool Sequence::onInit() {
 	endOfSequence = registerEvent("endOfSequence");
 
 	registerStream("out_img", &out_img);
+}
+
+bool Sequence::onInit() {
+	CLOG(LTRACE) << "Sequence::initialize\n";
 
 	if (!findFiles()) {
-		LOG(LERROR) << name() << ": There are no files matching regex " << props.pattern << " in " << props.directory;
+		CLOG(LERROR) << name() << ": There are no files matching regex "
+				<< prop_pattern << " in " << prop_directory;
 		return false;
 	}
 
@@ -46,38 +65,37 @@ bool Sequence::onInit() {
 }
 
 bool Sequence::onFinish() {
-	LOG(LTRACE) << "Sequence::finish\n";
+	CLOG(LTRACE) << "Sequence::finish\n";
 
 	return true;
 }
 
 bool Sequence::onStep() {
-	LOG(LTRACE) << "Sequence::onStep";
+	CLOG(LTRACE) << "Sequence::onStep";
 
-	if (props.triggered && !trig)
+	if (prop_triggered && !trig)
 		return true;
 
 	trig = false;
 
 	if (frame >= files.size()) {
-			LOG(LNOTICE) << "Sequence loop";
-			LOG(LNOTICE) << props.loop;
-			if (props.loop) {
-	                frame = 0;
-	                LOG(LNOTICE) << "Sequence loop2";
-	        } else {
-	                LOG(LINFO) << name() << ": end of sequence\n";
-	                endOfSequence->raise();
-	                return false;
-	        }
+		if (prop_loop) {
+			frame = 0;
+			CLOG(LINFO) << name() << ": loop";
+			endOfSequence->raise();
+		} else {
+			CLOG(LINFO) << name() << ": end of sequence";
+			endOfSequence->raise();
+			return false;
+		}
 	}
 
-	LOG(LTRACE) << "Sequence: reading image " << files[frame];
+	CLOG(LTRACE) << "Sequence: reading image " << files[frame];
 	try {
 		img = cv::imread(files[frame++], -1);
-	}
-	catch(...) {
-		LOG(LWARNING) << name() << ": image reading failed! [" << files[frame-1] << "]";
+	} catch (...) {
+		CLOG(LWARNING) << name() << ": image reading failed! ["
+				<< files[frame - 1] << "]";
 	}
 
 	out_img.write(img);
@@ -93,19 +111,17 @@ bool Sequence::onStop() {
 	return true;
 }
 
-
-
 bool Sequence::findFiles() {
 	files.clear();
 
-	files = Utils::searchFiles(props.directory, props.pattern);
+	files = Utils::searchFiles(prop_directory, prop_pattern);
 
-	if (props.sort)
+	if (prop_sort)
 		std::sort(files.begin(), files.end());
 
-	LOG(LINFO) << "Sequence loaded.";
+	CLOG(LINFO) << "Sequence loaded.";
 	BOOST_FOREACH(std::string fname, files)
-		LOG(LINFO) << fname;
+		CLOG(LINFO) << fname;
 
 	return !files.empty();
 }

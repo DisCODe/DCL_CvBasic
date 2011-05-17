@@ -36,24 +36,20 @@ CameraOpenCV_Source::CameraOpenCV_Source(const std::string & name) : Base::Compo
 
 	registerProperty(m_triggered);
 
-
-	newImage = registerEvent("newImage");
-
-
-
-	h_onTrigger.setup(this, &CameraOpenCV_Source::onTrigger);
-	registerHandler("onTrigger", &h_onTrigger);
-
-
-	registerStream("out_img", &out_img);
-
-
-
 	valid = false;
 }
 
 CameraOpenCV_Source::~CameraOpenCV_Source() {
 	LOG(LTRACE) << "CameraOpenCV_Source::~CameraOpenCV_Source()\n";
+}
+
+void CameraOpenCV_Source::prepareInterface() {
+	newImage = registerEvent("newImage");
+
+	h_onTrigger.setup(this, &CameraOpenCV_Source::onTrigger);
+	registerHandler("onTrigger", &h_onTrigger);
+
+	registerStream("out_img", &out_img);
 }
 
 bool CameraOpenCV_Source::onInit() {
