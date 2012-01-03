@@ -9,6 +9,7 @@
 
 #include "Movie_Source.hpp"
 
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 
 namespace Sources {
@@ -19,6 +20,7 @@ Movie_Source::Movie_Source(const std::string & name) : Base::Component(name) {
 
 //	cap = NULL;
 	trig = true;
+	m_state = Playing;
 }
 
 Movie_Source::~Movie_Source() {
@@ -33,6 +35,11 @@ bool Movie_Source::onInit() {
 
 	h_onTrigger.setup(this, &Movie_Source::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
+
+	h_onPlay.setup(boost::bind(&Movie_Source::setState, this, Playing));
+	h_onPause.setup(boost::bind(&Movie_Source::setState, this, Paused));
+	registerHandler("OnPlay", &h_onPlay);
+	registerHandler("OnPause", &h_onPause);
 
 	if (!boost::filesystem::exists(props.filename)) {
 		LOG(LERROR) << "File " << props.filename << " doesn't exist.";
@@ -65,10 +72,12 @@ bool Movie_Source::onStep() {
 	trig = false;
 
 	LOG(LTRACE) << "Movie_Source::step() start\n";
-	cap >> frame;
-	if (frame.empty()) {
-		cap.set(CV_CAP_PROP_POS_AVI_RATIO, 0);
+	if (m_state == Playing) {
 		cap >> frame;
+		if (frame.empty()) {
+			cap.set(CV_CAP_PROP_POS_AVI_RATIO, 0);
+			cap >> frame;
+		}
 	}
 
 	cv::Mat img = frame.clone();

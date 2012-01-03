@@ -18,20 +18,22 @@ using namespace Types::Objects3D;
 
 CvFindChessboardCorners_Processor::CvFindChessboardCorners_Processor(const std::string & name) :
 	Component(name),
-	prop_subpix("subpix", true),
-	prop_subpix_window("subpix_window", 9, "range"),
-	prop_scale("scale", true),
-	prop_scale_factor("scale_factor", 2, "range"),
+	prop_subpix("subpix.subpix", true),
+	prop_subpix_window("subpix.window_size", 9, "range"),
+	prop_scale("scale.scale", true),
+	prop_scale_factor("scale.scale_factor", 2, "range"),
 
-	prop_width("chessboard.width", 9),
-	prop_height("chessboard.height", 6),
+	prop_width("chessboard.board_width", 9),
+	prop_height("chessboard.board_height", 6),
 	prop_square_width("chessboard.square_width", 1),
 	prop_square_height("chessboard.square_height", 1),
 
 	prop_fastCheck("flags.fast_check", true),
 	prop_filterQuads("flags.filter_quads", true),
 	prop_adaptiveThreshold("flags.adaptive_treshold", true),
-	prop_normalizeImage("flags.normalize_image", true)
+	prop_normalizeImage("flags.normalize_image", true),
+
+	prop_interpolation_type("scale.interpolation_type", INTER_NEAREST, "combo")
 {
 
 	findChessboardCornersFlags = 0;
@@ -47,6 +49,8 @@ CvFindChessboardCorners_Processor::CvFindChessboardCorners_Processor(const std::
 	prop_scale_factor.addConstraint("1");
 	prop_scale_factor.addConstraint("8");
 	registerProperty(prop_scale_factor);
+
+	prop_width.setToolTip("Board width in squares");
 
 	registerProperty(prop_width);
 	registerProperty(prop_height);
@@ -68,6 +72,10 @@ CvFindChessboardCorners_Processor::CvFindChessboardCorners_Processor(const std::
 	prop_width.setCallback(boost::bind(&CvFindChessboardCorners_Processor::sizeCallback, this, _1, _2));
 	prop_height.setCallback(boost::bind(&CvFindChessboardCorners_Processor::sizeCallback, this, _1, _2));
 
+
+	prop_interpolation_type.setToolTip("Interpolation type");
+	PROP_ADD_COMBO_ITEMS(prop_interpolation_type, ELEMS);
+	registerProperty(prop_interpolation_type);
 }
 
 CvFindChessboardCorners_Processor::~CvFindChessboardCorners_Processor()
@@ -170,7 +178,7 @@ void CvFindChessboardCorners_Processor::onNewImage()
 
 		timer.restart();
 
-		cv::resize(image, sub_img, Size(), 1.0 / prop_scale_factor, 1.0 / prop_scale_factor, INTER_NEAREST);
+		cv::resize(image, sub_img, Size(), 1.0 / prop_scale_factor, 1.0 / prop_scale_factor, prop_interpolation_type);
 
 		bool found;
 

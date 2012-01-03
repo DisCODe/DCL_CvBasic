@@ -15,6 +15,9 @@
 #include "DataStream.hpp"
 #include "Props.hpp"
 
+
+#include "EventHandler2.hpp"
+
 #include <cv.h>
 #include <highgui.h>
 
@@ -92,6 +95,11 @@ struct Props : public Base::Props {
  */
 class Movie_Source : public Base::Component {
 
+	enum MovieSourceState {
+		Playing,
+		Paused
+	};
+
 public:
 	/*!
 	 * Constructor. Sets ID and startup variables.
@@ -137,6 +145,10 @@ protected:
 	bool onStop();
 
 
+	void setState(MovieSourceState state) {
+		m_state = state;
+	}
+
 
 	/*!
 	 * Event handler function.
@@ -145,6 +157,10 @@ protected:
 
 	/// Event handler.
 	Base::EventHandler<Movie_Source> h_onTrigger;
+
+	///
+	Base::EventHandler2 h_onPlay;
+	Base::EventHandler2 h_onPause;
 
 
 	/// Event signaling that new image was retrieved.
@@ -163,6 +179,8 @@ protected:
 	Props props;
 
 	bool trig;
+
+	MovieSourceState m_state;
 };
 
 }//: namespace Movie
