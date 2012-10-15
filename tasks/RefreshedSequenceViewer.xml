@@ -3,8 +3,7 @@
 	<!-- List of components -->
 	<Components>
 		<Seq1 type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/discode/public_html/datasets/opencv_classics/</directory>
-			<triggered>true</triggered>			
+			<directory>%[TASK_LOCATION]%/../data/opencv_classics/</directory>
 		</Seq1>
 
 		<Wnd1 type="CvWindow" thread="Exec3" group="s1">

@@ -7,7 +7,7 @@
         </Kbd1>
 
 		<Seq1 type="Sequence" thread="Exec1" group="s1">
-			<directory>/home/discode/public_html/datasets/opencv_classics/</directory>
+			<directory>%[TASK_LOCATION]%/../data/opencv_classics/</directory>
 			<triggered>true</triggered>			
 		</Seq1>
 
