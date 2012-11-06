@@ -139,6 +139,15 @@ protected:
 	/// Event handler.
 	Base::EventHandler<Sequence> h_onTrigger;
 
+
+	/*!
+	 * Event handler function.
+	 */
+	void onNextImage();
+
+	/// Event handler.
+	Base::EventHandler<Sequence> h_onNextImage;
+
 private:
 	/**
 	 * Fill list of files according to pattern

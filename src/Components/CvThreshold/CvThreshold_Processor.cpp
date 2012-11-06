@@ -46,9 +46,9 @@ CvThreshold_Processor::~CvThreshold_Processor()
 	LOG(LTRACE) << "Good bye CvThreshold_Processor\n";
 }
 
-bool CvThreshold_Processor::onInit()
-{
-	LOG(LTRACE) << "CvThreshold_Processor::initialize\n";
+
+void CvThreshold_Processor::prepareInterface() {
+	CLOG(LTRACE) << "CvThreshold_Processor::configure\n";
 
 	h_onNewImage.setup(this, &CvThreshold_Processor::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
@@ -59,7 +59,12 @@ bool CvThreshold_Processor::onInit()
 
 	registerStream("out_img", &out_img);
 
+	addDependency("onNewImage", &in_img);
+}
 
+bool CvThreshold_Processor::onInit()
+{
+	LOG(LTRACE) << "CvThreshold_Processor::initialize\n";
 
 	return true;
 }
@@ -89,7 +94,7 @@ bool CvThreshold_Processor::onStart()
 
 void CvThreshold_Processor::onNewImage()
 {
-	LOG(LTRACE) << "CvThreshold_Processor::onNewImage\n";
+	LOG(LNOTICE) << "CvThreshold_Processor::onNewImage\n";
 	try {
 		cv::Mat img = in_img.read();
 		cv::Mat out = img.clone();
@@ -103,4 +108,4 @@ void CvThreshold_Processor::onNewImage()
 }
 
 }//: namespace CvThreshold
-}//: namespace Processors
+} //: namespace Processors

@@ -46,10 +46,15 @@ void Sequence::prepareInterface() {
 	h_onTrigger.setup(this, &Sequence::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
 
+	h_onNextImage.setup(this, &Sequence::onNextImage);
+	registerHandler("onNextImage", &h_onNextImage);
+
 	newImage = registerEvent("newImage");
 	endOfSequence = registerEvent("endOfSequence");
 
 	registerStream("out_img", &out_img);
+
+	addDependency("onNextImage", NULL);
 }
 
 bool Sequence::onInit() {
@@ -70,11 +75,11 @@ bool Sequence::onFinish() {
 	return true;
 }
 
-bool Sequence::onStep() {
-	CLOG(LTRACE) << "Sequence::onStep";
+void Sequence::onNextImage() {
+	CLOG(LDEBUG) << "Sequence::onNextImage";
 
 	if (prop_triggered && !trig)
-		return true;
+		return;
 
 	trig = false;
 
@@ -86,7 +91,7 @@ bool Sequence::onStep() {
 		} else {
 			CLOG(LINFO) << name() << ": end of sequence";
 			endOfSequence->raise();
-			return false;
+			return;
 		}
 	}
 
@@ -99,8 +104,11 @@ bool Sequence::onStep() {
 	}
 
 	out_img.write(img);
-	newImage->raise();
-	return true;
+	//newImage->raise();
+}
+
+bool Sequence::onStep() {
+
 }
 
 bool Sequence::onStart() {

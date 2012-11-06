@@ -125,6 +125,8 @@ public:
 	 */
 	virtual ~CvThreshold_Processor();
 
+	virtual void prepareInterface();
+
 protected:
 
 	/*!
@@ -162,7 +164,7 @@ protected:
 	Base::EventHandler <CvThreshold_Processor> h_onNewImage;
 
 	/// Input data stream
-	Base::DataStreamIn <Mat> in_img;
+	Base::DataStreamIn <cv::Mat> in_img;
 
 	/// Event raised, when image is processed
 	Base::Event * newImage;
