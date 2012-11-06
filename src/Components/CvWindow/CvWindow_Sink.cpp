@@ -41,6 +41,12 @@ CvWindow_Sink::~CvWindow_Sink() {
 void CvWindow_Sink::prepareInterface() {
 	CLOG(LTRACE) << "CvWindow_Sink::configure\n";
 
+
+	h_onRefresh.setup(this, &CvWindow_Sink::onRefresh);
+	registerHandler("onRefresh", &h_onRefresh);
+
+	addDependency("onRefresh", NULL);
+
 	Base::EventHandler2 * hand;
 	for (int i = 0; i < count; ++i) {
 		char id = '0'+i;
@@ -57,6 +63,7 @@ void CvWindow_Sink::prepareInterface() {
 		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>);
 		registerStream(std::string("in_draw")+id, in_draw[i]);
 	}
+
 
 	// register aliases for first handler and streams
 	registerHandler("onNewImage", handlers[0]);
@@ -93,27 +100,7 @@ bool CvWindow_Sink::onFinish() {
 
 bool CvWindow_Sink::onStep()
 {
-	CLOG(LTRACE)<<"CvWindow_Sink::step\n";
 
-	try {
-		for (int i = 0; i < count; ++i) {
-			char id = '0' + i;
-
-			if (img[i].empty()) {
-				CLOG(LWARNING) << name() << ": image " << i << " empty";
-			} else {
-				// Refresh image.
-				imshow( std::string(title) + id, img[i] );
-				waitKey( 2 );
-			}
-		}
-
-	}
-	catch(...) {
-		CLOG(LERROR) << "CvWindow::onStep failed\n";
-	}
-
-	return true;
 }
 
 bool CvWindow_Sink::onStop()
@@ -150,6 +137,28 @@ void CvWindow_Sink::onNewImageN(int n) {
 	}
 	catch(std::exception &ex) {
 		CLOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
+	}
+}
+
+void CvWindow_Sink::onRefresh() {
+	CLOG(LTRACE)<<"CvWindow_Sink::step\n";
+
+	try {
+		for (int i = 0; i < count; ++i) {
+			char id = '0' + i;
+
+			if (img[i].empty()) {
+				CLOG(LWARNING) << name() << ": image " << i << " empty";
+			} else {
+				// Refresh image.
+				imshow( std::string(title) + id, img[i] );
+				waitKey( 2 );
+			}
+		}
+
+	}
+	catch(...) {
+		CLOG(LERROR) << "CvWindow::onStep failed\n";
 	}
 }
 

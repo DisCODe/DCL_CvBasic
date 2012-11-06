@@ -140,6 +140,14 @@ protected:
 	void onNewImageN(int n);
 
 	/*!
+	 * Event handler function.
+	 */
+	void onRefresh();
+
+	/// Event handler.
+	Base::EventHandler<CvWindow_Sink> h_onRefresh;
+
+	/*!
 	 * Callback called when title is changed
 	 */
 	void onTitleCahnged(const std::string & old_title, const std::string & new_title);
