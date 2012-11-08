@@ -15,6 +15,7 @@
 #include "Types/Drawable.hpp"
 
 #include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace Sinks {
 namespace CvWindow {
@@ -57,7 +58,7 @@ void CvWindow_Sink::prepareInterface() {
 
 		Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex> * stream = new Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>;
 		in_img.push_back(stream);
-		registerStream(std::string("in_img")+id, in_img[i]);
+		registerStream( std::string("in_img")+id, (Base::DataStreamInterface*)(in_img[i]));
 		addDependency(std::string("onNewImage")+id, stream);
 
 		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>);
@@ -73,14 +74,20 @@ void CvWindow_Sink::prepareInterface() {
 	img.resize(count);
 	to_draw.resize(count);
 
+	std::string t = title;
+	boost::split(titles, t, boost::is_any_of(","));
+	if ( (titles.size() == 1) && (count > 1) ) titles.clear();
+	for (int i = titles.size(); i < count; ++i) {
+		char id = '0' + i;
+		titles.push_back(std::string(title) + id);
+	}
 }
 
 bool CvWindow_Sink::onInit() {
 	CLOG(LTRACE) << "CvWindow_Sink::initialize\n";
 
 	for (int i = 0; i < count; ++i) {
-		char id = '0' + i;
-		cv::namedWindow( std::string(title) + id);
+		cv::namedWindow( titles[i] );
 	}
 	return true;
 }
@@ -91,7 +98,7 @@ bool CvWindow_Sink::onFinish() {
 #if OpenCV_MAJOR<2 || OpenCV_MINOR<2
 	for (int i = 0; i < count; ++i) {
 		char id = '0' + i;
-		cv::destroyWindow( std::string(title) + id);
+		cv::destroyWindow( titles[i] );
 	}
 #endif
 
@@ -100,7 +107,7 @@ bool CvWindow_Sink::onFinish() {
 
 bool CvWindow_Sink::onStep()
 {
-
+	return true;
 }
 
 bool CvWindow_Sink::onStop()
@@ -151,7 +158,7 @@ void CvWindow_Sink::onRefresh() {
 				CLOG(LWARNING) << name() << ": image " << i << " empty";
 			} else {
 				// Refresh image.
-				imshow( std::string(title) + id, img[i] );
+				imshow( titles[i], img[i] );
 				waitKey( 2 );
 			}
 		}

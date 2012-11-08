@@ -175,6 +175,7 @@ protected:
 
 	bool firststep;
 
+	std::vector<std::string> titles;
 };
 
 }//: namespace CvWindow
