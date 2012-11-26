@@ -20,13 +20,15 @@ namespace Sinks {
 namespace CvWindow {
 
 CvWindow_Sink::CvWindow_Sink(const std::string & name) : Base::Component(name),
-		title("title", boost::bind(&CvWindow_Sink::onTitleCahnged, this, _1, _2), name),
+		title("title", boost::bind(&CvWindow_Sink::onTitleChanged, this, _1, _2), name),
+		filename("filename", boost::bind(&CvWindow_Sink::onFilenameChanged, this, _1, _2), name),
 		count("count", 1)
 {
 	LOG(LTRACE)<<"Hello CvWindow_Sink\n";
 
 	registerProperty(title);
 	registerProperty(count);
+	registerProperty(filename);
 
 	count.setToolTip("Total number of displayed windows");
 
@@ -55,9 +57,16 @@ bool CvWindow_Sink::onInit() {
 		registerStream(std::string("in_draw")+id, in_draw[i]);
 
 		//cv::namedWindow(props.title + id);
+		// save handlers
+		hand = new Base::EventHandler2;
+		hand->setup(boost::bind(&CvWindow_Sink::onSaveImageN, this, i));
+		handlers.push_back(hand);
+		registerHandler(std::string("onSaveImage")+id, hand);
 
 	}
 	//waitKey( 1000 );
+	h_onSaveAllImages.setup(this, &CvWindow_Sink::onSaveAllImages);
+	registerHandler("onSaveAllImages", &h_onSaveAllImages);
 
 	// register aliases for first handler and streams
 	registerHandler("onNewImage", handlers[0]);
@@ -145,7 +154,46 @@ void CvWindow_Sink::onNewImageN(int n) {
 	}
 }
 
-void CvWindow_Sink::onTitleCahnged(const std::string & old_title, const std::string & new_title) {
+void CvWindow_Sink::onSaveImageN(int n) {
+	LOG(LTRACE) << name() << "::onNewImage(" << n << ")";
+
+	try {
+		// Save image.
+		imwrite( std::string(filename) + std::string(".png"), img[n]);
+	}
+	catch(std::exception &ex) {
+		LOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
+	}
+}
+
+void CvWindow_Sink::onSaveAllImages() {
+	LOG(LTRACE) << name() << "::onSaveAllImages";
+
+	try {
+		for (int i = 0; i < count; ++i) {
+			char id = '0' + i;
+
+			if (img[i].empty()) {
+				LOG(LWARNING) << name() << ": image " << i << " empty";
+			} else {
+				// Save image.
+				imwrite( std::string(filename)+id + std::string(".png"), img[i]);
+			}
+		}
+	}
+	catch(std::exception &ex) {
+		LOG(LERROR) << "CvWindow::onSaveAllImages failed: " << ex.what() << "\n";
+	}
+}
+
+void CvWindow_Sink::onFilenameChanged(const std::string & old_filename, const std::string & new_filename) {
+//	filename = std::string("/home/tkornuta/2012_foto/") + new_filename;
+	filename = std::string("./") + new_filename;
+	std::cout << "onFilenameChanged: " << std::string(filename) << std::endl;
+}
+
+
+void CvWindow_Sink::onTitleChanged(const std::string & old_title, const std::string & new_title) {
 	std::cout << "onTitleChanged: " << new_title << std::endl;
 
 #if OpenCV_MAJOR<2 || OpenCV_MINOR<2

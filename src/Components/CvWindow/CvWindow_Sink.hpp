@@ -139,9 +139,27 @@ protected:
 	void onNewImageN(int n);
 
 	/*!
+	 * Event handler function - for saving of a single selected image at once.
+	 */
+	void onSaveImageN(int n);
+
+	/*!
+	 * Event handler function - for saving of all images.
+	 */
+	void onSaveAllImages();
+
+	/*!
 	 * Callback called when title is changed
 	 */
-	void onTitleCahnged(const std::string & old_title, const std::string & new_title);
+	void onTitleChanged(const std::string & old_title, const std::string & new_title);
+
+	/*!
+	 * Callback called when filename is changed
+	 */
+	void onFilenameChanged(const std::string & old_filename, const std::string & new_filename);
+
+	/// Event handler.
+	Base::EventHandler <CvWindow_Sink> h_onSaveAllImages;
 
 	/// Event handlers
 	std::vector< Base::EventHandler2* > handlers;
@@ -159,6 +177,7 @@ protected:
 	std::vector< boost::shared_ptr<Types::Drawable> > to_draw;
 
 
+	Base::Property<std::string> filename;
 
 
 	Base::Property<std::string> title;
