@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <boost/foreach.hpp>
 
-#include <highgui.h>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace Sources {
 namespace Sequence {

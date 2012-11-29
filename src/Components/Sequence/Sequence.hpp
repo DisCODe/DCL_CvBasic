@@ -16,7 +16,7 @@
 #include <vector>
 #include <string>
 
-#include <cv.h>
+#include <opencv2/core/core.hpp>
 
 /**
  * \defgroup Sequence Sequence
