@@ -12,11 +12,11 @@
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
 #include "Property.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 /**
  * \defgroup CvMorphology CvMorphology
@@ -69,43 +69,20 @@ namespace CvMorphology {
 
 using namespace cv;
 
-/*!
- * \brief CvThreshold properties
- */
-struct Props: public Base::Props
-{
-	int type;
-	int iterations;
-
-	/*!
-	 * \copydoc Base::Props::load
-	 */
-	void load(const ptree & pt)
+class MorphTranslator {
+public:
+	static int fromStr(const std::string & s)
 	{
-		type = str2type(pt.get("type", "MORPH_OPEN"));
-		iterations = pt.get("iterations", 1);
-	}
-
-	/*!
-	 * \copydoc Base::Props::save
-	 */
-	void save(ptree & pt)
-	{
-		pt.put("type", type2str(type));
-		pt.put("iterations", iterations);
-	}
-
-protected:
-	int str2type(const std::string & s) {
 		if (s == "MORPH_BLACKHAT") return MORPH_BLACKHAT;
 		if (s == "MORPH_CLOSE")	   return MORPH_CLOSE;
 		if (s == "MORPH_GRADIENT") return MORPH_GRADIENT;
 		if (s == "MORPH_OPEN")     return MORPH_OPEN;
 		if (s == "MORPH_TOPHAT")   return MORPH_TOPHAT;
-		                           return MORPH_OPEN;
+								   return MORPH_OPEN;
 	}
 
-	std::string type2str(int t) {
+	static std::string toStr(int t)
+	{
 		switch(t) {
 			case MORPH_OPEN:     return "MORPH_OPEN";
 			case MORPH_CLOSE:    return "MORPH_CLOSE";
@@ -115,9 +92,6 @@ protected:
 			default:             return "MORPH_OPEN";
 		}
 	}
-
-
-
 };
 
 /*!
@@ -137,13 +111,7 @@ public:
 	 */
 	virtual ~CvMorphology_Processor();
 
-	/*!
-	 * Return window properties
-	 */
-	Base::Props * getProperties()
-	{
-		return &props;
-	}
+	void prepareInterface();
 
 protected:
 
@@ -190,13 +158,11 @@ protected:
 	/// Output data stream - processed image
 	Base::DataStreamOut <Mat> out_img;
 
-	/// Threshold properties
-	Props props;
 
 private:
 	Base::Property<int> iterations;
 
-
+	Base::Property<int, MorphTranslator> type;
 
 
 };
