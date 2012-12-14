@@ -79,7 +79,6 @@ void CvColorConv_Processor::onNewImage()
 		img = in_img.read();
 		cvtColor(img, out, conversion_type);
 		out_img.write(out);
-		newImage->raise();
 	} catch (const exception& ex) {
 		LOG(LERROR) << "CvColorConv_Processor::onNewImage() failed. " << ex.what() << endl;
 	}

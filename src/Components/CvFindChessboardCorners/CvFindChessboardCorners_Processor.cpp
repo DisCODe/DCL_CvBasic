@@ -6,6 +6,7 @@
  */
 
 #include "CvFindChessboardCorners_Processor.hpp"
+#include <boost/bind.hpp>
 
 namespace Processors {
 
@@ -74,6 +75,21 @@ CvFindChessboardCorners_Processor::~CvFindChessboardCorners_Processor()
 {
 }
 
+void CvFindChessboardCorners_Processor::prepareInterface() {
+	CLOG(LTRACE) << "CvFindChessboardCorners_Processor::prepareInterface\n";
+
+	h_onNewImage.setup(this, &CvFindChessboardCorners_Processor::onNewImage);
+	registerHandler("onNewImage", &h_onNewImage);
+
+	registerStream("in_img", &in_img);
+	registerStream("out_chessboard", &out_chessboard);
+	registerStream("out_imagePosition", &out_imagePosition);
+
+	addDependency("onNewImage", &in_img);
+}
+
+
+
 bool CvFindChessboardCorners_Processor::onFinish()
 {
 	return true;
@@ -86,16 +102,6 @@ bool CvFindChessboardCorners_Processor::onStop()
 
 bool CvFindChessboardCorners_Processor::onInit()
 {
-	h_onNewImage.setup(this, &CvFindChessboardCorners_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	registerStream("in_img", &in_img);
-	registerStream("out_chessboard", &out_chessboard);
-	registerStream("out_imagePosition", &out_imagePosition);
-
-	chessboardFound = registerEvent("chessboardFound");
-	chessboardNotFound = registerEvent("chessboardNotFound");
-
 	initChessboard();
 
 	LOG(LTRACE) << "component initialized\n";
@@ -208,11 +214,11 @@ void CvFindChessboardCorners_Processor::onNewImage()
 			imagePosition.elements[3] = - atan2(corners[1].y - corners[0].y, corners[1].x - corners[0].x);
 			out_imagePosition.write(imagePosition);
 
-			chessboardFound->raise();
+			// TODO: add unit type: found
 		} else {
 			LOG(LTRACE) << "chessboard not found\n";
+			// TODO: add unit type: not found
 
-			chessboardNotFound->raise();
 		}
 	} catch (const Exception& e) {
 		LOG(LERROR) << e.what() << "\n";

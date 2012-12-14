@@ -339,9 +339,6 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 
-	/// Event raised, when image is processed
-	Base::Event * newImage;
-
 	/// Output data stream - processed image
 	Base::DataStreamOut <Mat> out_img;
 

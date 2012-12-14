@@ -81,10 +81,6 @@ protected:
 	/// Event handler.
 	Base::EventHandler<CameraOpenCV_Source> h_onTrigger;
 
-
-	/// Event signaling that new image was retrieved.
-	Base::Event * newImage;
-
 	/// Output data stream
 	Base::DataStreamOut<Mat> out_img;
 

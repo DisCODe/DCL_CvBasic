@@ -8,7 +8,8 @@
 #ifndef CHESSBOARD_HPP_
 #define CHESSBOARD_HPP_
 
-#include <cv.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 
 #include "Object3D.hpp"
 
@@ -38,7 +39,7 @@ public:
 		return new Chessboard(*this);
 	}
 
-	virtual void draw(cv::Mat& image, CvScalar color, int offsetX = 0, int offsetY = 0)
+	virtual void draw(cv::Mat& image, cv::Scalar color, int offsetX = 0, int offsetY = 0)
 	{
 		cv::Mat ip(imagePoints);
 		cv::drawChessboardCorners(image, patternSize, ip, true);
