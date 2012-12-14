@@ -8,7 +8,6 @@
 #ifndef CVFINDCHESSBOARDCORNERS_PROCESSOR_HPP_
 #define CVFINDCHESSBOARDCORNERS_PROCESSOR_HPP_
 
-#include <cv.h>
 #include <boost/shared_ptr.hpp>
 #include "Component_Aux.hpp"
 #include "Panel_Empty.hpp"

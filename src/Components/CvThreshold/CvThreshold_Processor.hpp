@@ -71,6 +71,10 @@ namespace CvThreshold {
 
 using namespace cv;
 
+/*!
+ * \class ThresholdTranslator
+ * \brief Translates between the OpenCV enums and their names (string).
+ */
 class ThresholdTranslator {
 public:
 	static int fromStr(const std::string & s)
@@ -126,6 +130,9 @@ public:
 	 */
 	virtual ~CvThreshold_Processor();
 
+	/*!
+	 * Prepares communication interface.
+	 */
 	virtual void prepareInterface();
 
 protected:
@@ -174,7 +181,9 @@ protected:
 	Base::DataStreamOut <Mat> out_img;
 
 private:
+	/// Type of the performed thresholding operation.
 	Base::Property<int, ThresholdTranslator> m_type;
+
 	Base::Property<double> m_thresh;
 	Base::Property<double> m_maxval;
 };

@@ -15,8 +15,8 @@
 #include "DataStream.hpp"
 #include "Property.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace Sources {
 namespace CameraOpenCV {
@@ -40,7 +40,9 @@ public:
 	 */
 	virtual ~CameraOpenCV_Source();
 
-
+	/*!
+	 * Prepares communication interface.
+	 */
 	virtual void prepareInterface();
 
 protected:

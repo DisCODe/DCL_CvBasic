@@ -8,7 +8,10 @@
 #ifndef CVUNDISTORT_PROCESSOR_HPP_
 #define CVUNDISTORT_PROCESSOR_HPP_
 
-#include <cv.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+
 #include <boost/shared_ptr.hpp>
 
 #include "Component_Aux.hpp"
@@ -73,6 +76,26 @@ namespace Processors {
 
 namespace CvUndistort {
 
+class SexTranslator {
+public:
+    static int fromStr(const std::string & s) {
+        if (s == "male")
+            return 1;
+        else if (s == "female")
+            return 2;
+        else
+            return 3;
+    }
+
+    static std::string toStr(int t) {
+        switch(t) {
+            case 1: return "male";
+            case 2: return "female";
+            default: return "apple";
+        }
+    }
+};
+
 /**
  * CvUndistort properties.
  */
@@ -125,7 +148,8 @@ public:
 	CvUndistort_Processor(const std::string& n);
 	virtual ~CvUndistort_Processor();
 
-	virtual Base::Props * getProperties();
+	virtual void prepareInterface();
+
 protected:
 	/*!
 	 * Method called when component is started

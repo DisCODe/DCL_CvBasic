@@ -36,6 +36,7 @@ CvThreshold_Processor::CvThreshold_Processor(const std::string & name) : Base::C
 	m_maxval.addConstraint("0");
 	m_maxval.addConstraint("255");
 
+	// Register properties.
 	registerProperty(m_type);
 	registerProperty(m_thresh);
 	registerProperty(m_maxval);
@@ -48,7 +49,7 @@ CvThreshold_Processor::~CvThreshold_Processor()
 
 
 void CvThreshold_Processor::prepareInterface() {
-	CLOG(LTRACE) << "CvThreshold_Processor::configure\n";
+	CLOG(LTRACE) << "CvThreshold_Processor::prepareInterface\n";
 
 	h_onNewImage.setup(this, &CvThreshold_Processor::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
