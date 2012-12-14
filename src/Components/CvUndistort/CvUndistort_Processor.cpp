@@ -17,17 +17,24 @@ using namespace boost;
 using namespace Base;
 
 CvUndistort_Processor::CvUndistort_Processor(const std::string& n) :
-	Component(n)
+	Component(n),
+	cameraMatrix("cameraMatrix", cv::Mat::eye(3, 3, CV_32FC1), "s"),
+	distCoeffs("distCoeffs", cv::Mat::ones(1, 5, CV_32FC1), "s")
 {
+
 }
 
 CvUndistort_Processor::~CvUndistort_Processor()
 {
 }
 
-Props * CvUndistort_Processor::getProperties()
-{
-	return &props;
+void CvUndistort_Processor::prepareInterface() {
+	h_onNewImage.setup(this, &CvUndistort_Processor::onNewImage);
+	registerHandler("onNewImage", &h_onNewImage);
+	addDependency("onNewImage", &in_img);
+
+	registerStream("in_img", &in_img);
+	registerStream("out_img", &out_img);
 }
 
 bool CvUndistort_Processor::onStart()
@@ -41,12 +48,6 @@ bool CvUndistort_Processor::onStop()
 }
 bool CvUndistort_Processor::onInit()
 {
-	h_onNewImage.setup(this, &CvUndistort_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-	newUndistortedImage = registerEvent("newUndistortedImage");
-	registerStream("in_img", &in_img);
-	registerStream("out_img", &out_img);
-
 	interpolation = INTER_LINEAR;
 
 	return true;
@@ -72,7 +73,7 @@ void CvUndistort_Processor::onNewImage()
 	// TODO: replace with initUndistortRectifyMap + remap
 	//initUndistortRectifyMap(props.cameraMatrix, props.distCoeffs, Mat(), );
 	//remap(originalImage, undistortedImage, map1, map2, interpolation);
-	undistort(originalImage, undistortedImage, props.cameraMatrix, props.distCoeffs);
+	undistort(originalImage, undistortedImage, (cv::Mat)cameraMatrix, (cv::Mat)distCoeffs);
 
 	out_img.write(undistortedImage.clone());
 	newUndistortedImage->raise();

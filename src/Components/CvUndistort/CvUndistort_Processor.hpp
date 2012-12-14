@@ -13,10 +13,15 @@
 
 
 #include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+
+#include <sstream>
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
+#include "Property.hpp"
 
 
 /**
@@ -76,39 +81,62 @@ namespace Processors {
 
 namespace CvUndistort {
 
-class SexTranslator {
+class MatrixTranslator {
 public:
-    static int fromStr(const std::string & s) {
-        if (s == "male")
-            return 1;
-        else if (s == "female")
-            return 2;
-        else
-            return 3;
+    static cv::Mat fromStr(const std::string & s) {
+        std::vector<double> values;
+
+        typedef vector< string > split_vector_type;
+
+        split_vector_type rows; // #2: Search for tokens
+        boost::split( rows, s, boost::is_any_of(";"), boost::token_compress_on );
+
+        std::vector<split_vector_type> mat;
+        mat.resize(rows.size());
+        for (int i = 0; i < rows.size(); ++i) {
+        	boost::split( mat[i], rows[i], boost::is_any_of(" ,"), boost::token_compress_on );
+        }
+
+        int r = rows.size();
+        int c = mat[0].size();
+
+        cv::Mat ret(r, c, CV_32FC1);
+        for (int rr = 0; rr < r; ++rr) {
+        	for (int cc = 0; cc < c; ++cc)
+        		ret.at<float>(rr, cc) = boost::lexical_cast<float>(mat[rr][cc]);
+        }
+
+        return ret;
     }
 
-    static std::string toStr(int t) {
-        switch(t) {
-            case 1: return "male";
-            case 2: return "female";
-            default: return "apple";
+    static std::string toStr(cv::Mat m) {
+    	std::stringstream ss;
+    	std::string delim = "";
+        for(int r = 0; r < m.rows; ++r) {
+        	for(int c = 0; c < m.cols; ++c) {
+        		ss << m.at<float>(r, c) << " ";
+        	}
+        	ss << delim;
+        	delim = ";";
         }
+
+        return ss.str();
     }
 };
 
 /**
  * CvUndistort properties.
  */
-struct CvUndistortProps : public Base::Props
+/*struct CvUndistortProps : public Base::Props
 {
 	cv::Mat cameraMatrix;
 	cv::Mat distCoeffs;
 
-	/*!
+	!
 	 * Load settings
 	 *
 	 * @param pt root property tree to load settings from
-	 */
+
 	virtual void load(const ptree & pt)
 	{
 		LOG(LTRACE) << "loading camera parameters.\n";
@@ -129,15 +157,15 @@ struct CvUndistortProps : public Base::Props
 		}
 	}
 
-	/*!
+	!
 	 * Save settings
 	 *
 	 * @param pt root property tree to save settings
-	 */
+
 	virtual void save(ptree & pt)
 	{
 	}
-};
+};*/
 
 /**
  * Component for distortion correction.
@@ -194,11 +222,12 @@ private:
 	Base::DataStreamIn <cv::Mat> in_img;
 	Base::DataStreamOut <cv::Mat> out_img;
 
+	Base::Property<cv::Mat, MatrixTranslator> cameraMatrix;
+	Base::Property<cv::Mat, MatrixTranslator> distCoeffs;
+
 	cv::Mat map1;
 	cv::Mat map2;
 	int interpolation;
-
-	CvUndistortProps props;
 };
 
 } // namespace CvUndistort
