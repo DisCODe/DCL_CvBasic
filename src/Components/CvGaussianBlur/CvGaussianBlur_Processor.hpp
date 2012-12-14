@@ -12,10 +12,10 @@
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+#include "Property.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "Types/stream_OpenCV.hpp"
 
@@ -72,16 +72,13 @@ using namespace cv;
 /*!
  * \brief CvThreshold properties
  */
+/*
 struct BlurProps: public Base::Props
 {
-	cv::Size2i kernel;
 
-	double sigmax;
-	double sigmay;
-
-	/*!
+	!
 	 * \copydoc Base::Props::load
-	 */
+
 	void load(const ptree & pt)
 	{
 		kernel = pt.get("kernel", cv::Size2i(71,71));
@@ -90,9 +87,9 @@ struct BlurProps: public Base::Props
 		sigmay = pt.get("sigmay", 0.0);
 	}
 
-	/*!
+	!
 	 * \copydoc Base::Props::save
-	 */
+
 	void save(ptree & pt)
 	{
 		pt.put("kernel", kernel);
@@ -102,6 +99,7 @@ struct BlurProps: public Base::Props
 	}
 
 };
+*/
 
 /*!
  * \class CvGaussianBlur_Processor
@@ -121,12 +119,9 @@ public:
 	virtual ~CvGaussianBlur_Processor();
 
 	/*!
-	 * Return window properties
+	 * Prepares communication interface.
 	 */
-	Base::Props * getProperties()
-	{
-		return &props;
-	}
+	virtual void prepareInterface();
 
 protected:
 
@@ -167,14 +162,21 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 
-	/// Event raised, when image is processed
-	Base::Event * newImage;
-
 	/// Output data stream - processed image
 	Base::DataStreamOut <Mat> out_img;
 
-	/// Threshold properties
-	BlurProps props;
+	/// Gaussian kernel standard deviation in X direction.
+	Base::Property<double> sigmax;
+
+	/// Gaussian kernel standard deviation in Y direction.
+	Base::Property<double> sigmay;
+
+	/// Size of the kernel - width.
+	Base::Property<int> kernel_width;
+
+	/// Size of the kernel - height.
+	Base::Property<int> kernel_height;
+
 };
 
 }//: namespace CvGaussianBlur
@@ -184,7 +186,7 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvGaussianBlur", Processors::CvGaussianBlur::CvGaussianBlur_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvGaussianBlur", Processors::CvGaussianBlur::CvGaussianBlur_Processor)
 
 #endif /* CVGAUSSIANBLUR_PROCESSOR_HPP_ */
 

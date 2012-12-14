@@ -19,12 +19,12 @@ namespace Types {
 class Drawable {
 public:
 	Drawable() {
-		m_col = CV_RGB(255,0,0);
+		m_col = cv::Scalar(255,0,0);
 	}
 
 	virtual ~Drawable() {}
 
-	virtual void draw(cv::Mat& image, CvScalar color, int offsetX = 0, int offsetY = 0) = 0;
+	virtual void draw(cv::Mat& image, cv::Scalar color, int offsetX = 0, int offsetY = 0) = 0;
 
 	virtual Drawable * clone() {
 		return NULL;

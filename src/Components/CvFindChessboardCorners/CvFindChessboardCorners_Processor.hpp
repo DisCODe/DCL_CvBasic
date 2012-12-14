@@ -15,8 +15,10 @@
 #include "Types/ImagePosition.hpp"
 #include "Types/Drawable.hpp"
 #include "Timer.hpp"
-
 #include "Property.hpp"
+
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 
 /**
@@ -74,6 +76,13 @@ class CvFindChessboardCorners_Processor: public Base::Component
 public:
 	CvFindChessboardCorners_Processor(const std::string & name = "");
 	virtual ~CvFindChessboardCorners_Processor();
+
+	/*!
+	 * Prepares communication interface.
+	 */
+	virtual void prepareInterface();
+
+
 protected:
 	/*!
 	 * Method called when component is started
@@ -118,10 +127,6 @@ private:
 	/** Chessboard stream. */
 	Base::DataStreamOut <Types::Objects3D::Chessboard> out_chessboard;
 	Base::DataStreamOut <Types::ImagePosition> out_imagePosition;
-	/** Raised when chessboard has been located on the image. */
-	Base::Event *chessboardFound;
-	/** Raised when chessboard has not been located on the image. */
-	Base::Event *chessboardNotFound;
 
 	/** Located corners.*/
 	std::vector<cv::Point2f> corners;
@@ -148,6 +153,7 @@ private:
 	Base::Property<bool> prop_adaptiveThreshold;
 	Base::Property<bool> prop_normalizeImage;
 
+	// TODO: add unit types: found and not found
 
 	void sizeCallback(int old_value, int new_value);
 	void flagsCallback(bool old_value, bool new_value);

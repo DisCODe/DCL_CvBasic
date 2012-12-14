@@ -44,8 +44,6 @@ CameraOpenCV_Source::~CameraOpenCV_Source() {
 }
 
 void CameraOpenCV_Source::prepareInterface() {
-	newImage = registerEvent("newImage");
-
 	h_onTrigger.setup(this, &CameraOpenCV_Source::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
 
@@ -105,7 +103,6 @@ bool CameraOpenCV_Source::onStep() {
 
 	out_img.write(frame);
 
-	newImage->raise();
 	return true;
 }
 

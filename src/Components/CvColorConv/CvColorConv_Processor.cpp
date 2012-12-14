@@ -37,8 +37,6 @@ void CvColorConv_Processor::prepareInterface() {
 
 	registerStream("in_img", &in_img);
 
-	newImage = registerEvent("newImage");
-
 	registerStream("out_img", &out_img);
 
 	addDependency("onNewImage", &in_img);
@@ -47,15 +45,6 @@ void CvColorConv_Processor::prepareInterface() {
 bool CvColorConv_Processor::onInit()
 {
 	LOG(LTRACE) << "CvColorConv_Processor::initialize\n";
-
-	h_onNewImage.setup(this, &CvColorConv_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	registerStream("in_img", &in_img);
-
-	newImage = registerEvent("newImage");
-
-	registerStream("out_img", &out_img);
 
 	return true;
 }
@@ -90,7 +79,6 @@ void CvColorConv_Processor::onNewImage()
 		img = in_img.read();
 		cvtColor(img, out, conversion_type);
 		out_img.write(out);
-		newImage->raise();
 	} catch (const exception& ex) {
 		LOG(LERROR) << "CvColorConv_Processor::onNewImage() failed. " << ex.what() << endl;
 	}
