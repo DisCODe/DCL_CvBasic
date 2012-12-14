@@ -15,13 +15,21 @@ namespace Processors {
 namespace CvMorphology {
 
 CvMorphology_Processor::CvMorphology_Processor(const std::string & name) : Base::Component(name),
-		iterations("iterations", 1, "range")
+		iterations("iterations", 1, "range"),
+		type("type", MORPH_OPEN, "combo")
 {
 	LOG(LTRACE) << "Hello CvMorphology_Processor\n";
 
 	iterations.addConstraint("0");
 	iterations.addConstraint("255");
 	registerProperty(iterations);
+
+	type.addConstraint("MORPH_OPEN");
+	type.addConstraint("MORPH_CLOSE");
+	type.addConstraint("MORPH_GRADIENT");
+	type.addConstraint("MORPH_TOPHAT");
+	type.addConstraint("MORPH_BLACKHAT");
+	registerProperty(type);
 }
 
 CvMorphology_Processor::~CvMorphology_Processor()
@@ -29,18 +37,19 @@ CvMorphology_Processor::~CvMorphology_Processor()
 	LOG(LTRACE) << "Good bye CvMorphology_Processor\n";
 }
 
-bool CvMorphology_Processor::onInit()
-{
-	LOG(LTRACE) << "CvMorphology_Processor::initialize\n";
-
+void CvMorphology_Processor::prepareInterface() {
 	h_onNewImage.setup(this, &CvMorphology_Processor::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
+	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);
 
-	newImage = registerEvent("newImage");
-
 	registerStream("out_img", &out_img);
+}
+
+bool CvMorphology_Processor::onInit()
+{
+	LOG(LTRACE) << "CvMorphology_Processor::initialize\n";
 
 	return true;
 }
@@ -74,9 +83,8 @@ void CvMorphology_Processor::onNewImage()
 	try {
 		cv::Mat img = in_img.read();
 		//cv::Mat out = img.clone();
-		cv::morphologyEx(img, img, props.type, cv::Mat(), Point(-1, -1), iterations);
+		cv::morphologyEx(img, img, type, cv::Mat(), Point(-1, -1), iterations);
 		out_img.write(img);
-		newImage->raise();
 	} catch (...) {
 		LOG(LERROR) << "CvMorphology_Processor::onNewImage failed\n";
 	}
