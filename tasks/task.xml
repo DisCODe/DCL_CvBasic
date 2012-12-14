@@ -37,10 +37,6 @@
 	
 	</Subtasks>
 	
-	<!-- connections between events and handelrs -->
-	<Events>
-	</Events>
-	
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
 		<Source name="Source.out_img">
