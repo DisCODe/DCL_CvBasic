@@ -56,8 +56,6 @@ void CvThreshold_Processor::prepareInterface() {
 
 	registerStream("in_img", &in_img);
 
-	newImage = registerEvent("newImage");
-
 	registerStream("out_img", &out_img);
 
 	addDependency("onNewImage", &in_img);

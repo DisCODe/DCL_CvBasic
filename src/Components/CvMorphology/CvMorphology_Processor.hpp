@@ -111,6 +111,9 @@ public:
 	 */
 	virtual ~CvMorphology_Processor();
 
+	/*!
+	 * Prepares communication interface.
+	 */
 	void prepareInterface();
 
 protected:

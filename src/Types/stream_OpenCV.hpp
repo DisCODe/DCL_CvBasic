@@ -3,7 +3,7 @@
  * \brief stream operators for OpenCV types
  */
 
-#include <cv.h>
+#include <opencv2/core/core.hpp>
 
 // hide those functions from Doxygen
 #ifndef DOXYGEN_INVOKED
@@ -100,81 +100,5 @@ std::basic_istream<Ch, Traits> & operator>>(std::basic_istream<Ch, Traits>& s, s
  * Operators for Boost::PropertyTree
  */
 
-namespace boost {
-namespace property_tree {
-
-template <typename Ch, typename Traits, typename T>
-struct customize_stream<Ch, Traits, cv::Size_<T>, void>
-{
-
-	static void insert(std::basic_ostream<Ch, Traits>& s, const cv::Size_<T>& e) {
-		s << e.width << " " << e.height;
-	}
-
-	static void extract(std::basic_istream<Ch, Traits>& s, cv::Size_<T>& e) {
-		T w,h;
-		s >> w >> h;
-		e.width = w;
-		e.height = h;
-	}
-};
-
-
-template <typename Ch, typename Traits, typename T>
-struct customize_stream<Ch, Traits, cv::Rect_<T>, void>
-{
-
-	static void insert(std::basic_ostream<Ch, Traits>& s, const cv::Rect_<T>& e) {
-		s << e.x << " " << e.y << " " << e.width << " " << e.height;
-	}
-
-	static void extract(std::basic_istream<Ch, Traits>& s, cv::Rect_<T>& e) {
-		T x,y,w,h;
-		s >> x >> y >> w >> h;
-
-		e.x = x;
-		e.y = y;
-		e.width = w;
-		e.height = h;
-	}
-};
-
-
-template <typename Ch, typename Traits, typename T>
-struct customize_stream<Ch, Traits, cv::Mat_<T>, void>
-{
-
-	static void insert(std::basic_ostream<Ch, Traits>& s, const cv::Mat_<T>& e) {
-		int w = e.size().width();
-		int h = e.size().height();
-		s << w << " " << h << "\n";
-		for (int i = 0; i < w; ++i) {
-			for (int j = 0; j < h; ++j) {
-				s << e(j,i) << " ";
-			}
-			s << "\n";
-		}
-	}
-
-	static void extract(std::basic_istream<Ch, Traits>& s, cv::Mat_<T>& e) {
-		int w, h;
-		T elem;
-		s >> w >> h;
-
-		std::cout << w << " " << h << "\n";
-		e = cv::Mat_<T>(h, w);
-
-		for (int i = 0; i < w; ++i) {
-			for (int j = 0; j < h; ++j) {
-				s >> elem;
-				e(j,i) = elem;
-				std::cout << elem << " ";
-			}
-		}
-	}
-};
-
-}
-}
 
 #endif /* DOXYGEN_INVOKED */
