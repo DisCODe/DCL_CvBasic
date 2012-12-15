@@ -8,6 +8,8 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 FIND_PACKAGE( OpenCV REQUIRED )
 
+DISCODE_FIND_DCL(CvCoreTypes)
+
 # CvBasic components
 ADD_SUBDIRECTORY(Components)
 
