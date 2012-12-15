@@ -134,20 +134,20 @@ protected:
 
 
 	/*!
-	 * Event handler function - reload the same image from the file.
-	 */
-	void onReloadImage();
-
-	/// Event handler - reload the same image from the file.
-	Base::EventHandler<Sequence> h_onReloadImage;
-
-	/*!
 	 * Event handler function - load next image from the sequence.
 	 */
 	void onNextImage();
 
 	/// Event handler - load next image from the sequence.
 	Base::EventHandler<Sequence> h_onNextImage;
+
+	/*!
+	 * Event handler function - reload the sequence.
+	 */
+	void onSequenceReload();
+
+	/// Event handler - reload the sequence.
+	Base::EventHandler<Sequence> h_onSequenceReload;
 
 private:
 	/**
@@ -183,6 +183,9 @@ private:
 
 	/// Sort image sequence by their names.
 	Base::Property<bool> prop_sort;
+
+	/// Working mode: iterative vs constant.
+	Base::Property<bool> prop_iterate;
 
 	/// ???
 	//Base::Property<bool> prop_prefetch;

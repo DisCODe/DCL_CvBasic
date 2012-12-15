@@ -15,22 +15,25 @@ namespace Processors {
 namespace CvGaussianBlur {
 
 CvGaussianBlur_Processor::CvGaussianBlur_Processor(const std::string & name) : Base::Component(name),
-		sigmax("sigmax", 0.0, "range"),
-		sigmay("sigmay", 0.0, "range"),
-		kernel_width("kernel_width", 3, "range"),
-		kernel_height("kernel_height", 3, "range")
+		sigmax("sigma.x", 0.0),
+		sigmay("sigma.y", 0.0),
+		kernel_width("kernel.width", 1, "range"),
+		kernel_height("kernel.height", 1, "range")
 {
+	// Set properties ranges and tooltips.
 	sigmax.setToolTip("Gaussian kernel standard deviation in X direction");
-	sigmax.addConstraint("0.0");
-	sigmax.addConstraint("10.0");
 	sigmay.setToolTip("Gaussian kernel standard deviation in Y direction");
-	sigmay.addConstraint("0.0");
-	sigmay.addConstraint("10.0");
 
 	kernel_width.addConstraint("0");
 	kernel_width.addConstraint("10");
 	kernel_height.addConstraint("0");
 	kernel_height.addConstraint("10");
+
+	// Register properties.
+	registerProperty(sigmax);
+	registerProperty(sigmay);
+	registerProperty(kernel_height);
+	registerProperty(kernel_width);
 
 	LOG(LTRACE) << "Hello CvGaussianBlur_Processor\n";
 }
