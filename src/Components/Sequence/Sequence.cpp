@@ -17,17 +17,17 @@ namespace Sequence {
 
 Sequence::Sequence(const std::string & n) :
 	Base::Component(n),
-	prop_directory("directory", std::string(".")),
-	prop_pattern("pattern", std::string(".*\\.(jpg|png|bmp)")),
-	prop_sort("sort", true),
-	prop_prefetch("prefetch", false),
-	prop_triggered("triggered", false),
-	prop_loop("loop", false)
+	prop_directory("sequence.directory", std::string(".")),
+	prop_pattern("sequence.pattern", std::string(".*\\.(jpg|png|bmp)")),
+	prop_sort("mode.sort", true),
+	//prop_prefetch("mode.prefetch", false),
+	prop_triggered("mode.triggered", false),
+	prop_loop("mode.loop", false)
 {
 	registerProperty(prop_directory);
 	registerProperty(prop_pattern);
 	registerProperty(prop_sort);
-	registerProperty(prop_prefetch);
+	//registerProperty(prop_prefetch);
 	registerProperty(prop_triggered);
 	registerProperty(prop_loop);
 
@@ -43,17 +43,20 @@ Sequence::~Sequence() {
 
 
 void Sequence::prepareInterface() {
+	// Register handlers.
 	h_onTrigger.setup(this, &Sequence::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
 
 	h_onNextImage.setup(this, &Sequence::onNextImage);
 	registerHandler("onNextImage", &h_onNextImage);
 
-	newImage = registerEvent("newImage");
-	endOfSequence = registerEvent("endOfSequence");
+	h_onReloadImage.setup(this, &Sequence::onReloadImage);
+	registerHandler("onReloadImage", &h_onReloadImage);
 
+	// Register streams.
 	registerStream("out_img", &out_img);
 
+	// Add dependencies.
 	addDependency("onNextImage", NULL);
 }
 
@@ -87,10 +90,10 @@ void Sequence::onNextImage() {
 		if (prop_loop) {
 			frame = 0;
 			CLOG(LINFO) << name() << ": loop";
-			endOfSequence->raise();
+			// TODO: endOfSequence->raise();
 		} else {
 			CLOG(LINFO) << name() << ": end of sequence";
-			endOfSequence->raise();
+			// TODO: endOfSequence->raise();
 			return;
 		}
 	}
@@ -103,9 +106,35 @@ void Sequence::onNextImage() {
 				<< files[frame - 1] << "]";
 	}
 
+	// Write image to the output port.
 	out_img.write(img);
-	//newImage->raise();
 }
+
+void Sequence::onReloadImage() {
+	CLOG(LDEBUG) << "Sequence::onReloadImage";
+
+	// It is assumed that this option will work only in the triggered mode.
+	// However, when such handler is activated it is assumed that is should not wait for the trigger.
+	if (!prop_triggered)
+		return;
+	// reset the trigger, i.e. do not load the next frame.
+	trig = false;
+	// Move the pointer to the last frame.
+	int last = frame-1;
+	if (last < 0)
+		last = files.size() -1;
+
+	CLOG(LTRACE) << "Sequence: reading image " << files[last];
+	try {
+		img = cv::imread(files[last], -1);
+	} catch (...) {
+		CLOG(LWARNING) << name() << ": image reading failed! ["
+				<< files[last] << "]";
+	}
+	// Write image to the output port.
+	out_img.write(img);
+}
+
 
 bool Sequence::onStep() {
 

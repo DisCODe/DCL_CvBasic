@@ -120,13 +120,6 @@ protected:
 	 */
 	bool onStop();
 
-
-	/// Event signaling that new image was retrieved.
-	Base::Event * newImage;
-
-	/// Sequence has ended
-	Base::Event * endOfSequence;
-
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 
@@ -141,11 +134,19 @@ protected:
 
 
 	/*!
-	 * Event handler function.
+	 * Event handler function - reload the same image from the file.
+	 */
+	void onReloadImage();
+
+	/// Event handler - reload the same image from the file.
+	Base::EventHandler<Sequence> h_onReloadImage;
+
+	/*!
+	 * Event handler function - load next image from the sequence.
 	 */
 	void onNextImage();
 
-	/// Event handler.
+	/// Event handler - load next image from the sequence.
 	Base::EventHandler<Sequence> h_onNextImage;
 
 private:
@@ -162,17 +163,29 @@ private:
 	/// current frame
 	cv::Mat img;
 
-	/// index of current frame
+	/// Index of current frame.
 	int frame;
 
+	/// Flag indicating thethwe the image was already loaded or not.
 	bool trig;
 
+	/// Directory containing the images sequence.
 	Base::Property<std::string> prop_directory;
+
+	/// Files pattern (regular expression).
 	Base::Property<std::string> prop_pattern;
-	Base::Property<bool> prop_sort;
-	Base::Property<bool> prop_prefetch;
+
+	/// Loading mode: triggered vs continous.
 	Base::Property<bool> prop_triggered;
+
+	/// Loading mode: images loaded in the loop.
 	Base::Property<bool> prop_loop;
+
+	/// Sort image sequence by their names.
+	Base::Property<bool> prop_sort;
+
+	/// ???
+	//Base::Property<bool> prop_prefetch;
 
 };
 
