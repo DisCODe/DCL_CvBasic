@@ -11,12 +11,11 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+#include "Property.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 /**
  * \defgroup Movie Movie
@@ -61,32 +60,6 @@ namespace Movie {
 using namespace cv;
 
 /*!
- * \class Props
- * \brief Movie_Source properties
- */
-struct Props : public Base::Props {
-
-	std::string filename;
-	bool triggered;
-
-	/*!
-	 * \copydoc Base::Props::load
-	 */
-	void load(const ptree & pt) {
-		filename  = pt.get("filename", "");
-		triggered = pt.get("triggered", false);
-	}
-
-	/*!
-	 * \copydoc Base::Props::save
-	 */
-	void save(ptree & pt) {
-		pt.put("filename", filename);
-		pt.put("triggered", triggered);
-	}
-};
-
-/*!
  * \class Movie_Source
  * \brief Class responsible for retrieving images from movies.
  */
@@ -103,12 +76,7 @@ public:
 	 */
 	virtual ~Movie_Source();
 
-	/*!
-	 * Return movie properties
-	 */
-	Base::Props * getProperties() {
-		return &props;
-	}
+	void prepareInterface();
 
 protected:
 	/*!
@@ -120,11 +88,6 @@ protected:
 	 * Disconnect source from device, closes streams, etc.
 	 */
 	bool onFinish();
-
-	/*!
-	 * Retrieves data from device.
-	 */
-	bool onStep();
 
 	/*!
 	 * Start component
@@ -147,8 +110,14 @@ protected:
 	Base::EventHandler<Movie_Source> h_onTrigger;
 
 
-	/// Event signaling that new image was retrieved.
-	Base::Event * newImage;
+	/*!
+	 * Event handler function.
+	 */
+	void onStep();
+
+	/// Event handler.
+	Base::EventHandler<Movie_Source> h_onStep;
+
 
 	/// Output data stream
 	Base::DataStreamOut<Mat> out_img;
@@ -159,10 +128,10 @@ protected:
 	/// Movie frame
 	Mat frame;
 
-	/// Movie properties
-	Props props;
-
 	bool trig;
+
+	Base::Property<std::string> filename;
+	Base::Property<bool> triggered;
 };
 
 }//: namespace Movie
@@ -171,6 +140,6 @@ protected:
 /*
  * Register source component.
  */
-REGISTER_SOURCE_COMPONENT("Movie", Sources::Movie::Movie_Source, Common::Panel_Empty)
+REGISTER_COMPONENT("Movie", Sources::Movie::Movie_Source)
 
 #endif /* MOVIE_SOURCE_HPP_ */
