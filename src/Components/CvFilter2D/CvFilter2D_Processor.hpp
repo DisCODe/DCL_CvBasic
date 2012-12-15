@@ -12,14 +12,14 @@
 #include "Component.hpp"
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+#include "Property.hpp"
 
-#include <Types/stream_OpenCV.hpp>
+#include "Types/MatrixTranslator.hpp"
 
-#include <cv.h>
-#include <highgui.h>
 
-#include <sstream>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 
 /**
  * \defgroup CvFilter2D CvFilter2D
@@ -69,64 +69,6 @@ namespace CvFilter2D {
 
 using namespace cv;
 
-/*!
- * \brief Properties
- */
-struct Props: public Base::Props
-{
-	cv::Size size;
-	cv::Mat kernel;
-	double delta;
-	double norm;
-
-	/*!
-	 * \copydoc Base::Props::load
-	 */
-	void load(const ptree & pt)
-	{
-		size = pt.get("size", cv::Size(3,3));
-
-		norm = pt.get("norm", 1.0);
-
-		kernel = str2mat(size, pt.get("kernel", ""), norm);
-
-		delta = pt.get("delta", 0.0);
-	}
-
-	/*!
-	 * \copydoc Base::Props::save
-	 */
-	void save(ptree & pt)
-	{
-		pt.put("size", size);
-
-		// \todo write kernel (cv::Mat)
-
-		pt.put("delta", delta);
-
-		pt.put("norm", norm);
-	}
-
-protected:
-	cv::Mat str2mat(cv::Size size, std::string s, double norm) {
-		std::stringstream ss;
-		cv::Mat mat = cv::Mat::eye(size, CV_32F);
-		double val;
-
-		ss << s;
-
-		for (int i = 0; i < size.height; ++i) {
-			for (int j = 0; j < size.width; ++j) {
-				ss >> val;
-				val /= norm;
-				mat.at<float>(i,j) = val;
-			}
-		}
-
-		return mat;
-	}
-
-};
 
 /*!
  * \class CvFilter2D_Processor
@@ -145,13 +87,7 @@ public:
 	 */
 	virtual ~CvFilter2D_Processor();
 
-	/*!
-	 * Return window properties
-	 */
-	Base::Props * getProperties()
-	{
-		return &props;
-	}
+	void prepareInterface();
 
 protected:
 
@@ -192,14 +128,12 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 
-	/// Event raised, when image is processed
-	Base::Event * newImage;
-
 	/// Output data stream - processed image
 	Base::DataStreamOut <Mat> out_img;
 
-	/// Threshold properties
-	Props props;
+	Base::Property<cv::Mat, Types::MatrixTranslator> kernel;
+	Base::Property<double> norm;
+	Base::Property<double> delta;
 
 private:
 	cv::Mat tmp;
@@ -212,7 +146,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvFilter2D", Processors::CvFilter2D::CvFilter2D_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvFilter2D", Processors::CvFilter2D::CvFilter2D_Processor)
 
 #endif /* CVFILTER2D_PROCESSOR_HPP_ */
 
