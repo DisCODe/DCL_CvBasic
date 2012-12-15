@@ -22,6 +22,7 @@ Sequence::Sequence(const std::string & n) :
 	prop_sort("mode.sort", true),
 	//prop_prefetch("mode.prefetch", false),
 	prop_triggered("mode.triggered", false),
+	prop_iterate("mode.iterate", true),
 	prop_loop("mode.loop", false)
 {
 	registerProperty(prop_directory);
@@ -29,9 +30,15 @@ Sequence::Sequence(const std::string & n) :
 	registerProperty(prop_sort);
 	//registerProperty(prop_prefetch);
 	registerProperty(prop_triggered);
+	registerProperty(prop_iterate);
 	registerProperty(prop_loop);
 
-	frame = 0;
+	// Set first frame index number.
+	if (prop_iterate)
+		frame = -1;
+	else
+		frame = 0;
+
 	trig = true;
 
 	CLOG(LTRACE) << name() << ": constructed";
@@ -50,8 +57,8 @@ void Sequence::prepareInterface() {
 	h_onNextImage.setup(this, &Sequence::onNextImage);
 	registerHandler("onNextImage", &h_onNextImage);
 
-	h_onReloadImage.setup(this, &Sequence::onReloadImage);
-	registerHandler("onReloadImage", &h_onReloadImage);
+	h_onSequenceReload.setup(this, &Sequence::onSequenceReload);
+	registerHandler("onSequenceReload", &h_onSequenceReload);
 
 	// Register streams.
 	registerStream("out_img", &out_img);
@@ -81,11 +88,15 @@ bool Sequence::onFinish() {
 void Sequence::onNextImage() {
 	CLOG(LDEBUG) << "Sequence::onNextImage";
 
+	// Check triggering mode.
 	if (prop_triggered && !trig)
 		return;
-
 	trig = false;
+	// Check iterate mode.
+	if (prop_iterate)
+		frame++;
 
+	// Check the size of the dataset.
 	if (frame >= files.size()) {
 		if (prop_loop) {
 			frame = 0;
@@ -96,44 +107,36 @@ void Sequence::onNextImage() {
 			// TODO: endOfSequence->raise();
 			return;
 		}
+
 	}
 
 	CLOG(LTRACE) << "Sequence: reading image " << files[frame];
 	try {
-		img = cv::imread(files[frame++], -1);
+		img = cv::imread(files[frame], -1);
 	} catch (...) {
 		CLOG(LWARNING) << name() << ": image reading failed! ["
-				<< files[frame - 1] << "]";
+				<< files[frame] << "]";
 	}
 
 	// Write image to the output port.
 	out_img.write(img);
 }
 
-void Sequence::onReloadImage() {
-	CLOG(LDEBUG) << "Sequence::onReloadImage";
-
-	// It is assumed that this option will work only in the triggered mode.
-	// However, when such handler is activated it is assumed that is should not wait for the trigger.
-	if (!prop_triggered)
-		return;
-	// reset the trigger, i.e. do not load the next frame.
-	trig = false;
-	// Move the pointer to the last frame.
-	int last = frame-1;
-	if (last < 0)
-		last = files.size() -1;
-
-	CLOG(LTRACE) << "Sequence: reading image " << files[last];
-	try {
-		img = cv::imread(files[last], -1);
-	} catch (...) {
-		CLOG(LWARNING) << name() << ": image reading failed! ["
-				<< files[last] << "]";
+void Sequence::onSequenceReload() {
+	// Set first frame index number.
+	if (prop_iterate)
+		frame = -1;
+	else
+		frame = 0;
+	// Try to load new sequence.
+	if (!findFiles()) {
+		CLOG(LERROR) << name() << ": There are no files matching regex "
+				<< prop_pattern << " in " << prop_directory;
+		frame = -1;
 	}
-	// Write image to the output port.
-	out_img.write(img);
 }
+
+
 
 
 bool Sequence::onStep() {
