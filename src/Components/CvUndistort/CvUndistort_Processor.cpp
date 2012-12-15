@@ -17,9 +17,7 @@ using namespace boost;
 using namespace Base;
 
 CvUndistort_Processor::CvUndistort_Processor(const std::string& n) :
-	Component(n),
-	cameraMatrix("cameraMatrix", cv::Mat::eye(3, 3, CV_32FC1), "s"),
-	distCoeffs("distCoeffs", cv::Mat::ones(1, 5, CV_32FC1), "s")
+	Component(n)
 {
 
 }
@@ -32,9 +30,11 @@ void CvUndistort_Processor::prepareInterface() {
 	h_onNewImage.setup(this, &CvUndistort_Processor::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 	addDependency("onNewImage", &in_img);
+	addDependency("onNewImage", &in_camerainfo);
 
 	registerStream("in_img", &in_img);
 	registerStream("out_img", &out_img);
+	registerStream("in_camerainfo", &in_camerainfo);
 }
 
 bool CvUndistort_Processor::onStart()
@@ -66,6 +66,7 @@ void CvUndistort_Processor::onNewImage()
 	cv::Mat originalImage;
 
 	originalImage = in_img.read();
+	camera_info = in_camerainfo.read();
 
 	//cv::Mat undistortedImage = originalImage.clone();
 	cv::Mat undistortedImage;
@@ -73,10 +74,9 @@ void CvUndistort_Processor::onNewImage()
 	// TODO: replace with initUndistortRectifyMap + remap
 	//initUndistortRectifyMap(props.cameraMatrix, props.distCoeffs, Mat(), );
 	//remap(originalImage, undistortedImage, map1, map2, interpolation);
-	undistort(originalImage, undistortedImage, (cv::Mat)cameraMatrix, (cv::Mat)distCoeffs);
+	undistort(originalImage, undistortedImage, camera_info.cameraMatrix(), camera_info.distCoeffs());
 
 	out_img.write(undistortedImage.clone());
-	newUndistortedImage->raise();
 }
 
 } // namespace CvUndistort
