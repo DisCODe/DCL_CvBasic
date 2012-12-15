@@ -100,7 +100,6 @@ void CvThreshold_Processor::onNewImage()
 		LOG(LTRACE) << "Threshold " << m_thresh;
 		cv::threshold(img, out, m_thresh, m_maxval, m_type);
 		out_img.write(out);
-		newImage->raise();
 	} catch (...) {
 		LOG(LERROR) << "CvThreshold::onNewImage failed\n";
 	}
