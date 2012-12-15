@@ -14,7 +14,7 @@
 #include "Property.hpp"
 #include "EventHandler2.hpp"
 #include "Types/Objects3D/Chessboard.hpp"
-
+#include "Types/CameraInfo.hpp"
 
 namespace Processors {
 namespace Calib {
@@ -69,6 +69,10 @@ protected:
 	// Data streams
 	Base::DataStreamIn< Types::Objects3D::Chessboard > in_chessboard;
 
+	Base::DataStreamIn< Types::CameraInfo > in_camerainfo;
+
+	Base::DataStreamOut< Types::CameraInfo > out_camerainfo;
+
 	// Handlers
 
 	// Handler activated when datastream chessboard is present.
@@ -90,6 +94,8 @@ private:
 
 	// The vector of vectors of points on the calibration pattern in its coordinate system, one vector per view.
 	vector<vector<cv::Point3f> > objectPoints;
+
+	cv::Size imageSize;
 
 };
 

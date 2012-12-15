@@ -11,6 +11,6 @@ ADD_LIBRARY(Calib SHARED ${files})
 TARGET_LINK_LIBRARIES(Calib ${DisCODe_LIBRARIES} )
 
 # Add aother libraries if necessary, for example:
-# TARGET_LINK_LIBRARIES(Example ${DisCODe_LIBRARIES} ${OpenCV_LIBS} )
+TARGET_LINK_LIBRARIES(Calib ${DisCODe_LIBRARIES} ${OpenCV_LIBS} )
 
 INSTALL_COMPONENT(Calib)
