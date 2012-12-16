@@ -15,7 +15,7 @@
 	<!-- task definition -->
 	<Subtasks>
 		<Subtask name="Processing">
-			<Executor name="Exec1"  period="1">
+			<Executor name="ProcessingThread"  period="1">
 				<Component name="Source" type="CvBasic:Sequence" priority="1" bump="0">
 					<param name="sequence.pattern">.*\.jpeg</param>
 					<param name="sequence.directory">%[TASK_LOCATION]%/../data/chessboard/</param>
@@ -44,14 +44,11 @@
 				</Component>
 				
 				<Component name="Calib" type="CvBasic:Calib" priority="6" bump="1">
-					
 				</Component>
 				
 			</Executor>
-		</Subtask>
-		
-		<Subtask name="Visualisation">
-			<Executor name="Exec2" period="0.2">
+
+			<Executor name="VisualizationThread" period="0.2">
 				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
 					<param name="count">1</param>
 					<param name="title">Okienko</param>
