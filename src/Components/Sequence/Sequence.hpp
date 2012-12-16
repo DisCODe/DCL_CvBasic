@@ -9,7 +9,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
@@ -198,6 +197,6 @@ private:
 /*
  * Register source component.
  */
-REGISTER_SOURCE_COMPONENT("Sequence", Sources::Sequence::Sequence, Common::Panel_Empty)
+REGISTER_COMPONENT("Sequence", Sources::Sequence::Sequence)
 
 #endif /* SEQUENCE_HPP_ */

@@ -10,7 +10,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
@@ -174,7 +173,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvMorphology", Processors::CvMorphology::CvMorphology_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvMorphology", Processors::CvMorphology::CvMorphology_Processor)
 
 #endif /* CVMORPHOLOGY_PROCESSOR_HPP_ */
 

@@ -10,7 +10,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "EventHandler.hpp"
 #include "DataStream.hpp"
 #include "Types/Objects3D/Object3D.hpp"
@@ -129,6 +128,6 @@ private:
 
 } // namespace Processors
 
-REGISTER_PROCESSOR_COMPONENT("CvSolvePnP", Processors::CvSolvePnP::CvSolvePnP_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvSolvePnP", Processors::CvSolvePnP::CvSolvePnP_Processor)
 
 #endif /* CVSOLVEPNP_PROCESSOR_HPP_ */

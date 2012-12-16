@@ -10,7 +10,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
@@ -138,7 +137,7 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvSplit", Processors::CvSplit::CvSplit_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvSplit", Processors::CvSplit::CvSplit_Processor)
 
 #endif /* CVSPLIT_PROCESSOR_HPP_ */
 

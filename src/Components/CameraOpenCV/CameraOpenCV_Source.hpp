@@ -11,7 +11,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
@@ -108,6 +107,6 @@ protected:
 /*
  * Register source component.
  */
-REGISTER_SOURCE_COMPONENT("CameraOpenCV", Sources::CameraOpenCV::CameraOpenCV_Source, Common::Panel_Empty)
+REGISTER_COMPONENT("CameraOpenCV", Sources::CameraOpenCV::CameraOpenCV_Source)
 
 #endif /* CAMERAOPENCV_SOURCE_HPP_ */

@@ -10,7 +10,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Logger.hpp"
 
@@ -185,7 +184,7 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvWindow", Sinks::CvWindow::CvWindow_Sink, Common::Panel_Empty)
+REGISTER_COMPONENT("CvWindow", Sinks::CvWindow::CvWindow_Sink)
 
 #endif /* CVWINDOW_SINK_HPP_ */
 

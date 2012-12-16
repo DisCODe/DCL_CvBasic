@@ -10,7 +10,6 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
@@ -195,7 +194,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvThreshold", Processors::CvThreshold::CvThreshold_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvThreshold", Processors::CvThreshold::CvThreshold_Processor)
 
 #endif /* CVTHRESHOLD_PROCESSOR_HPP_ */
 

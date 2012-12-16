@@ -10,7 +10,6 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Component_Aux.hpp"
-#include "Panel_Empty.hpp"
 #include "Types/Objects3D/Chessboard.hpp"
 #include "Types/ImagePosition.hpp"
 #include "Types/Drawable.hpp"
@@ -163,6 +162,6 @@ private:
 
 } // namespace Processors {
 
-REGISTER_PROCESSOR_COMPONENT("CvFindChessboardCorners", Processors::CvFindChessboardCorners::CvFindChessboardCorners_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvFindChessboardCorners", Processors::CvFindChessboardCorners::CvFindChessboardCorners_Processor)
 
 #endif /* CVFINDCHESSBOARDCORNERS_PROCESSOR_HPP_ */
