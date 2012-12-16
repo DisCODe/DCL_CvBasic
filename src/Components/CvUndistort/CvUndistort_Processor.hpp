@@ -131,7 +131,6 @@ private:
 
 	/// Event handler.
 	Base::EventHandler <CvUndistort_Processor> h_onNewImage;
-	Base::Event *newUndistortedImage;
 
 	Base::DataStreamIn <cv::Mat> in_img;
 	Base::DataStreamIn <Types::CameraInfo> in_camerainfo;
