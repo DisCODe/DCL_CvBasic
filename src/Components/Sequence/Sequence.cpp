@@ -54,8 +54,11 @@ void Sequence::prepareInterface() {
 	h_onTrigger.setup(this, &Sequence::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
 
-	h_onNextImage.setup(this, &Sequence::onNextImage);
-	registerHandler("onNextImage", &h_onNextImage);
+	h_onLoadImage.setup(this, &Sequence::onLoadImage);
+	registerHandler("onLoadImage", &h_onLoadImage);
+
+	h_onLoadNextImage.setup(this, &Sequence::onLoadNextImage);
+	registerHandler("onLoadNextImage", &h_onLoadNextImage);
 
 	h_onSequenceReload.setup(this, &Sequence::onSequenceReload);
 	registerHandler("onSequenceReload", &h_onSequenceReload);
@@ -64,7 +67,7 @@ void Sequence::prepareInterface() {
 	registerStream("out_img", &out_img);
 
 	// Add dependencies.
-	addDependency("onNextImage", NULL);
+	addDependency("onLoadImage", NULL);
 }
 
 bool Sequence::onInit() {
@@ -85,8 +88,8 @@ bool Sequence::onFinish() {
 	return true;
 }
 
-void Sequence::onNextImage() {
-	CLOG(LDEBUG) << "Sequence::onNextImage";
+void Sequence::onLoadImage() {
+	CLOG(LDEBUG) << "Sequence::onLoadImage";
 
 	// Check triggering mode.
 	if (prop_triggered && !trig)
@@ -103,9 +106,9 @@ void Sequence::onNextImage() {
 			CLOG(LINFO) << name() << ": loop";
 			// TODO: endOfSequence->raise();
 		} else {
+			frame = files.size() -1;
 			CLOG(LINFO) << name() << ": end of sequence";
 			// TODO: endOfSequence->raise();
-			return;
 		}
 
 	}
@@ -121,6 +124,12 @@ void Sequence::onNextImage() {
 	// Write image to the output port.
 	out_img.write(img);
 }
+
+void Sequence::onLoadNextImage(){
+	CLOG(LDEBUG) << "Sequence::onLoadNextImage - next image from the sequence will be loaded";
+	frame++;
+}
+
 
 void Sequence::onSequenceReload() {
 	// Set first frame index number.

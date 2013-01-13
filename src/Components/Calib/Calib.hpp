@@ -80,12 +80,27 @@ protected:
 	// Handler activated a calibration computations should be performed.
 	Base::EventHandler2 h_perform_calibration;
 
+	// Handler activated when user will trigger "add chessboard"
+	Base::EventHandler2 h_add_chessboard;
+
+	// Handler activated when user will trigger "clear whole dataset"
+	Base::EventHandler2 h_clear_dataset;
 
 	// Adds received chessboard observation to calibration set.
 	void process_chessboard();
 
 	// Performs the calibration.
 	void perform_calibration();
+
+	// Sets the add_set flag.
+	void add_chessboard();
+
+	// Adds received chessboard observation to calibration set.
+	void clear_dataset();
+
+
+	// Working mode: if activated, memorizes every data set that is received.
+	Base::Property<bool> continuous;
 
 private:
    // The vector of vectors of the object point projections on the calibration pattern views, one vector per a view.
@@ -96,6 +111,8 @@ private:
 
 	cv::Size imageSize;
 
+	// Flag used for memorizing that used demanded to process and store the incomming frame.
+	bool addChessboard;
 };
 
 } //: namespace Calib

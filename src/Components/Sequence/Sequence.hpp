@@ -131,14 +131,22 @@ protected:
 	/// Event handler.
 	Base::EventHandler<Sequence> h_onTrigger;
 
+	/*!
+	 * Event handler function - moves image index to the next frame of the sequence.
+	 */
+	void onLoadNextImage();
+
+	/// Event handler - moves image index to the next frame of the sequence.
+	Base::EventHandler<Sequence> h_onLoadNextImage;
+
 
 	/*!
-	 * Event handler function - load next image from the sequence.
+	 * Event handler function - loads image from the sequence.
 	 */
-	void onNextImage();
+	void onLoadImage();
 
-	/// Event handler - load next image from the sequence.
-	Base::EventHandler<Sequence> h_onNextImage;
+	/// Event handler - loads image from the sequence.
+	Base::EventHandler<Sequence> h_onLoadImage;
 
 	/*!
 	 * Event handler function - reload the sequence.
