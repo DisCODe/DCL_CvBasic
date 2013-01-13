@@ -4,8 +4,8 @@
  * \author Tomek Kornuta,,,
  */
 
-#ifndef SUM_HPP_
-#define SUM_HPP_
+#ifndef CVCANNY_HPP_
+#define CVCANNY_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -14,31 +14,32 @@
 //#include "EventHandler2.hpp"
 
 #include <opencv2/core/core.hpp>
-//#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 
 
 namespace Processors {
-namespace Sum {
+namespace CvCanny {
 
 using namespace cv;
 
 /*!
- * \class Sum
- * \brief Sum processor class.
+ * \class CvCanny
+ * \brief CvCanny processor class.
  *
- * Sum processor.
+ * CvCanny processor.
  */
-class Sum: public Base::Component {
+class CvCanny: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	Sum(const std::string & name = "Sum");
+	CvCanny(const std::string & name = "CvCanny");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~Sum();
+	virtual ~CvCanny();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -75,29 +76,26 @@ protected:
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <Sum> h_onNewImage;
+	Base::EventHandler <CvCanny> h_onNewImage;
 
-	/// Input data streams
-	Base::DataStreamIn <Mat> in_img1;
-	Base::DataStreamIn <Mat> in_img2;
+	/// Input data stream
+	Base::DataStreamIn <Mat> in_img;
 
 	/// Output data stream - a normalized sum of input images
 	Base::DataStreamOut <Mat> out_img;
 
-	// A normalizer, by which the sum will be multipiled.
-	Base::Property<double> norm;
-
-private:
-	cv::Mat tmp;
+	Base::Property<int> lowerThreshold;
+	Base::Property<int> higherThreshold;
+	Base::Property<int> kernelSize;
 
 };
 
-} //: namespace Sum
+} //: namespace CvCanny
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("Sum", Processors::Sum::Sum)
+REGISTER_COMPONENT("CvCanny", Processors::CvCanny::CvCanny)
 
-#endif /* SUM_HPP_ */
+#endif /* CVCANNY_HPP_ */
