@@ -9,7 +9,7 @@
 #define CIRCLES_HPP_
 
 #include <vector>
-#include <cv.h>
+#include <opencv2/core/core.hpp>
 
 #include "Types/Drawable.hpp"
 
