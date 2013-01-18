@@ -1,6 +1,6 @@
 # Add all components here using ADD_COMPONENT(<COMPONENT_DIRECTORY>)
 ADD_COMPONENT(CvFindChessboardCorners)
- 
+
 ADD_COMPONENT(CvThreshold)
 
 ADD_COMPONENT(CvUndistort)
@@ -32,3 +32,4 @@ ADD_COMPONENT(Calib)
 ADD_COMPONENT(RGBLUT)
 
 ADD_COMPONENT(HSVLUT)
+ADD_COMPONENT(ImageWriter)

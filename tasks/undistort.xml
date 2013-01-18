@@ -31,7 +31,7 @@
 			</Executor>
 			
 			<Executor name="VisualizationThread" period="0.2">
-				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="5">
+				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
 					<param name="count">2</param>
 					<param name="title">Original,Undistorted</param>
 				</Component>
