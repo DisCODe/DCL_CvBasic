@@ -1,6 +1,4 @@
 # Add all components here using ADD_COMPONENT(<COMPONENT_DIRECTORY>)
-ADD_COMPONENT(CameraCalib)
-
 ADD_COMPONENT(CvHoughCircles)
 
 ADD_COMPONENT(CvAdaptiveThreshold)
