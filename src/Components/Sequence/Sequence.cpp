@@ -99,6 +99,9 @@ void Sequence::onLoadImage() {
 	if (prop_iterate)
 		frame++;
 
+	if (frame <0)
+		frame = 0;
+
 	// Check the size of the dataset.
 	if (frame >= files.size()) {
 		if (prop_loop) {
