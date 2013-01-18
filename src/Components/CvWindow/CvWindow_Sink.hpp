@@ -166,9 +166,6 @@ protected:
 
 	std::vector< boost::shared_ptr<Types::Drawable> > to_draw;
 
-
-
-
 	Base::Property<std::string> title;
 	Base::Property<int> count;
 

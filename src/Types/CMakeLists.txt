@@ -15,3 +15,4 @@ install(
     COMPONENT sdk
 )
 
+add_subdirectory(Circles)
