@@ -64,7 +64,7 @@ void CvContour::onNewImage()
 		// Find contours.
 		vector<vector<Point> > contours;
 		vector<Vec4i> hierarchy;
-		findContours( input, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+		findContours( input, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
 /*		  /// Get the moments
 		  vector<Moments> mu(contours.size() );
@@ -76,6 +76,12 @@ void CvContour::onNewImage()
 		  for( int i = 0; i < contours.size(); i++ )
 		     { mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); }*/
 
+		CLOG(LINFO) << "Found "<< contours.size() << " contours";
+		// Select only the external contour
+/*		if (contours.size() > 1)
+			contours.erase (contours.begin()+1,contours.end());*/
+
+
 		  /// Draw contours
 		  Mat drawing = Mat::zeros( input.size(), CV_8UC3 );
 		  for( int i = 0; i< contours.size(); i++ )
@@ -85,7 +91,6 @@ void CvContour::onNewImage()
 //		       circle( drawing, mc[i], 4, color, -1, 8, 0 );
 		     }
 
-		CLOG(LINFO) << "Found "<< contours.size() << " contours";
 		// Write contours to the output.
 		out_contours.write(contours);
 		out_img.write(drawing);
