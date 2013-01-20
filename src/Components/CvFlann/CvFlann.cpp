@@ -18,9 +18,11 @@ namespace CvFlann {
 CvFlann::CvFlann(const std::string & name) :
 		Base::Component(name),
 		distance_recalc("recalculate_distance", true),
+		print_stats("print_stats", true),
 		dist("distance", 0.15)
 {
 	registerProperty(distance_recalc);
+	registerProperty(print_stats);
 	registerProperty(dist);
 }
 
@@ -69,7 +71,7 @@ bool CvFlann::onStart() {
 
 void CvFlann::onNewImage()
 {
-	LOG(LTRACE) << "CvFlann::onNewImage\n";
+	CLOG(LTRACE) << "CvFlann::onNewImage\n";
 	try {
 		// Read input features.
 		Types::Features features_1 = in_features0.read();
@@ -97,9 +99,9 @@ void CvFlann::onNewImage()
 				if( dist > max_dist ) max_dist = dist;
 			}
 			dist = 2*min_dist;
-			printf("-- Max dist : %f \n", (double)max_dist );
-			printf("-- Min dist : %f \n", (double)min_dist );
-			printf("-- Dist : %f \n", (double)dist );
+			CLOG(LINFO) << " Max dist : " << (double)max_dist;
+			CLOG(LINFO) << " Min dist : " << (double)min_dist;
+			CLOG(LINFO) << " Dist : " << (double)dist << std::endl;
 		}
 
 		//Draw only "good" matches (i.e. whose distance is less than 2*min_dist ).
@@ -118,15 +120,19 @@ void CvFlann::onNewImage()
 				   vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
 		// Print stats.
-		for( int i = 0; i < good_matches.size(); i++ )
-		{ printf( "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n", i, good_matches[i].queryIdx, good_matches[i].trainIdx ); }
-
+		if (print_stats) {
+			for( int i = 0; i < good_matches.size(); i++ )
+			{
+				CLOG(LINFO) << " Good Match [" << i <<"] Keypoint 1: " << good_matches[i].queryIdx << "  -- Keypoint 2: " << good_matches[i].trainIdx;
+			}
+			CLOG(LINFO) << std::endl;
+		}
 
 
 		// Write the result to the output.
 		out_img.write(img_matches);
 	} catch (...) {
-		LOG(LERROR) << "CvFlann::onNewImage failed\n";
+		CLOG(LERROR) << "CvFlann::onNewImage failed\n";
 	}
 }
 

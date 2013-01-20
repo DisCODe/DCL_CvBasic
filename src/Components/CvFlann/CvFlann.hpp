@@ -100,6 +100,9 @@ protected:
 	/// Flag: automatic distance recalculation.
 	Base::Property<bool> distance_recalc;
 
+	/// Flag: printing matching statistics.
+	Base::Property<bool> print_stats;
+
 	/// Minimal distance between two features so they will be classified as match.
 	Base::Property<double> dist;
 
