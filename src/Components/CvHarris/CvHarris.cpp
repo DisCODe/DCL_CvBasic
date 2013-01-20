@@ -44,7 +44,7 @@ void CvHarris::prepareInterface() {
 
 	// Input and output data streams.
 	registerStream("in_img", &in_img);
-	registerStream("out_img", &out_img);
+	registerStream("out_features", &out_features);
 }
 
 bool CvHarris::onInit() {
@@ -81,6 +81,8 @@ void CvHarris::onNewImage()
 		normalize( dst, dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat() );
 		//convertScaleAbs( dst_norm, dst_norm_scaled );
 
+	    std::vector<cv::KeyPoint> keypoints;
+
 		// Clone the grayscale image
 		cv::Mat out;
 		cvtColor(in, out, CV_GRAY2BGR);
@@ -90,13 +92,15 @@ void CvHarris::onNewImage()
 		        {
 		          if( (int) dst_norm.at<float>(j,i) > thresh )
 		            {
-		             circle( out, Point( i, j ), 5,  Scalar(240, 240, 0), 2, 8, 0 );
+		        	  keypoints.push_back(cv::KeyPoint(i,j,5));
+		             //circle( out, Point( i, j ), 5,  Scalar(240, 240, 0), 2, 8, 0 );
 		            }
 		        }
 		   }
 
-		// Write the result to the output.
-		out_img.write(out);
+		// Write features to the output.
+	    Types::Features features(keypoints);
+		out_features.write(features);
 	} catch (...) {
 		LOG(LERROR) << "CvHarris::onNewImage failed\n";
 	}

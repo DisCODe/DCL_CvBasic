@@ -12,9 +12,13 @@
 #include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
+#include "Types/Features.hpp"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 
 
 
@@ -78,14 +82,26 @@ protected:
 	/// Event handler.
 	Base::EventHandler <CvFlann> h_onNewImage;
 
-	/// Input data streams
+	/// Input data stream containing extracted features.
+	Base::DataStreamIn <Types::Features> in_features0;
+	Base::DataStreamIn <Types::Features> in_features1;
+
+	/// Input data streams containing features descriptors
+	Base::DataStreamIn <cv::Mat> in_descriptors0;
+	Base::DataStreamIn <cv::Mat> in_descriptors1;
+
+	/// Input data streams containing images
 	Base::DataStreamIn <Mat> in_img0;
 	Base::DataStreamIn <Mat> in_img1;
 
 	/// Output data stream - "matching" image
 	Base::DataStreamOut <Mat> out_img;
 
-	
+	/// Flag: automatic distance recalculation.
+	Base::Property<bool> distance_recalc;
+
+	/// Minimal distance between two features so they will be classified as match.
+	Base::Property<double> dist;
 
 };
 

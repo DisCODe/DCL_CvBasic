@@ -11,7 +11,7 @@
 #include "Component.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
-//#include "EventHandler2.hpp"
+#include "Types/Features.hpp"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -80,9 +80,8 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 
-	/// Output data stream - a normalized sum of input images
-	Base::DataStreamOut <Mat> out_img;
-
+	/// Output data stream containing extracted features
+	Base::DataStreamOut <Types::Features> out_features;
 
 	/// Detector parameters
 	Base::Property<int> blockSize;
