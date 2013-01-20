@@ -285,8 +285,9 @@ void skeletonize(cv::Mat im) {
 		}
 	}
 
-	while (again) {
-		again = 0;
+//	while (again) {
+//		again = 0;
+  for (int tmpi = 0; tmpi < 2; ++tmpi) {
   	for (i = 1; i < h-1; i++)
 			for (j = 1; j < w-1; j++) {
 				pixel = im.at<uchar>(i, j);
