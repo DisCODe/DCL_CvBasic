@@ -17,10 +17,14 @@ namespace CvBayesClassifier {
 
 CvBayesClassifier::CvBayesClassifier(const std::string & name) :
 		Base::Component(name),
-		trainingClass("trainingClass", 1)
+		recognize("recognize", true),
+		trainingClass("trainingClass", 1),
+		filename("filename", boost::bind(&CvBayesClassifier::onFilenameChanged, this, _1, _2), name)
 {
 	// Register properties.
+	registerProperty(recognize);
 	registerProperty(trainingClass);
+	registerProperty(filename);
 
 	add=false;
 }
@@ -46,9 +50,20 @@ void CvBayesClassifier::prepareInterface() {
 	h_onTraining.setup(this, &CvBayesClassifier::onTraining);
 	registerHandler("onTraining", &h_onTraining);
 
+	// Display.
+	h_onDisplayDataset.setup(this, &CvBayesClassifier::onDisplayDataset);
+	registerHandler("onDisplayDataset", &h_onDisplayDataset);
+
+	// Save.
+	h_onSaveBayes.setup(this, &CvBayesClassifier::onSaveBayes);
+	registerHandler("onSaveBayes", &h_onSaveBayes);
+
+	// Load.
+	h_onLoadBayes.setup(this, &CvBayesClassifier::onLoadBayes);
+	registerHandler("onLoadBayes", &h_onLoadBayes);
+
 	// Input data stream.
 	registerStream("in_moments", &in_moments);
-
 }
 
 bool CvBayesClassifier::onInit() {
@@ -83,13 +98,23 @@ void CvBayesClassifier::onNewData()
 			for(std::vector<Moments>::iterator it = m.begin(); it != m.end(); ++it) {
 			    /* std::cout << *it; ... */
 				training_dataset.push_back((Moments)*it);
-				training_responses.push_back(trainingClass);
-				CLOG(LINFO) << "Set of moments added to training dataset";
+				training_responses.push_back((double)trainingClass);
+				CLOG(LNOTICE) << "Set of moments added to training dataset";
 			}
 			CLOG(LINFO) << "Size of training dataset: "<<training_dataset.size();
 		}
 
-
+		if(recognize)
+		{
+			// Prepare data structures for prediction.
+			cv::Mat test_mat = cv::Mat::zeros( m.size(), 10, CV_32FC1);
+			prepareSampleMatrix(m, test_mat);
+			cv::Mat prediction = cv::Mat::zeros( 1, m.size(), CV_32FC1);
+			CLOG(LNOTICE) << "Test matrix:\n"<<test_mat;
+			// Predict!
+			bayes.predict(test_mat, &prediction);
+			CLOG(LNOTICE) << "Recognized classes: " << prediction;
+		}
 
 	} catch (...) {
 		CLOG(LERROR) << "CvBayesClassifier::onNewData failed\n";
@@ -108,8 +133,51 @@ void CvBayesClassifier::onClearDataset()
 	training_dataset.clear();
 	training_responses.clear();
 	bayes.clear();
-	CLOG(LINFO) << "Training dataset cleared";
+	CLOG(LNOTICE) << "Training dataset cleared";
 }
+
+void CvBayesClassifier::prepareSampleMatrix(const vector<Moments>& vector_, cv::Mat& mat_)
+{
+//	mat_ = cv::Mat::zeros( vector_.size(), 10, CV_32FC1);
+	for(unsigned int i = 0; i < vector_.size(); i++ ){
+		mat_.at<float>(i, 0) = (float) vector_[i].m00;
+		mat_.at<float>(i, 1) = (float) vector_[i].m10;
+		mat_.at<float>(i, 2) = (float) vector_[i].m01;
+		mat_.at<float>(i, 3) = (float) vector_[i].m20;
+		mat_.at<float>(i, 4) = (float) vector_[i].m11;
+		mat_.at<float>(i, 5) = (float) vector_[i].m02;
+		mat_.at<float>(i, 6) = (float) vector_[i].m30;
+		mat_.at<float>(i, 7) = (float) vector_[i].m21;
+		mat_.at<float>(i, 8) = (float) vector_[i].m12;
+		mat_.at<float>(i, 9) = (float) vector_[i].m03;
+/*			//! central moments
+		mat_.at<float>(i, 10) = (float) vector_[i].mu20;
+		mat_.at<float>(i, 11) = (float) vector_[i].mu11;
+		mat_.at<float>(i, 12) = (float) vector_[i].mu02;
+		mat_.at<float>(i, 13) = (float) vector_[i].mu30;
+		mat_.at<float>(i, 14) = (float) vector_[i].mu21;
+		mat_.at<float>(i, 15) = (float) vector_[i].mu12;
+		mat_.at<float>(i, 16) = (float) vector_[i].mu03;
+		//! central normalized moments
+		mat_.at<float>(i, 17) = (float) vector_[i].nu20;
+		mat_.at<float>(i, 18) = (float) vector_[i].nu11;
+		mat_.at<float>(i, 19) = (float) vector_[i].nu02;
+		mat_.at<float>(i, 20) = (float) vector_[i].nu30;
+		mat_.at<float>(i, 21) = (float) vector_[i].nu21;
+		mat_.at<float>(i, 22) = (float) vector_[i].nu12;
+		mat_.at<float>(i, 23) = (float) vector_[i].nu03;*/
+	}
+}
+
+void CvBayesClassifier::prepareResponseVector(cv::Mat& resp_mat_)
+{
+	resp_mat_ = cv::Mat::zeros( 1, training_responses.size(), CV_32FC1);
+	for(unsigned int i = 0; i < training_responses.size(); i++ ){
+		// class
+		resp_mat_.at<float>(0,i) = (float) training_responses[i];
+	}
+}
+
 
 
 void CvBayesClassifier::onTraining()
@@ -119,47 +187,20 @@ void CvBayesClassifier::onTraining()
 		// Train in here...
 		//cv::Mat img(Size(320,240),CV_8UC3)
 		cv::Mat train_mat = cv::Mat::zeros( training_dataset.size(), 10, CV_32FC1);
-		cv::Mat resp_mat = cv::Mat::zeros( 1, training_dataset.size(), CV_32FC1);
-
-		for(unsigned int i = 0; i < training_dataset.size(); i++ ){
-/*			train_mat.at<double>(i, 0) = (double) training_dataset[i].m00;
-			train_mat.at<double>(i, 1) = (double) training_dataset[i].m10;
-			train_mat.at<double>(i, 2) = (double) training_dataset[i].m01;
-			train_mat.at<double>(i, 3) = (double) training_dataset[i].m20;
-			train_mat.at<double>(i, 4) = (double) training_dataset[i].m11;
-			train_mat.at<double>(i, 5) = (double) training_dataset[i].m02;
-			train_mat.at<double>(i, 6) = (double) training_dataset[i].m30;
-			train_mat.at<double>(i, 7) = (double) training_dataset[i].m21;
-			train_mat.at<double>(i, 8) = (double) training_dataset[i].m12;
-			train_mat.at<double>(i, 9) = (double) training_dataset[i].m03;
-			//! central moments
-			train_mat.at<double>(i, 10) = (double) training_dataset[i].mu20;
-			train_mat.at<double>(i, 11) = (double) training_dataset[i].mu11;
-			train_mat.at<double>(i, 12) = (double) training_dataset[i].mu02;
-			train_mat.at<double>(i, 13) = (double) training_dataset[i].mu30;
-			train_mat.at<double>(i, 14) = (double) training_dataset[i].mu21;
-			train_mat.at<double>(i, 15) = (double) training_dataset[i].mu12;
-			train_mat.at<double>(i, 16) = (double) training_dataset[i].mu03;
-			//! central normalized moments
-			train_mat.at<double>(i, 17) = (double) training_dataset[i].nu20;
-			train_mat.at<double>(i, 18) = (double) training_dataset[i].nu11;
-			train_mat.at<double>(i, 19) = (double) training_dataset[i].nu02;
-			train_mat.at<double>(i, 20) = (double) training_dataset[i].nu30;
-			train_mat.at<double>(i, 21) = (double) training_dataset[i].nu21;
-			train_mat.at<double>(i, 22) = (double) training_dataset[i].nu12;
-			train_mat.at<double>(i, 23) = (double) training_dataset[i].nu03;*/
-
-			// class
-			resp_mat.at<double>(0,i) = (double) training_responses[i];
-		}
+		prepareSampleMatrix(training_dataset, train_mat);
+		cv::Mat resp_mat;
+		prepareResponseVector(resp_mat);
 
 		CLOG(LINFO) << "Training matrix:\n"<<train_mat;
 		CLOG(LINFO) << "Training response:\n"<<resp_mat;
 
 		// Train is coming! ;)
-//		bayes.train(train_mat, resp_mat);
+		bayes.train(train_mat, resp_mat);
 
-		cv::Mat train = cv::Mat::zeros( 100, 32, CV_32FC1);//, cv::Scalar(CV_VAR_ORDERED));
+		// Clear dataset.
+		onClearDataset();
+
+/*		cv::Mat train = cv::Mat::zeros( 100, 32, CV_32FC1);//, cv::Scalar(CV_VAR_ORDERED));
 		train.at<double>(0, 0) = (double) 2;
 		train.at<double>(0, 1) = (double) 5;
 		train.at<double>(1, 17) = (double) 12;
@@ -175,20 +216,58 @@ void CvBayesClassifier::onTraining()
 		cv::Mat res = cv::Mat::ones( 1, 100, CV_32FC1);//, cv::Scalar(CV_VAR_CATEGORICAL) );
 		res.at<double>(0, 0) = (double) 2;
 		res.at<double>(1, 0) = (double) 2;
-		res.at<double>(29, 0) = (double) 2;
+		res.at<double>(29, 0) = (double) 2;*/
 
 /*		CLOG(LINFO) << "train matrix:\n"<<train;
 		CLOG(LINFO) << "res response:\n"<<res;*/
 
 		//cvSet( train, cvScalarAll(CV_VAR_ORDERED));
 		//cvSet( res, cvScalarAll(CV_VAR_CATEGORICAL));
-		bayes.train(train, res);
-		CLOG(LINFO) << "Training successful";
+		//bayes.train(train, res);
+		CLOG(LNOTICE) << "Training successful";
 
 	} catch (...) {
 		CLOG(LERROR) << "CvBayesClassifier::onTraining failed\n";
 	}
 
+}
+
+
+void CvBayesClassifier::onFilenameChanged(const std::string & old_filename, const std::string & new_filename)
+{
+	filename = new_filename;
+	CLOG(LTRACE) << "onFilenameChanged: " << std::string(filename) << std::endl;
+}
+
+
+void CvBayesClassifier::onDisplayDataset()
+{
+	CLOG(LTRACE) << "CvBayesClassifier::onDisplayDataset\n";
+	cv::Mat train_mat = cv::Mat::zeros( training_dataset.size(), 10, CV_32FC1);
+	prepareSampleMatrix(training_dataset, train_mat);
+	cv::Mat resp_mat;
+	prepareResponseVector(resp_mat);
+
+	CLOG(LNOTICE) << "Training matrix:\n"<<train_mat;
+	CLOG(LNOTICE) << "Training response:\n"<<resp_mat;
+}
+
+
+void CvBayesClassifier::onSaveBayes()
+{
+	CLOG(LTRACE) << "CvBayesClassifier::onSaveBayes\n";
+	std::string tmp = std::string("./") + std::string(filename);
+	CLOG(LNOTICE) << " file: "<<std::string(tmp).c_str();
+	bayes.save(std::string(tmp).c_str());
+	CLOG(LNOTICE) << "Bayes saved to xml file: "<<filename;
+}
+
+
+void CvBayesClassifier::onLoadBayes()
+{
+	CLOG(LTRACE) << "CvBayesClassifier::onLoadBayes\n";
+	bayes.load(std::string(filename).c_str());
+	CLOG(LNOTICE) << "Bayes loaded from the xml file: "<<filename;
 }
 
 

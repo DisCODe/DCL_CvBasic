@@ -70,6 +70,13 @@ protected:
 	 */
 	bool onStop();
 
+	/// Returns matrix with samples.
+	void prepareSampleMatrix(const vector<Moments>& vector_, cv::Mat& mat_);
+
+	/// Returns vector with responses.
+	void prepareResponseVector(cv::Mat& resp_mat_);
+
+
 	/// Event handler.
 	Base::EventHandler<CvBayesClassifier> h_onTraining;
 	/// Train the classifier with the possessed dataset.
@@ -88,6 +95,24 @@ protected:
 	void onClearDataset();
 
 
+	// Handler activated when user will trigger "display dataset"
+	Base::EventHandler<CvBayesClassifier> h_onDisplayDataset;
+	// Displays the dataset.
+	void onDisplayDataset();
+
+	// Updates filename
+	void onFilenameChanged(const std::string & old_filename, const std::string & new_filename);
+
+	// Handler activated when user will trigger "save bayes"
+	Base::EventHandler<CvBayesClassifier> h_onSaveBayes;
+	// Saves the bayes internal state to an xml file.
+	void onSaveBayes();
+
+	// Handler activated when user will trigger "load bayes"
+	Base::EventHandler<CvBayesClassifier> h_onLoadBayes;
+	// Loads the model state from an xml file.
+	void onLoadBayes();
+
 
 
 	/// Event handler.
@@ -98,8 +123,14 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn<vector<Moments> > in_moments;
 
-	// Class of the incomming training example.
+	// Flag: if set, the bayes recognition
+	Base::Property<bool> recognize;
+
+	// Class of the incoming training example.
 	Base::Property<short> trainingClass;
+
+	// Name of file.
+	Base::Property<std::string> filename;
 
 private:
 	// Classifier.
