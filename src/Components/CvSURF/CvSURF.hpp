@@ -4,11 +4,12 @@
  * \author Tomek Kornuta,,,
  */
 
-#ifndef CVSIFT_HPP_
-#define CVSIFT_HPP_
+#ifndef CVSURF_HPP_
+#define CVSURF_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
+#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 #include "Types/Features.hpp"
@@ -17,28 +18,29 @@
 #include <opencv2/features2d/features2d.hpp>
 
 
+
 namespace Processors {
-namespace CvSIFT {
+namespace CvSURF {
 
 using namespace cv;
 
 /*!
- * \class CvSIFT
- * \brief CvSIFT processor class.
+ * \class CvSURF
+ * \brief CvSURF processor class.
  *
- * CvSIFT processor.
+ * CvSURF processor.
  */
-class CvSIFT: public Base::Component {
+class CvSURF: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	CvSIFT(const std::string & name = "CvSIFT");
+	CvSURF(const std::string & name = "CvSURF");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~CvSIFT();
+	virtual ~CvSURF();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -75,10 +77,10 @@ protected:
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <CvSIFT> h_onNewImage;
+	Base::EventHandler <CvSURF> h_onNewImage;
 
 	/// Input data stream
-	Base::DataStreamIn <Mat> in_img;
+	Base::DataStreamIn <cv::Mat> in_img;
 
 	/// Output data stream containing extracted features
 	Base::DataStreamOut <Types::Features> out_features;
@@ -86,14 +88,17 @@ protected:
 	/// Output data stream containing feature descriptors
 	Base::DataStreamOut <cv::Mat> out_descriptors;
 
+	// Hessian
+	Base::Property<int> minHessian;
+
 };
 
-} //: namespace CvSIFT
+} //: namespace CvSURF
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CvSIFT", Processors::CvSIFT::CvSIFT)
+REGISTER_COMPONENT("CvSURF", Processors::CvSURF::CvSURF)
 
-#endif /* CVSIFT_HPP_ */
+#endif /* CVSURF_HPP_ */

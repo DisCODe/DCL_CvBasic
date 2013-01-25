@@ -4,41 +4,41 @@
  * \author Tomek Kornuta,,,
  */
 
-#ifndef CVSIFT_HPP_
-#define CVSIFT_HPP_
+#ifndef CVMOMENTS_HPP_
+#define CVMOMENTS_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
+#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
-#include "Types/Features.hpp"
+#include "EventHandler2.hpp"
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/features2d/features2d.hpp>
-
-
-namespace Processors {
-namespace CvSIFT {
+#include <opencv2/imgproc/imgproc.hpp>
 
 using namespace cv;
 
+namespace Processors {
+namespace CvMoments {
+
 /*!
- * \class CvSIFT
- * \brief CvSIFT processor class.
+ * \class CvMoments
+ * \brief CvMoments processor class.
  *
- * CvSIFT processor.
+ * CvMoments processor.
  */
-class CvSIFT: public Base::Component {
+class CvMoments: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	CvSIFT(const std::string & name = "CvSIFT");
+	CvMoments(const std::string & name = "CvMoments");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~CvSIFT();
+	virtual ~CvMoments();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -72,28 +72,25 @@ protected:
 	/*!
 	 * Event handler function.
 	 */
-	void onNewImage();
+	void onNewContours();
 
 	/// Event handler.
-	Base::EventHandler <CvSIFT> h_onNewImage;
+	Base::EventHandler <CvMoments> h_onNewContours;
 
 	/// Input data stream
-	Base::DataStreamIn <Mat> in_img;
+	Base::DataStreamIn <vector<vector<Point> > > in_contours;
 
-	/// Output data stream containing extracted features
-	Base::DataStreamOut <Types::Features> out_features;
-
-	/// Output data stream containing feature descriptors
-	Base::DataStreamOut <cv::Mat> out_descriptors;
+	/// Output data stream containing extracted moments
+	Base::DataStreamOut <vector<Moments> > out_moments;
 
 };
 
-} //: namespace CvSIFT
+} //: namespace CvMoments
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CvSIFT", Processors::CvSIFT::CvSIFT)
+REGISTER_COMPONENT("CvMoments", Processors::CvMoments::CvMoments)
 
-#endif /* CVSIFT_HPP_ */
+#endif /* CVMOMENTS_HPP_ */

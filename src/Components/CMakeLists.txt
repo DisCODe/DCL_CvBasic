@@ -1,6 +1,4 @@
 # Add all components here using ADD_COMPONENT(<COMPONENT_DIRECTORY>)
-ADD_COMPONENT(CameraCalib)
-
 ADD_COMPONENT(CvHoughCircles)
 
 ADD_COMPONENT(CvAdaptiveThreshold)
@@ -48,3 +46,15 @@ ADD_COMPONENT(CvCanny)
 ADD_COMPONENT(CvHarris)
 
 ADD_COMPONENT(CvSIFT)
+
+ADD_COMPONENT(CvFlann)
+
+ADD_COMPONENT(CvSURF)
+
+ADD_COMPONENT(CvContour)
+
+ADD_COMPONENT(CvMoments)
+
+ADD_COMPONENT(Skeletonization)
+
+ADD_COMPONENT(CvBayesClassifier)

@@ -7,25 +7,28 @@
 #include <memory>
 #include <string>
 
-#include "CvSIFT.hpp"
+#include "CvSURF.hpp"
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
 
 namespace Processors {
-namespace CvSIFT {
+namespace CvSURF {
 
-CvSIFT::CvSIFT(const std::string & name) :
-		Base::Component(name)  {
-
+CvSURF::CvSURF(const std::string & name) :
+		Base::Component(name),
+		minHessian("minHessian", 400, "minHessian")
+{
+	// Register properties.
+	registerProperty(minHessian);
 }
 
-CvSIFT::~CvSIFT() {
+CvSURF::~CvSURF() {
 }
 
-void CvSIFT::prepareInterface() {
+void CvSURF::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvSIFT::onNewImage);
+	h_onNewImage.setup(this, &CvSURF::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 	addDependency("onNewImage", &in_img);
 
@@ -35,49 +38,53 @@ void CvSIFT::prepareInterface() {
 	registerStream("out_descriptors", &out_descriptors);
 }
 
-bool CvSIFT::onInit() {
+bool CvSURF::onInit() {
 
 	return true;
 }
 
-bool CvSIFT::onFinish() {
+bool CvSURF::onFinish() {
 	return true;
 }
 
-bool CvSIFT::onStop() {
+bool CvSURF::onStop() {
 	return true;
 }
 
-bool CvSIFT::onStart() {
+bool CvSURF::onStart() {
 	return true;
 }
 
-void CvSIFT::onNewImage()
+void CvSURF::onNewImage()
 {
-	LOG(LTRACE) << "CvSIFT::onNewImage\n";
+	LOG(LTRACE) << "CvSURF::onNewImage\n";
 	try {
 		// Input: a grayscale image.
 		cv::Mat input = in_img.read();
 
-		//-- Step 1: Detect the keypoints.
-	    cv::SiftFeatureDetector detector;
-	    std::vector<cv::KeyPoint> keypoints;
-	    detector.detect(input, keypoints);
+		//-- Step 1: Detect the keypoints using SURF Detector.
+		SurfFeatureDetector detector( minHessian );
+		std::vector<KeyPoint> keypoints;
+		detector.detect( input, keypoints );
+
 
 		//-- Step 2: Calculate descriptors (feature vectors).
-		cv::SiftDescriptorExtractor extractor;
+		cv::SurfDescriptorExtractor extractor;
 		Mat descriptors;
 		extractor.compute( input, keypoints, descriptors);
 
-		// Write results to outputs.
+		// Write features to the output.
 	    Types::Features features(keypoints);
 		out_features.write(features);
+
+		// Write descriptors to the output.
 		out_descriptors.write(descriptors);
 	} catch (...) {
-		LOG(LERROR) << "CvSIFT::onNewImage failed\n";
+		LOG(LERROR) << "CvSURF::onNewImage failed\n";
 	}
 }
 
 
-} //: namespace CvSIFT
+
+} //: namespace CvSURF
 } //: namespace Processors

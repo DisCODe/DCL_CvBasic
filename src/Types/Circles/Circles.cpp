@@ -5,8 +5,6 @@
  *      Author: x
  */
 
-#include <cv.h>
-
 #include "Circles.hpp"
 
 namespace Types {
