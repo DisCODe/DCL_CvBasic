@@ -15,6 +15,7 @@
 #include "Types/Drawable.hpp"
 
 #include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace Sinks {
 namespace CvWindow {
@@ -23,22 +24,29 @@ CvWindow_Sink::CvWindow_Sink(const std::string & name) : Base::Component(name),
 		title("title", boost::bind(&CvWindow_Sink::onTitleCahnged, this, _1, _2), name),
 		count("count", 1)
 {
-	LOG(LTRACE)<<"Hello CvWindow_Sink\n";
+	CLOG(LTRACE)<<"Hello CvWindow_Sink\n";
 
 	registerProperty(title);
-	registerProperty(count);
 
 	count.setToolTip("Total number of displayed windows");
+	registerProperty(count);
 
 	firststep = true;
 }
 
 CvWindow_Sink::~CvWindow_Sink() {
-	LOG(LTRACE)<<"Good bye CvWindow_Sink\n";
+	CLOG(LTRACE)<<"Good bye CvWindow_Sink\n";
 }
 
-bool CvWindow_Sink::onInit() {
-	LOG(LTRACE) << "CvWindow_Sink::initialize\n";
+
+void CvWindow_Sink::prepareInterface() {
+	CLOG(LTRACE) << "CvWindow_Sink::configure\n";
+
+
+	h_onRefresh.setup(this, &CvWindow_Sink::onRefresh);
+	registerHandler("onRefresh", &h_onRefresh);
+
+	addDependency("onRefresh", NULL);
 
 	Base::EventHandler2 * hand;
 	for (int i = 0; i < count; ++i) {
@@ -48,16 +56,15 @@ bool CvWindow_Sink::onInit() {
 		handlers.push_back(hand);
 		registerHandler(std::string("onNewImage")+id, hand);
 
-		in_img.push_back(new Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>);
-		registerStream(std::string("in_img")+id, in_img[i]);
+		Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex> * stream = new Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>;
+		in_img.push_back(stream);
+		registerStream( std::string("in_img")+id, (Base::DataStreamInterface*)(in_img[i]));
+		addDependency(std::string("onNewImage")+id, stream);
 
 		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>);
 		registerStream(std::string("in_draw")+id, in_draw[i]);
-
-		//cv::namedWindow(props.title + id);
-
 	}
-	//waitKey( 1000 );
+
 
 	// register aliases for first handler and streams
 	registerHandler("onNewImage", handlers[0]);
@@ -67,61 +74,56 @@ bool CvWindow_Sink::onInit() {
 	img.resize(count);
 	to_draw.resize(count);
 
+	std::string t = title;
+	boost::split(titles, t, boost::is_any_of(","));
+	if ( (titles.size() == 1) && (count > 1) ) titles.clear();
+	for (int i = titles.size(); i < count; ++i) {
+		char id = '0' + i;
+		titles.push_back(std::string(title) + id);
+	}
+}
+
+bool CvWindow_Sink::onInit() {
+	CLOG(LTRACE) << "CvWindow_Sink::initialize\n";
+
+	for (int i = 0; i < count; ++i) {
+		cv::namedWindow( titles[i] );
+	}
 	return true;
 }
 
 bool CvWindow_Sink::onFinish() {
-	LOG(LTRACE) << "CvWindow_Sink::finish\n";
+	CLOG(LTRACE) << "CvWindow_Sink::finish\n";
+
+#if OpenCV_MAJOR<2 || OpenCV_MINOR<2
+	for (int i = 0; i < count; ++i) {
+		char id = '0' + i;
+		cv::destroyWindow( titles[i] );
+	}
+#endif
 
 	return true;
 }
 
 bool CvWindow_Sink::onStep()
 {
-	LOG(LTRACE)<<"CvWindow_Sink::step\n";
-
-	if (firststep) {
-		firststep = false;
-		for (int i = 0; i < count; ++i) {
-			char id = '0' + i;
-			cv::namedWindow( std::string(title) + id);
-		}
-		return true;
-	}
-
-	try {
-		for (int i = 0; i < count; ++i) {
-			char id = '0' + i;
-
-			if (img[i].empty()) {
-				LOG(LWARNING) << name() << ": image " << i << " empty";
-			} else {
-				// Refresh image.
-				imshow( std::string(title) + id, img[i] );
-				waitKey( 2 );
-			}
-		}
-
-	}
-	catch(...) {
-		LOG(LERROR) << "CvWindow::onStep failed\n";
-	}
-
 	return true;
 }
 
 bool CvWindow_Sink::onStop()
 {
+	CLOG(LTRACE) << name() << "::onStop";
 	return true;
 }
 
 bool CvWindow_Sink::onStart()
 {
+	CLOG(LTRACE) << name() << "::onStart";
 	return true;
 }
 
 void CvWindow_Sink::onNewImageN(int n) {
-	LOG(LTRACE) << name() << "::onNewImage(" << n << ")";
+	CLOG(LTRACE) << name() << "::onNewImage(" << n << ")";
 
 	try {
 		if(!in_img[n]->empty()){
@@ -141,7 +143,29 @@ void CvWindow_Sink::onNewImageN(int n) {
 		onStep();
 	}
 	catch(std::exception &ex) {
-		LOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
+		CLOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
+	}
+}
+
+void CvWindow_Sink::onRefresh() {
+	CLOG(LTRACE)<<"CvWindow_Sink::step\n";
+
+	try {
+		for (int i = 0; i < count; ++i) {
+			char id = '0' + i;
+
+			if (img[i].empty()) {
+				CLOG(LWARNING) << name() << ": image " << i << " empty";
+			} else {
+				// Refresh image.
+				imshow( titles[i], img[i] );
+				waitKey( 2 );
+			}
+		}
+
+	}
+	catch(...) {
+		CLOG(LERROR) << "CvWindow::onStep failed\n";
 	}
 }
 

@@ -1,0 +1,60 @@
+<Task>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Maciej Stefańczyk</name>
+			<link></link>
+		</Author>
+		
+		<Description>
+			<brief>Simple camera viewer</brief>
+			<full>Simple camera viewer</full>	
+		</Description>
+	</Reference>
+	
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Processing">
+			<Executor name="ProcessingThread"  period="1">
+				<Component name="Source" type="CvBasic:Sequence" priority="1" bump="0">
+					<param name="sequence.pattern">.*\.jpeg</param>
+					<param name="sequence.directory">%[TASK_LOCATION]%/../data/chessboard/</param>
+				</Component>
+				
+				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="2">
+					<param name="camera_matrix">500 0 320 ; 0 500 240 ; 0 0 1</param>
+					<param name="dist_coeffs">-0.51084775, 0.23313555, 4.50637517e-03, -6.86281081e-03, 4.94365674e-03</param>
+				</Component>
+				
+				<Component name="Undistort" type="CvBasic:CvUndistort" priority="2" bump="0">
+				</Component>
+			</Executor>
+			
+			<Executor name="VisualizationThread" period="0.2">
+				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
+					<param name="count">2</param>
+					<param name="title">Original,Undistorted</param>
+				</Component>
+			</Executor>
+		</Subtask>	
+	
+	</Subtasks>
+	
+	<!-- pipes connecting datastreams -->
+	<DataStreams>
+		<Source name="Source.out_img">
+			<sink>Undistort.in_img</sink>	
+			<sink>Window.in_img0</sink>			
+		</Source>
+		<Source name="CameraInfo.out_camerainfo">
+			<sink>Undistort.in_camerainfo</sink>
+		</Source>
+		<Source name="Undistort.out_img">
+			<sink>Window.in_img1</sink>		
+		</Source>
+	</DataStreams>
+</Task>
+
+
+
+

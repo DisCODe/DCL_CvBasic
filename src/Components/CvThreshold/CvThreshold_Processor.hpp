@@ -10,12 +10,12 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 /**
  * \defgroup CvThreshold CvThreshold
@@ -70,6 +70,10 @@ namespace CvThreshold {
 
 using namespace cv;
 
+/*!
+ * \class ThresholdTranslator
+ * \brief Translates between the OpenCV enums and their names (string).
+ */
 class ThresholdTranslator {
 public:
 	static int fromStr(const std::string & s)
@@ -125,6 +129,11 @@ public:
 	 */
 	virtual ~CvThreshold_Processor();
 
+	/*!
+	 * Prepares communication interface.
+	 */
+	virtual void prepareInterface();
+
 protected:
 
 	/*!
@@ -162,16 +171,15 @@ protected:
 	Base::EventHandler <CvThreshold_Processor> h_onNewImage;
 
 	/// Input data stream
-	Base::DataStreamIn <Mat> in_img;
-
-	/// Event raised, when image is processed
-	Base::Event * newImage;
+	Base::DataStreamIn <cv::Mat> in_img;
 
 	/// Output data stream - processed image
 	Base::DataStreamOut <Mat> out_img;
 
 private:
+	/// Type of the performed thresholding operation.
 	Base::Property<int, ThresholdTranslator> m_type;
+
 	Base::Property<double> m_thresh;
 	Base::Property<double> m_maxval;
 };
@@ -183,7 +191,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvThreshold", Processors::CvThreshold::CvThreshold_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvThreshold", Processors::CvThreshold::CvThreshold_Processor)
 
 #endif /* CVTHRESHOLD_PROCESSOR_HPP_ */
 

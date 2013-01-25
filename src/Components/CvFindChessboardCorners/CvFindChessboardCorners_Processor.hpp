@@ -8,16 +8,16 @@
 #ifndef CVFINDCHESSBOARDCORNERS_PROCESSOR_HPP_
 #define CVFINDCHESSBOARDCORNERS_PROCESSOR_HPP_
 
-#include <cv.h>
 #include <boost/shared_ptr.hpp>
 #include "Component_Aux.hpp"
-#include "Panel_Empty.hpp"
 #include "Types/Objects3D/Chessboard.hpp"
 #include "Types/ImagePosition.hpp"
 #include "Types/Drawable.hpp"
 #include "Timer.hpp"
-
 #include "Property.hpp"
+
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 
 /**
@@ -65,9 +65,6 @@
  *
  * @}
  */
-
-#include <boost/preprocessor/list/for_each.hpp>
-#include <boost/preprocessor/tuple/to_list.hpp>
 
 
 namespace Processors {
@@ -124,6 +121,13 @@ class CvFindChessboardCorners_Processor: public Base::Component
 public:
 	CvFindChessboardCorners_Processor(const std::string & name = "");
 	virtual ~CvFindChessboardCorners_Processor();
+
+	/*!
+	 * Prepares communication interface.
+	 */
+	virtual void prepareInterface();
+
+
 protected:
 	/*!
 	 * Method called when component is started
@@ -168,10 +172,6 @@ private:
 	/** Chessboard stream. */
 	Base::DataStreamOut <Types::Objects3D::Chessboard> out_chessboard;
 	Base::DataStreamOut <Types::ImagePosition> out_imagePosition;
-	/** Raised when chessboard has been located on the image. */
-	Base::Event *chessboardFound;
-	/** Raised when chessboard has not been located on the image. */
-	Base::Event *chessboardNotFound;
 
 	/** Located corners.*/
 	std::vector<cv::Point2f> corners;
@@ -200,6 +200,7 @@ private:
 
 	Base::Property<int, InterpolationTranslator> prop_interpolation_type;
 
+	// TODO: add unit types: found and not found
 
 	void sizeCallback(int old_value, int new_value);
 	void flagsCallback(bool old_value, bool new_value);
@@ -209,6 +210,6 @@ private:
 
 } // namespace Processors {
 
-REGISTER_PROCESSOR_COMPONENT("CvFindChessboardCorners", Processors::CvFindChessboardCorners::CvFindChessboardCorners_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvFindChessboardCorners", Processors::CvFindChessboardCorners::CvFindChessboardCorners_Processor)
 
 #endif /* CVFINDCHESSBOARDCORNERS_PROCESSOR_HPP_ */

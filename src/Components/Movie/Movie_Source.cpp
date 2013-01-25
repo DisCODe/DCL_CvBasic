@@ -15,42 +15,47 @@
 namespace Sources {
 namespace Movie {
 
-Movie_Source::Movie_Source(const std::string & name) : Base::Component(name) {
+Movie_Source::Movie_Source(const std::string & name) : Base::Component(name),
+		filename("filename", std::string("movie.avi")),
+		triggered("triggered", false)
+{
 	LOG(LTRACE) << "Movie_Source::Movie_Source()\n";
 
 //	cap = NULL;
 	trig = true;
-	m_state = Playing;
+
+	registerProperty(filename);
+	registerProperty(triggered);
 }
 
 Movie_Source::~Movie_Source() {
 	LOG(LTRACE) << "Movie_Source::~Movie_Source()\n";
 }
 
-bool Movie_Source::onInit() {
-	LOG(LTRACE) << "Movie_Source::initialize()\n";
-	newImage = registerEvent("newImage");
-
+void Movie_Source::prepareInterface() {
 	registerStream("out_img", &out_img);
 
 	h_onTrigger.setup(this, &Movie_Source::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
 
-	h_onPlay.setup(boost::bind(&Movie_Source::setState, this, Playing));
-	h_onPause.setup(boost::bind(&Movie_Source::setState, this, Paused));
-	registerHandler("OnPlay", &h_onPlay);
-	registerHandler("OnPause", &h_onPause);
+	h_onStep.setup(this, &Movie_Source::onStep);
+	registerHandler("onStep", &h_onStep);
+	addDependency("onStep", NULL);
+}
 
-	if (!boost::filesystem::exists(props.filename)) {
-		LOG(LERROR) << "File " << props.filename << " doesn't exist.";
+bool Movie_Source::onInit() {
+	LOG(LTRACE) << "Movie_Source::initialize()\n";
+
+	if (!boost::filesystem::exists(std::string(filename))) {
+		LOG(LERROR) << "File " << filename << " doesn't exist.";
 		LOG(LNOTICE) << "Check config file or override movie filename thorugh -S switch.";
 		return false;
 	}
 
-	cap.open(props.filename);
+	cap.open(filename);
 
 	if (!cap.isOpened()) {
-		LOG(LERROR) << "Couldn't open movie " << props.filename;
+		LOG(LERROR) << "Couldn't open movie " << filename;
 		LOG(LNOTICE) << "Check if you have proper codecs installed.";
 		return false;
 	}
@@ -65,28 +70,23 @@ bool Movie_Source::onFinish() {
 	return true;
 }
 
-bool Movie_Source::onStep() {
-	if (props.triggered && !trig)
-		return true;
+void Movie_Source::onStep() {
+	if (triggered && !trig)
+		return;
 
 	trig = false;
 
 	LOG(LTRACE) << "Movie_Source::step() start\n";
-	if (m_state == Playing) {
+	cap >> frame;
+	if (frame.empty()) {
+		cap.set(CV_CAP_PROP_POS_AVI_RATIO, 0);
 		cap >> frame;
-		if (frame.empty()) {
-			cap.set(CV_CAP_PROP_POS_AVI_RATIO, 0);
-			cap >> frame;
-		}
 	}
 
 	cv::Mat img = frame.clone();
 	out_img.write(img);
 
-	newImage->raise();
-
 	LOG(LTRACE) << "Movie_Source::step() end\n";
-	return true;
 }
 
 bool Movie_Source::onStart() {

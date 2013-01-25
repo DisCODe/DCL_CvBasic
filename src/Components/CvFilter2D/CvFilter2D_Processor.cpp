@@ -14,9 +14,16 @@
 namespace Processors {
 namespace CvFilter2D {
 
-CvFilter2D_Processor::CvFilter2D_Processor(const std::string & name) : Base::Component(name)
+CvFilter2D_Processor::CvFilter2D_Processor(const std::string & name) : Base::Component(name) ,
+		kernel("kernel", cv::Mat(cv::Mat::eye(3, 3, CV_32FC1))),
+		norm("norm", 1),
+		delta("delta", 0)
 {
 	LOG(LTRACE) << "Hello CvFilter2D_Processor\n";
+
+	registerProperty(kernel);
+	registerProperty(norm);
+	registerProperty(delta);
 }
 
 CvFilter2D_Processor::~CvFilter2D_Processor()
@@ -24,18 +31,20 @@ CvFilter2D_Processor::~CvFilter2D_Processor()
 	LOG(LTRACE) << "Good bye CvFilter2D_Processor\n";
 }
 
-bool CvFilter2D_Processor::onInit()
-{
-	LOG(LTRACE) << "CvFilter2D_Processor::initialize\n";
-
+void CvFilter2D_Processor::prepareInterface() {
 	h_onNewImage.setup(this, &CvFilter2D_Processor::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
+	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);
 
-	newImage = registerEvent("newImage");
-
 	registerStream("out_img", &out_img);
+
+}
+
+bool CvFilter2D_Processor::onInit()
+{
+	LOG(LTRACE) << "CvFilter2D_Processor::initialize\n";
 
 	return true;
 }
@@ -70,11 +79,9 @@ void CvFilter2D_Processor::onNewImage()
 		cv::Mat img = in_img.read();
 
 		//img.convertTo(tmp, CV_32F, 1./255);
-		cv::filter2D(img, tmp, -1, props.kernel, cv::Size(-1, -1), props.delta, cv::BORDER_REPLICATE);
+		cv::filter2D(img, tmp, -1, norm * kernel, cv::Size(-1, -1), delta, cv::BORDER_REPLICATE);
 
 		out_img.write(tmp);
-
-		newImage->raise();
 	} catch (...) {
 		LOG(LERROR) << "CvFilter2D_Processor::onNewImage failed\n";
 	}

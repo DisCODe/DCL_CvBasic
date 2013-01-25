@@ -10,12 +10,12 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+#include "Property.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+//#include <opencv2/highgui/highgui.hpp>
 
 /**
  * \defgroup CvColorConv CvColorConv
@@ -75,31 +75,12 @@ namespace CvColorConv {
 using namespace cv;
 
 /*!
- * \brief CvColorConv properties
+ * \class ColourTranslator
+ * \brief Translates between the OpenCV colour transformation enums and their names (string).
  */
-struct ColorConvProps: public Base::Props
-{
-
-	int type;
-
-	/*!
-	 * \copydoc Base::Props::load
-	 */
-	void load(const ptree & pt)
-	{
-		type = str2type(pt.get("type", "BGR2GRAY"));
-	}
-
-	/*!
-	 * \copydoc Base::Props::save
-	 */
-	void save(ptree & pt)
-	{
-		pt.put("type", type2str(type));
-	}
-
-protected:
-	int str2type(const std::string & s)
+class ColourTranslator {
+public:
+	static int fromStr(const std::string & s)
 	{
 		if (s=="BGR2BGRA") return CV_BGR2BGRA;
 		if (s=="RGB2RGBA") return CV_RGB2RGBA;
@@ -196,7 +177,7 @@ protected:
 		return CV_BGR2GRAY;
 	}
 
-	std::string type2str(int t)
+	static std::string toStr(int t)
 	{
 		switch (t)
 		{
@@ -315,12 +296,9 @@ public:
 	virtual ~CvColorConv_Processor();
 
 	/*!
-	 * Return window properties
+	 * Prepares communication interface.
 	 */
-	Base::Props * getProperties()
-	{
-		return &props;
-	}
+	virtual void prepareInterface();
 
 protected:
 
@@ -360,14 +338,11 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 
-	/// Event raised, when image is processed
-	Base::Event * newImage;
-
 	/// Output data stream - processed image
 	Base::DataStreamOut <Mat> out_img;
 
-	/// Threshold properties
-	ColorConvProps props;
+	/// Type of the performed colour conversion.
+	Base::Property<int, ColourTranslator> conversion_type;
 
 private:
 	cv::Mat img;
@@ -381,7 +356,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvColorConv", Processors::CvColorConv::CvColorConv_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvColorConv", Processors::CvColorConv::CvColorConv_Processor)
 
 #endif /* CVCOLORCONV_PROCESSOR_HPP_ */
 

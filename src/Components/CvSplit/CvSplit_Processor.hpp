@@ -10,14 +10,12 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+#include "Property.hpp"
 
 #include <vector>
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
 
 /**
  * \defgroup CvSplit CvSplit
@@ -65,31 +63,6 @@ namespace CvSplit {
 using namespace cv;
 
 /*!
- * \brief CvSplit properties
- */
-struct Props: public Base::Props
-{
-	int channels;
-
-	/*!
-	 * \copydoc Base::Props::load
-	 */
-	void load(const ptree & pt)
-	{
-		channels = pt.get("channels", 3);
-	}
-
-	/*!
-	 * \copydoc Base::Props::save
-	 */
-	void save(ptree & pt)
-	{
-		pt.put("channels", channels);
-	}
-
-};
-
-/*!
  * \class CvSplit_Processor
  * \brief Divides multi-channel array into several single-channel arrays
  */
@@ -106,13 +79,7 @@ public:
 	 */
 	virtual ~CvSplit_Processor();
 
-	/*!
-	 * Return window properties
-	 */
-	Base::Props * getProperties()
-	{
-		return &props;
-	}
+	void prepareInterface();
 
 protected:
 
@@ -153,9 +120,6 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 
-	/// Event raised, when image is processed
-	Base::Event * newImage;
-
 	/// Output data stream - image split into channels
 	std::vector< Base::DataStreamOut<cv::Mat> * > out_img;
 
@@ -163,7 +127,7 @@ protected:
 	std::vector<Mat> mv;
 
 	/// Threshold properties
-	Props props;
+	Base::Property<int> channels;
 };
 
 }//: namespace CvSplit
@@ -173,7 +137,7 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvSplit", Processors::CvSplit::CvSplit_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvSplit", Processors::CvSplit::CvSplit_Processor)
 
 #endif /* CVSPLIT_PROCESSOR_HPP_ */
 

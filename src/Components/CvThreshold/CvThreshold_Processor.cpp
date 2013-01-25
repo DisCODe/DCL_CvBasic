@@ -36,6 +36,7 @@ CvThreshold_Processor::CvThreshold_Processor(const std::string & name) : Base::C
 	m_maxval.addConstraint("0");
 	m_maxval.addConstraint("255");
 
+	// Register properties.
 	registerProperty(m_type);
 	registerProperty(m_thresh);
 	registerProperty(m_maxval);
@@ -46,20 +47,23 @@ CvThreshold_Processor::~CvThreshold_Processor()
 	LOG(LTRACE) << "Good bye CvThreshold_Processor\n";
 }
 
-bool CvThreshold_Processor::onInit()
-{
-	LOG(LTRACE) << "CvThreshold_Processor::initialize\n";
+
+void CvThreshold_Processor::prepareInterface() {
+	CLOG(LTRACE) << "CvThreshold_Processor::prepareInterface\n";
 
 	h_onNewImage.setup(this, &CvThreshold_Processor::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 
 	registerStream("in_img", &in_img);
 
-	newImage = registerEvent("newImage");
-
 	registerStream("out_img", &out_img);
 
+	addDependency("onNewImage", &in_img);
+}
 
+bool CvThreshold_Processor::onInit()
+{
+	LOG(LTRACE) << "CvThreshold_Processor::initialize\n";
 
 	return true;
 }
@@ -89,18 +93,17 @@ bool CvThreshold_Processor::onStart()
 
 void CvThreshold_Processor::onNewImage()
 {
-	LOG(LTRACE) << "CvThreshold_Processor::onNewImage\n";
+	LOG(LNOTICE) << "CvThreshold_Processor::onNewImage\n";
 	try {
 		cv::Mat img = in_img.read();
 		cv::Mat out = img.clone();
 		LOG(LTRACE) << "Threshold " << m_thresh;
 		cv::threshold(img, out, m_thresh, m_maxval, m_type);
 		out_img.write(out);
-		newImage->raise();
 	} catch (...) {
 		LOG(LERROR) << "CvThreshold::onNewImage failed\n";
 	}
 }
 
 }//: namespace CvThreshold
-}//: namespace Processors
+} //: namespace Processors

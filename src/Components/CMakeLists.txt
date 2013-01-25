@@ -1,6 +1,12 @@
 # Add all components here using ADD_COMPONENT(<COMPONENT_DIRECTORY>)
-ADD_COMPONENT(CvFindChessboardCorners)
+ADD_COMPONENT(CameraCalib)
 
+ADD_COMPONENT(CvHoughCircles)
+
+ADD_COMPONENT(CvAdaptiveThreshold)
+
+ADD_COMPONENT(CvFindChessboardCorners)
+ 
 ADD_COMPONENT(CvThreshold)
 
 ADD_COMPONENT(CvUndistort)
@@ -19,8 +25,6 @@ ADD_COMPONENT(CvSolvePnP)
 
 ADD_COMPONENT(Sequence)
 
-ADD_COMPONENT(CvPixelOperator)
-
 ADD_COMPONENT(CvSplit)
 
 ADD_COMPONENT(CvFilter2D)
@@ -28,3 +32,19 @@ ADD_COMPONENT(CvFilter2D)
 ADD_COMPONENT(CameraOpenCV)
 
 ADD_COMPONENT(CvWindow)
+
+ADD_COMPONENT(Calib)
+
+ADD_COMPONENT(RGBLUT)
+
+ADD_COMPONENT(HSVLUT)
+
+ADD_COMPONENT(ImageWriter)
+
+ADD_COMPONENT(Sum)
+
+ADD_COMPONENT(CvCanny)
+
+ADD_COMPONENT(CvHarris)
+
+ADD_COMPONENT(CvSIFT)

@@ -6,6 +6,7 @@
  */
 
 #include "CvFindChessboardCorners_Processor.hpp"
+#include <boost/bind.hpp>
 
 namespace Processors {
 
@@ -82,6 +83,21 @@ CvFindChessboardCorners_Processor::~CvFindChessboardCorners_Processor()
 {
 }
 
+void CvFindChessboardCorners_Processor::prepareInterface() {
+	CLOG(LTRACE) << "CvFindChessboardCorners_Processor::prepareInterface\n";
+
+	h_onNewImage.setup(this, &CvFindChessboardCorners_Processor::onNewImage);
+	registerHandler("onNewImage", &h_onNewImage);
+
+	registerStream("in_img", &in_img);
+	registerStream("out_chessboard", &out_chessboard);
+	registerStream("out_imagePosition", &out_imagePosition);
+
+	addDependency("onNewImage", &in_img);
+}
+
+
+
 bool CvFindChessboardCorners_Processor::onFinish()
 {
 	return true;
@@ -94,16 +110,6 @@ bool CvFindChessboardCorners_Processor::onStop()
 
 bool CvFindChessboardCorners_Processor::onInit()
 {
-	h_onNewImage.setup(this, &CvFindChessboardCorners_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	registerStream("in_img", &in_img);
-	registerStream("out_chessboard", &out_chessboard);
-	registerStream("out_imagePosition", &out_imagePosition);
-
-	chessboardFound = registerEvent("chessboardFound");
-	chessboardNotFound = registerEvent("chessboardNotFound");
-
 	initChessboard();
 
 	LOG(LTRACE) << "component initialized\n";
@@ -115,15 +121,17 @@ void CvFindChessboardCorners_Processor::initChessboard() {
 	LOG(LINFO) << "CvFindChessboardCorners_Processor: height: " << prop_height << "\n";
 	LOG(LINFO) << "CvFindChessboardCorners_Processor: squareSize: " << prop_square_width << "x" << prop_square_height << "m\n";
 
+	// Create chessboard object.
 	chessboard = boost::shared_ptr <Chessboard>(new Chessboard(cv::Size(prop_width, prop_height)));
 
+	// Initialize modelPoints - localization of the chessboard corners in Cartesian space.
 	vector <Point3f> modelPoints;
 	for (int i = 0; i < prop_height; ++i) {
 		for (int j = 0; j < prop_width; ++j) {
 			modelPoints.push_back(Point3f(-j * prop_square_height, -i * prop_square_width, 0));
 		}
 	}
-
+	// Set model points.
 	chessboard->setModelPoints(modelPoints);
 }
 
@@ -132,6 +140,7 @@ void CvFindChessboardCorners_Processor::sizeCallback(int old_value, int new_valu
 }
 
 void CvFindChessboardCorners_Processor::flagsCallback(bool old_value, bool new_value) {
+	// Set flags.
 	if(prop_fastCheck){
 		findChessboardCornersFlags |= CV_CALIB_CB_FAST_CHECK;
 	} else {
@@ -174,6 +183,7 @@ void CvFindChessboardCorners_Processor::onNewImage()
 		if(in_img.empty()){
 			return;
 		}
+		// Retrieve image from the stream.
 		Mat image = in_img.read();
 
 		timer.restart();
@@ -182,9 +192,10 @@ void CvFindChessboardCorners_Processor::onNewImage()
 
 		bool found;
 
-
+		// Initialize chessboard size.
 		cv::Size chessboardSize(prop_width, prop_height);
 
+		// Find chessboard corners.
 		if (prop_scale) {
 			found = findChessboardCorners(sub_img, chessboardSize, corners, findChessboardCornersFlags);
 			for (size_t i = 0; i < corners.size(); ++i) {
@@ -200,27 +211,30 @@ void CvFindChessboardCorners_Processor::onNewImage()
 		if (found) {
 			LOG(LTRACE) << "chessboard found\n";
 
+			// Perform subpix pose update.
 			if (prop_subpix) {
 				cornerSubPix(image, corners, Size(prop_subpix_window, prop_subpix_window), Size(1, 1), TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 50, 1e-3));
 			}
 
+			// Set image points and write the result to ourput stream.
 			chessboard->setImagePoints(corners);
 			out_chessboard.write(*chessboard);
 
-
+			// Recalculate the image chessboard pose in form of <X,Y,0,alpha>.
 			Types::ImagePosition imagePosition;
 			double maxPixels = std::max(image.size().width, image.size().height);
 			imagePosition.elements[0] = (corners[0].x - image.size().width / 2) / maxPixels;
 			imagePosition.elements[1] = (corners[0].y - image.size().height / 2) / maxPixels;
 			imagePosition.elements[2] = 0;
 			imagePosition.elements[3] = - atan2(corners[1].y - corners[0].y, corners[1].x - corners[0].x);
+			// Write output stream.
 			out_imagePosition.write(imagePosition);
 
-			chessboardFound->raise();
+			// TODO: add unit type: found
 		} else {
 			LOG(LTRACE) << "chessboard not found\n";
+			// TODO: add unit type: not found
 
-			chessboardNotFound->raise();
 		}
 	} catch (const Exception& e) {
 		LOG(LERROR) << e.what() << "\n";

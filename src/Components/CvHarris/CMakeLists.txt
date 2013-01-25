@@ -8,7 +8,9 @@ FIND_PACKAGE( OpenCV REQUIRED )
 FILE(GLOB files *.cpp)
 
 # Create an executable file from sources:
-ADD_LIBRARY(CvPixelOperator SHARED ${files})
-TARGET_LINK_LIBRARIES(CvPixelOperator ${OpenCV_LIBRARIES} ${DisCODe_LIBRARIES})
+ADD_LIBRARY(CvHarris SHARED ${files})
 
-INSTALL_COMPONENT(CvPixelOperator)
+# Link external libraries
+TARGET_LINK_LIBRARIES(CvHarris ${DisCODe_LIBRARIES} ${OpenCV_LIBS})
+
+INSTALL_COMPONENT(CvHarris)

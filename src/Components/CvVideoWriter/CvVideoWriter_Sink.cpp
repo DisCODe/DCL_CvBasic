@@ -16,26 +16,44 @@
 namespace Sinks {
 namespace CvVideoWriter {
 
-CvVideoWriter_Sink::CvVideoWriter_Sink(const std::string & name) : Base::Component(name) {
+CvVideoWriter_Sink::CvVideoWriter_Sink(const std::string & name) : Base::Component(name),
+		filename("filename", std::string("out.avi")),
+		fourcc("fourcc", CV_FOURCC_DEFAULT),
+		width("width", 640),
+		height("height", 480),
+		fps("fps", 25)
+{
 	LOG(LTRACE)<<"Hello CvVideoWriter_Sink\n";
+
+	width.addConstraint("0");
+	width.addConstraint("1280");
+	registerProperty(width);
+
+	height.addConstraint("0");
+	height.addConstraint("1280");
+	registerProperty(height);
+
+	registerProperty(filename);
+	registerProperty(fourcc);
+	registerProperty(fps);
 }
 
 CvVideoWriter_Sink::~CvVideoWriter_Sink() {
 	LOG(LTRACE)<<"Good bye CvVideoWriter_Sink\n";
 }
 
+void CvVideoWriter_Sink::prepareInterface() {
+	h_onNewImage.setup(this, &CvVideoWriter_Sink::onNewImage);
+	registerHandler("onNewImage", &h_onNewImage);
+	addDependency("onNewImage", &in_img);
+
+	registerStream("in_img", &in_img);
+}
+
 bool CvVideoWriter_Sink::onInit() {
 	LOG(LTRACE) << "CvVideoWriter_Sink::initialize\n";
 
-	h_onNewImage.setup(this, &CvVideoWriter_Sink::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-
-	registerStream("in_img", &in_img);
-
-	registerStream("in_draw", &in_draw);
-
-	writer.open(props.filename, props.fourcc, props.fps, props.size);
+	writer.open(filename, fourcc, fps, cv::Size(width, height));
 
 	if (writer.isOpened())
 		LOG(LTRACE) << "CameraOpenCV: device opened\n";
@@ -72,15 +90,6 @@ void CvVideoWriter_Sink::onNewImage() {
 
 	try {
 		cv::Mat img = in_img.read().clone();
-
-		if (!in_draw.empty()) {
-			to_draw = in_draw.read();
-		}
-
-		if (to_draw) {
-			to_draw->draw(img, CV_RGB(255,0,255));
-			to_draw = boost::shared_ptr<Types::Drawable>();
-		}
 
 		writer << img;
 	}

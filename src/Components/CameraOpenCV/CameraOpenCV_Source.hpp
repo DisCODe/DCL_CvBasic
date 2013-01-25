@@ -11,12 +11,11 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace Sources {
 namespace CameraOpenCV {
@@ -39,6 +38,11 @@ public:
 	 * Destructor.
 	 */
 	virtual ~CameraOpenCV_Source();
+
+	/*!
+	 * Prepares communication interface.
+	 */
+	virtual void prepareInterface();
 
 protected:
 
@@ -76,10 +80,6 @@ protected:
 	/// Event handler.
 	Base::EventHandler<CameraOpenCV_Source> h_onTrigger;
 
-
-	/// Event signaling that new image was retrieved.
-	Base::Event * newImage;
-
 	/// Output data stream
 	Base::DataStreamOut<Mat> out_img;
 
@@ -91,10 +91,10 @@ protected:
 
 	bool trig;
 
-
 	Base::Property<int> m_device;
 	Base::Property<int> m_width;
 	Base::Property<int> m_height;
+	Base::Property<bool> m_triggered;
 
 	void onDeviceCahnged(int old_device, int new_device);
 
@@ -107,6 +107,6 @@ protected:
 /*
  * Register source component.
  */
-REGISTER_SOURCE_COMPONENT("CameraOpenCV", Sources::CameraOpenCV::CameraOpenCV_Source, Common::Panel_Empty)
+REGISTER_COMPONENT("CameraOpenCV", Sources::CameraOpenCV::CameraOpenCV_Source)
 
 #endif /* CAMERAOPENCV_SOURCE_HPP_ */

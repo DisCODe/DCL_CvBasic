@@ -10,14 +10,13 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+#include "Property.hpp"
 #include "Logger.hpp"
 #include "Types/stream_OpenCV.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 /**
  * \defgroup CvVideoWriter CvVideoWriter
@@ -91,52 +90,23 @@ namespace CvVideoWriter {
 
 using namespace cv;
 
-/*!
- * \brief CvVideoWriter properties
- *
- * WndProps contain window properties, such as title
- */
-struct Props : public Base::Props {
-
-	std::string filename;
-	int fourcc;
-	cv::Size size;
-	double fps;
-
-
-	/*!
-	 * \copydoc Base::Props::load
-	 */
-	void load(const ptree & pt) {
-		filename = pt.get("filename", "output.avi");
-		fourcc = str2cc(pt.get("fourcc", "MJPG"));
-		size = pt.get("size", cv::Size(640, 480));
-		fps = pt.get("fps", 25.0);
-	}
-
-	/*!
-	 * \copydoc Base::Props::save
-	 */
-	void save(ptree & pt) {
-		pt.put("filename", filename);
-		pt.put("fourcc", cc2str(fourcc));
-		pt.put("size", size);
-		pt.put("fps", fps);
-	}
-
-protected:
-	int str2cc(const std::string & s) {
+class FourCCTranslator {
+public:
+	static int fromStr(const std::string & s) {
 		if (s.length() != 4)
 			return -1;
 
 		return CV_FOURCC(s[0], s[1], s[2], s[3]);
 	}
 
-	std::string cc2str(int cc) {
-		if (cc == CV_FOURCC('M','J','P','G'))
-			return "MJPG";
-		else
-			return "MJPG";
+	static std::string toStr(int cc) {
+		std::string ret = "XXXX";
+		ret[0] = cc & 0xFF;
+		ret[1] = (cc >> 8) & 0xFF;
+		ret[2] = (cc >> 16) & 0xFF;
+		ret[3] = (cc >> 24) & 0xFF;
+
+		return ret;
 	}
 };
 
@@ -157,13 +127,7 @@ public:
 	 */
 	virtual ~CvVideoWriter_Sink();
 
-	/*!
-	 * Return window properties
-	 */
-	Base::Props * getProperties() {
-		return &props;
-	}
-
+	void prepareInterface();
 protected:
 
 	/*!
@@ -208,11 +172,15 @@ protected:
 	Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex> in_draw;
 	boost::shared_ptr<Types::Drawable> to_draw;
 
-	/// Window properties
-	Props props;
-
 	/// Video writer
 	cv::VideoWriter writer;
+
+	Base::Property<std::string> filename;
+	Base::Property<int, FourCCTranslator> fourcc;
+	Base::Property<int> width;
+	Base::Property<int> height;
+	Base::Property<double> fps;
+
 };
 
 }//: namespace CvVideoWriter
@@ -222,7 +190,7 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvVideoWriter", Sinks::CvVideoWriter::CvVideoWriter_Sink, Common::Panel_Empty)
+REGISTER_COMPONENT("CvVideoWriter", Sinks::CvVideoWriter::CvVideoWriter_Sink)
 
 #endif /* CVVIDEOWRITER_SINK_HPP_ */
 

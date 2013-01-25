@@ -18,7 +18,8 @@ namespace CameraOpenCV {
 CameraOpenCV_Source::CameraOpenCV_Source(const std::string & name) : Base::Component(name),
 		m_device("device", boost::bind(&CameraOpenCV_Source::onDeviceCahnged, this, _1, _2), 0),
 		m_width("width", 640, "combo"),
-		m_height("width", 480, "combo")
+		m_height("width", 480, "combo"),
+		m_triggered("triggered", false)
 {
 	LOG(LTRACE) << "CameraOpenCV_Source::CameraOpenCV_Source()\n";
 	trig = true;
@@ -33,6 +34,8 @@ CameraOpenCV_Source::CameraOpenCV_Source(const std::string & name) : Base::Compo
 	m_height.addConstraint("480");
 	registerProperty(m_height);
 
+	registerProperty(m_triggered);
+
 	valid = false;
 }
 
@@ -40,17 +43,15 @@ CameraOpenCV_Source::~CameraOpenCV_Source() {
 	LOG(LTRACE) << "CameraOpenCV_Source::~CameraOpenCV_Source()\n";
 }
 
-bool CameraOpenCV_Source::onInit() {
-	LOG(LTRACE) << "CameraOpenCV_Source::initialize()\n";
-	newImage = registerEvent("newImage");
-
-
-
+void CameraOpenCV_Source::prepareInterface() {
 	h_onTrigger.setup(this, &CameraOpenCV_Source::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
 
-
 	registerStream("out_img", &out_img);
+}
+
+bool CameraOpenCV_Source::onInit() {
+	LOG(LTRACE) << "CameraOpenCV_Source::initialize()\n";
 
 	cap.open(m_device);
 
@@ -88,6 +89,8 @@ bool CameraOpenCV_Source::onStep() {
 	if (!valid)
 		return true;
 
+	if (m_triggered && !trig)
+		return true;
 
 	trig = false;
 	cap >> frame;
@@ -100,7 +103,6 @@ bool CameraOpenCV_Source::onStep() {
 
 	out_img.write(frame);
 
-	newImage->raise();
 	return true;
 }
 

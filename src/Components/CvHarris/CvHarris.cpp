@@ -1,0 +1,106 @@
+/*!
+ * \file
+ * \brief
+ * \author Tomek Kornuta,,,
+ */
+
+#include <memory>
+#include <string>
+
+#include "CvHarris.hpp"
+#include "Common/Logger.hpp"
+
+#include <boost/bind.hpp>
+
+namespace Processors {
+namespace CvHarris {
+
+CvHarris::CvHarris(const std::string & name) :
+		Base::Component(name),
+		blockSize("blockSize", 2),
+		apertureSize("apertureSize", 3),
+		k("k", 0.04),
+		thresh("thresh", 200, "range")
+{
+	// Constraints.
+	thresh.addConstraint("0");
+	thresh.addConstraint("255");
+
+	// Register properties.
+	registerProperty(blockSize);
+	registerProperty(apertureSize);
+	registerProperty(k);
+	registerProperty(thresh);
+}
+
+CvHarris::~CvHarris() {
+}
+
+void CvHarris::prepareInterface() {
+	// Register handlers with their dependencies.
+	h_onNewImage.setup(this, &CvHarris::onNewImage);
+	registerHandler("onNewImage", &h_onNewImage);
+	addDependency("onNewImage", &in_img);
+
+	// Input and output data streams.
+	registerStream("in_img", &in_img);
+	registerStream("out_img", &out_img);
+}
+
+bool CvHarris::onInit() {
+
+	return true;
+}
+
+bool CvHarris::onFinish() {
+	return true;
+}
+
+bool CvHarris::onStop() {
+	return true;
+}
+
+bool CvHarris::onStart() {
+	return true;
+}
+
+void CvHarris::onNewImage()
+{
+	LOG(LTRACE) << "CvHarris::onNewImage\n";
+	try {
+		// Input: a grayscale image.
+		cv::Mat in = in_img.read();
+
+		Mat dst, dst_norm, dst_norm_scaled;
+		dst = Mat::zeros( in.size(), CV_32FC1 );
+
+		/// Detecting corners
+		cornerHarris( in, dst, blockSize, apertureSize, k, BORDER_DEFAULT );
+
+		/// Normalizing
+		normalize( dst, dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat() );
+		//convertScaleAbs( dst_norm, dst_norm_scaled );
+
+		// Clone the grayscale image
+		cv::Mat out;
+		cvtColor(in, out, CV_GRAY2BGR);
+		/// Drawing a circle around corners
+		for( int j = 0; j < dst_norm.rows ; j++ )
+		   { for( int i = 0; i < dst_norm.cols; i++ )
+		        {
+		          if( (int) dst_norm.at<float>(j,i) > thresh )
+		            {
+		             circle( out, Point( i, j ), 5,  Scalar(240, 240, 0), 2, 8, 0 );
+		            }
+		        }
+		   }
+
+		// Write the result to the output.
+		out_img.write(out);
+	} catch (...) {
+		LOG(LERROR) << "CvHarris::onNewImage failed\n";
+	}
+}
+
+} //: namespace CvHarris
+} //: namespace Processors

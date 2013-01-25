@@ -8,13 +8,21 @@
 #ifndef CVUNDISTORT_PROCESSOR_HPP_
 #define CVUNDISTORT_PROCESSOR_HPP_
 
-#include <cv.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+
 #include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+
+#include <sstream>
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
+#include "Property.hpp"
 
+#include <Types/CameraInfo.hpp>
 
 /**
  * \defgroup CvUndistort CvUndistort
@@ -74,49 +82,6 @@ namespace Processors {
 namespace CvUndistort {
 
 /**
- * CvUndistort properties.
- */
-struct CvUndistortProps : public Base::Props
-{
-	cv::Mat cameraMatrix;
-	cv::Mat distCoeffs;
-
-	/*!
-	 * Load settings
-	 *
-	 * @param pt root property tree to load settings from
-	 */
-	virtual void load(const ptree & pt)
-	{
-		LOG(LTRACE) << "loading camera parameters.\n";
-		boost::numeric::ublas::matrix <double> cameraMatrixUblas = str2mat(pt.get <std::string> ("cameraMatrix"), 3, 3);
-		cameraMatrix = cv::Mat(3, 3, CV_32F);
-		for (int i = 0; i < 3; ++i) {
-			for (int j = 0; j < 3; ++j) {
-				cameraMatrix.at <float> (i, j) = cameraMatrixUblas(i, j);
-				LOG(LDEBUG) << "cameraMatrix(" << i << ", " << j << "): " << cameraMatrix.at <float> (i, j) << endl;
-			}
-		}
-
-		boost::numeric::ublas::matrix <double> distCoeffsUblas = str2mat(pt.get <std::string> ("distCoeffs"), 1, 5);
-		distCoeffs = cv::Mat(1, 5, CV_32F);
-		for (int j = 0; j < 5; ++j) {
-			distCoeffs.at <float> (0, j) = distCoeffsUblas(0, j);
-			LOG(LDEBUG) << "distCoeffs(" << 0 << ", " << j << "): " << distCoeffs.at <float> (0, j) << endl;
-		}
-	}
-
-	/*!
-	 * Save settings
-	 *
-	 * @param pt root property tree to save settings
-	 */
-	virtual void save(ptree & pt)
-	{
-	}
-};
-
-/**
  * Component for distortion correction.
  */
 class CvUndistort_Processor : public Base::Component
@@ -125,7 +90,8 @@ public:
 	CvUndistort_Processor(const std::string& n);
 	virtual ~CvUndistort_Processor();
 
-	virtual Base::Props * getProperties();
+	virtual void prepareInterface();
+
 protected:
 	/*!
 	 * Method called when component is started
@@ -165,22 +131,22 @@ private:
 
 	/// Event handler.
 	Base::EventHandler <CvUndistort_Processor> h_onNewImage;
-	Base::Event *newUndistortedImage;
 
 	Base::DataStreamIn <cv::Mat> in_img;
+	Base::DataStreamIn <Types::CameraInfo> in_camerainfo;
 	Base::DataStreamOut <cv::Mat> out_img;
+
+	Types::CameraInfo camera_info;
 
 	cv::Mat map1;
 	cv::Mat map2;
 	int interpolation;
-
-	CvUndistortProps props;
 };
 
 } // namespace CvUndistort
 
 } // namespace Processors
 
-REGISTER_PROCESSOR_COMPONENT("CvUndistort", Processors::CvUndistort::CvUndistort_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvUndistort", Processors::CvUndistort::CvUndistort_Processor)
 
 #endif /* CVUNDISTORT_PROCESSOR_HPP_ */

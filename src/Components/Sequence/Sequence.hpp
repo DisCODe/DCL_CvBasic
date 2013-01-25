@@ -9,14 +9,13 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+#include "Property.hpp"
 
 #include <vector>
 #include <string>
 
-#include <cv.h>
+#include <opencv2/core/core.hpp>
 
 /**
  * \defgroup Sequence Sequence
@@ -74,42 +73,6 @@
 namespace Sources {
 namespace Sequence {
 
-struct Props : public Base::Props {
-
-	std::string directory;
-	std::string pattern;
-
-	bool sort;
-	bool prefetch;
-
-	bool triggered;
-
-	bool loop;
-
-
-	void load(const ptree & pt) {
-		directory = pt.get("directory", ".");
-		pattern = pt.get("pattern", ".*\\.(jpg|png|bmp)");
-
-		sort = pt.get("sort", true);
-		prefetch = pt.get("prefetch", false);
-
-
-		triggered = pt.get("triggered", false);
-
-		loop = pt.get("loop", false);
-	}
-
-	void save(ptree & pt) {
-		pt.put("directory", directory);
-		pt.put("pattern", pattern);
-		pt.put("sort", sort);
-		pt.put("prefetch", prefetch);
-		pt.put("triggered", triggered);
-		pt.put("loop", loop);
-	}
-};
-
 /*!
  * \class Sequence
  * \brief Class responsible for retrieving images from image sequences.
@@ -127,12 +90,7 @@ public:
 	 */
 	virtual ~Sequence();
 
-	/*!
-	 * Return sequence properties
-	 */
-	Base::Props * getProperties() {
-		return &props;
-	}
+	virtual void prepareInterface();
 
 protected:
 
@@ -161,13 +119,6 @@ protected:
 	 */
 	bool onStop();
 
-
-	/// Event signaling that new image was retrieved.
-	Base::Event * newImage;
-
-	/// Sequence has ended
-	Base::Event * endOfSequence;
-
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 
@@ -179,6 +130,31 @@ protected:
 
 	/// Event handler.
 	Base::EventHandler<Sequence> h_onTrigger;
+
+	/*!
+	 * Event handler function - moves image index to the next frame of the sequence.
+	 */
+	void onLoadNextImage();
+
+	/// Event handler - moves image index to the next frame of the sequence.
+	Base::EventHandler<Sequence> h_onLoadNextImage;
+
+
+	/*!
+	 * Event handler function - loads image from the sequence.
+	 */
+	void onLoadImage();
+
+	/// Event handler - loads image from the sequence.
+	Base::EventHandler<Sequence> h_onLoadImage;
+
+	/*!
+	 * Event handler function - reload the sequence.
+	 */
+	void onSequenceReload();
+
+	/// Event handler - reload the sequence.
+	Base::EventHandler<Sequence> h_onSequenceReload;
 
 private:
 	/**
@@ -196,13 +172,32 @@ private:
 	/// current frame
 	cv::Mat img;
 
-	/// index of current frame
+	/// Index of current frame.
 	int frame;
 
-	/// sequence properties
-	Props props;
-
+	/// Flag indicating thethwe the image was already loaded or not.
 	bool trig;
+
+	/// Directory containing the images sequence.
+	Base::Property<std::string> prop_directory;
+
+	/// Files pattern (regular expression).
+	Base::Property<std::string> prop_pattern;
+
+	/// Loading mode: triggered vs continous.
+	Base::Property<bool> prop_triggered;
+
+	/// Loading mode: images loaded in the loop.
+	Base::Property<bool> prop_loop;
+
+	/// Sort image sequence by their names.
+	Base::Property<bool> prop_sort;
+
+	/// Working mode: iterative vs constant.
+	Base::Property<bool> prop_iterate;
+
+	/// ???
+	//Base::Property<bool> prop_prefetch;
 
 };
 
@@ -212,6 +207,6 @@ private:
 /*
  * Register source component.
  */
-REGISTER_SOURCE_COMPONENT("Sequence", Sources::Sequence::Sequence, Common::Panel_Empty)
+REGISTER_COMPONENT("Sequence", Sources::Sequence::Sequence)
 
 #endif /* SEQUENCE_HPP_ */

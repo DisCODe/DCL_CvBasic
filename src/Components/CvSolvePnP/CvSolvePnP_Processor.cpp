@@ -8,7 +8,6 @@
 #include "CvSolvePnP_Processor.hpp"
 #include "Logger.hpp"
 
-#include <cv.h>
 #include <sstream>
 
 namespace Processors {
@@ -30,9 +29,15 @@ CvSolvePnP_Processor::~CvSolvePnP_Processor()
 {
 }
 
-Base::Props * CvSolvePnP_Processor::getProperties()
-{
-	return &props;
+void CvSolvePnP_Processor::prepareInterface() {
+	h_onNewObject3D.setup(this, &CvSolvePnP_Processor::onNewObject3D);
+	registerHandler("onNewObject3D", &h_onNewObject3D);
+	addDependency("onNewObject3D", &in_object3d);
+	addDependency("onNewObject3D", &in_camerainfo);
+
+	registerStream("in_object3d", &in_object3d);
+	registerStream("in_camerainfo", &in_camerainfo);
+	registerStream("out_homogMatrix", &out_homogMatrix);
 }
 
 bool CvSolvePnP_Processor::onStart()
@@ -51,13 +56,6 @@ bool CvSolvePnP_Processor::onInit()
 {
 	LOG(LTRACE) << "CvSolvePnP_Processor::onInit()\n";
 
-	h_onNewObject3D.setup(this, &CvSolvePnP_Processor::onNewObject3D);
-	registerHandler("onNewObject3D", &h_onNewObject3D);
-
-	registerStream("in_object3d", &in_object3d);
-	registerStream("out_homogMatrix", &out_homogMatrix);
-
-	objectLocated = registerEvent("objectLocated");
 
 	return true;
 }
@@ -78,13 +76,16 @@ void CvSolvePnP_Processor::onNewObject3D()
 {
 	LOG(LTRACE) << "CvSolvePnP_Processor::onNewObject3D()\n";
 	boost::shared_ptr <Types::Objects3D::Object3D> object3D = in_object3d.read();
+
+	Types::CameraInfo camera_info = in_camerainfo.read();
+
 	Mat modelPoints(object3D->getModelPoints());
 	Mat imagePoints(object3D->getImagePoints());
 
 	Mat_<double> rvec;
 	Mat_<double> tvec;
 
-	solvePnP(modelPoints, imagePoints, props.cameraMatrix, props.distCoeffs, rvec, tvec, false);
+	solvePnP(modelPoints, imagePoints, camera_info.cameraMatrix(), camera_info.distCoeffs(), rvec, tvec, false);
 
 	Mat_<double> rotationMatrix;
 	Rodrigues(rvec, rotationMatrix);
@@ -103,8 +104,6 @@ void CvSolvePnP_Processor::onNewObject3D()
 	LOG(LDEBUG) << "HomogMatrix:\n" << ss.str() << endl;
 
 	out_homogMatrix.write(hm);
-
-	objectLocated->raise();
 }
 
 } // namespace CvSolvePnP

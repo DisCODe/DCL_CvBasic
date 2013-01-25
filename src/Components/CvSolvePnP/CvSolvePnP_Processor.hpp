@@ -8,17 +8,16 @@
 #ifndef CVSOLVEPNP_PROCESSOR_HPP_
 #define CVSOLVEPNP_PROCESSOR_HPP_
 
-#include <cv.h>
-
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
-#include "Props.hpp"
 #include "EventHandler.hpp"
 #include "DataStream.hpp"
 #include "Types/Objects3D/Object3D.hpp"
 #include "Types/HomogMatrix.hpp"
+#include "Types/CameraInfo.hpp"
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 
 /**
  * \defgroup CvSolvePnP CvSolvePnP
@@ -76,53 +75,13 @@
 namespace Processors {
 namespace CvSolvePnP {
 
-struct CvSolvePnPProps: Base::Props
-{
-	cv::Mat_<double> cameraMatrix;
-	cv::Mat_<double> distCoeffs;
-
-	/*!
-	 * Load settings
-	 *
-	 * @param pt root property tree to load settings from
-	 */
-	virtual void load(const ptree & pt)
-	{
-		LOG(LTRACE) << "loading camera parameters.\n";
-		boost::numeric::ublas::matrix <double> cameraMatrixUblas = str2mat(pt.get <std::string> ("cameraMatrix"), 3, 3);
-		cameraMatrix = cv::Mat_<double>(3, 3);
-		for (int i = 0; i < 3; ++i) {
-			for (int j = 0; j < 3; ++j) {
-				cameraMatrix(i, j) = cameraMatrixUblas(i, j);
-				LOG(LDEBUG) << "cameraMatrix(" << i << ", " << j << "): " << cameraMatrix(i, j) << endl;
-			}
-		}
-
-		boost::numeric::ublas::matrix <double> distCoeffsUblas = str2mat(pt.get <std::string> ("distCoeffs"), 1, 5);
-		distCoeffs = cv::Mat_<double>(1, 5);
-		for (int j = 0; j < 5; ++j) {
-			distCoeffs(0, j) = distCoeffsUblas(0, j);
-			LOG(LDEBUG) << "distCoeffs(" << 0 << ", " << j << "): " << distCoeffs(0, j) << endl;
-		}
-	}
-
-	/*!
-	 * Save settings
-	 *
-	 * @param pt root property tree to save settings
-	 */
-	virtual void save(ptree & pt)
-	{
-	}
-};
-
 class CvSolvePnP_Processor: public Base::Component
 {
 public:
 	CvSolvePnP_Processor(const std::string & n);
 	virtual ~CvSolvePnP_Processor();
 
-	virtual Base::Props * getProperties();
+	void prepareInterface();
 protected:
 	/*!
 	 * Method called when component is started
@@ -158,19 +117,17 @@ private:
 
 	void onNewObject3D();
 
-	CvSolvePnPProps props;
-
 	Base::DataStreamInPtr <Types::Objects3D::Object3D> in_object3d;
+	Base::DataStreamIn <Types::CameraInfo> in_camerainfo;
 	Base::DataStreamOut <Types::HomogMatrix> out_homogMatrix;
 
 	Base::EventHandler <CvSolvePnP_Processor> h_onNewObject3D;
-	Base::Event *objectLocated;
 };
 
 } // namespace CvSolvePnP
 
 } // namespace Processors
 
-REGISTER_PROCESSOR_COMPONENT("CvSolvePnP", Processors::CvSolvePnP::CvSolvePnP_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvSolvePnP", Processors::CvSolvePnP::CvSolvePnP_Processor)
 
 #endif /* CVSOLVEPNP_PROCESSOR_HPP_ */

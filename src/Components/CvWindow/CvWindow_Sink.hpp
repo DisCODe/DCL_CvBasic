@@ -10,16 +10,14 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
 #include "Logger.hpp"
 
 #include "EventHandler2.hpp"
 #include "Property.hpp"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 /**
  * \defgroup CvWindow CvWindow
@@ -106,6 +104,8 @@ public:
 	 */
 	virtual ~CvWindow_Sink();
 
+	virtual void prepareInterface();
+
 protected:
 
 	/*!
@@ -139,6 +139,14 @@ protected:
 	void onNewImageN(int n);
 
 	/*!
+	 * Event handler function.
+	 */
+	void onRefresh();
+
+	/// Event handler.
+	Base::EventHandler<CvWindow_Sink> h_onRefresh;
+
+	/*!
 	 * Callback called when title is changed
 	 */
 	void onTitleCahnged(const std::string & old_title, const std::string & new_title);
@@ -158,14 +166,12 @@ protected:
 
 	std::vector< boost::shared_ptr<Types::Drawable> > to_draw;
 
-
-
-
 	Base::Property<std::string> title;
 	Base::Property<int> count;
 
 	bool firststep;
 
+	std::vector<std::string> titles;
 };
 
 }//: namespace CvWindow
@@ -175,7 +181,7 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvWindow", Sinks::CvWindow::CvWindow_Sink, Common::Panel_Empty)
+REGISTER_COMPONENT("CvWindow", Sinks::CvWindow::CvWindow_Sink)
 
 #endif /* CVWINDOW_SINK_HPP_ */
 

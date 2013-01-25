@@ -1,36 +1,46 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Task>
-	<!-- List of components -->
-	<Components>
-		<Source type="CameraOpenCV" thread="Thread1" group="s1">
-		</Source>
+	<!-- reference task information -->
+	<Reference>
+		<Author>
+			<name>Maciej Stefańczyk</name>
+			<link></link>
+		</Author>
+	
+		<Description>
+			<brief>Simple camera viewer</brief>
+			<full>Simple camera viewer</full>
+		</Description>
+	</Reference>
 
-		<Window type="CvWindow" thread="Thread1" group="s1">
-			<title>Preview</title>
-		</Window>
-	</Components>
-
-	<!-- Threads of execution -->
-	<Executors>
-		<Thread1 type="continuous">
-			<main_component>Source</main_component>
-		</Thread1>
-	</Executors>
-
-	<!-- Event connections -->
+	<!-- task definition -->
+	<Subtasks>
+		<Subtask name="Processing">
+			<Executor name="Exec1" period="0.0">
+				<Component name="Source" type="CvBasic:CameraOpenCV" priority="1" bump="0">
+					<param name="device">1</param>
+				</Component>
+			</Executor>
+		</Subtask>
+			
+		<Subtask name="Visualisation">
+			<Executor name="Exec2" period="0.05">
+				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
+					<param name="count">1</param>
+					<param name="title">Okienko</param>
+				</Component>
+			</Executor>
+		</Subtask>
+	</Subtasks>
+	
+	<!-- connections between events and handelrs -->
 	<Events>
-		<Event source="Source.newImage" destination="Window.onNewImage"/>
 	</Events>
-
-	<!-- Data stream assignments -->
+	
+	<!-- pipes connecting datastreams -->
 	<DataStreams>
-		<Source>
-			<out_img type="out" group="Con"/>
+		<Source name="Source.out_img">
+			<sink>Window.in_img</sink>
 		</Source>
-
-		<Window>
-			<in_img type="in" group="Con"/>
-		</Window>
 	</DataStreams>
-
 </Task>
+
