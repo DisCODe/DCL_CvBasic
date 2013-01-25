@@ -9,6 +9,8 @@
 #include "CvHoughCircles.hpp"
 #include "Common/Logger.hpp"
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 namespace Processors {
 namespace CvHoughCircles {
 
@@ -35,28 +37,27 @@ CvHoughCircles_Processor::~CvHoughCircles_Processor()
 	LOG(LTRACE) << "Good bye CvHoughCircles_Processor\n";
 }
 
+void CvHoughCircles_Processor::prepareInterface() {
+	// Register data streams, events and event handlers HERE!
+
+	h_onNewImage.setup(this, &CvHoughCircles_Processor::onNewImage);
+	registerHandler("onNewImage", &h_onNewImage);
+	addDependency("onNewImage", &in_img);
+
+	registerStream("in_img", &in_img);
+	registerStream("out_circles", &out_circles);
+}
+
 bool CvHoughCircles_Processor::onInit()
 {
 	LOG(LTRACE) << "CvHoughCircles_Processor::initialize\n";
 
-	// Register data streams, events and event handlers HERE!
-	newCircles = registerEvent("newCircles");
-
-	h_onNewImage.setup(this, &CvHoughCircles_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	registerStream("in_img", &in_img);
-	registerStream("out_circles", &out_circles);
+	
 
 	return true;
 }
 
 bool CvHoughCircles_Processor::onFinish()
-{
-	return true;
-}
-
-bool CvHoughCircles_Processor::onStep()
 {
 	return true;
 }
@@ -89,7 +90,6 @@ void CvHoughCircles_Processor::onNewImage()
 	HoughCircles(image, c.circles, CV_HOUGH_GRADIENT, inverseRatioOfAccumulatorResolution, minDist, cannyHigherThreshold, accumulatorThreshold, minCircleRadius, maxCircleRadius);
 
 	out_circles.write(c);
-	newCircles->raise();
 }
 
 }//: namespace CvHoughCircles

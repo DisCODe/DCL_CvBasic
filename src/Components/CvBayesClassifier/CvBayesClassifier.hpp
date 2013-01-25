@@ -80,6 +80,11 @@ protected:
 	Base::EventHandler<CvBayesClassifier> h_onAddToDataset;
 	// Sets the add_set flag.
 	void onAddToDataset();
+	
+	// Handler activated when user will trigger "predict data"
+	Base::EventHandler<CvBayesClassifier> h_onPredict;
+	// Sets the predict flag.
+	void onPredict();
 
 
 	// Handler activated when user will trigger "clear whole dataset"
@@ -87,8 +92,16 @@ protected:
 	// Adds received observation to dataset.
 	void onClearDataset();
 
-
-
+	
+	// Handler activated when user will trigger "save params"
+	Base::EventHandler<CvBayesClassifier> h_onSaveParams;
+	// Save classifier parameters to file
+	void onSaveParams();
+	
+	// Handler activated when user will trigger "load params"
+	Base::EventHandler<CvBayesClassifier> h_onLoadParams;
+	// Load classifier parameters from file
+	void onLoadParams();
 
 	/// Event handler.
 	Base::EventHandler<CvBayesClassifier> h_onNewData;
@@ -117,6 +130,8 @@ private:
 	// Flag used for memorizing that user demanded to add the incomming moments to dataset.
 	bool add;
 
+	// Flag used for memorizing that user demanded to predict incomming moments.
+	bool predict;
 };
 
 } //: namespace CvBayesClassifier

@@ -8,11 +8,10 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 
-#include <cv.h>
+#include <opencv2/core/core.hpp>
 using namespace cv;
 
 namespace Processors {
@@ -34,6 +33,8 @@ public:
 	 * Destructor
 	 */
 	virtual ~CvAdaptiveThreshold_Processor();
+	
+	void prepareInterface();
 protected:
 
 	/*!
@@ -45,11 +46,6 @@ protected:
 	 * Disconnect source from device, closes streams, etc.
 	 */
 	bool onFinish();
-
-	/*!
-	 * Retrieves data from device.
-	 */
-	bool onStep();
 
 	/*!
 	 * Start component
@@ -71,7 +67,6 @@ private:
 
 	Base::EventHandler <CvAdaptiveThreshold_Processor> h_onNewImage;
 	Base::DataStreamIn <Mat> in_img;
-	Base::Event *newImage;
 	Base::DataStreamOut <Mat> out_img;
 
 	cv::Mat thresholdedImage;
@@ -85,6 +80,6 @@ private:
 
 /*
  * Register processor component.
- */REGISTER_PROCESSOR_COMPONENT("CvAdaptiveThreshold", Processors::CvAdaptiveThreshold::CvAdaptiveThreshold_Processor, Common::Panel_Empty)
+ */REGISTER_COMPONENT("CvAdaptiveThreshold", Processors::CvAdaptiveThreshold::CvAdaptiveThreshold_Processor)
 
 #endif /* CVADAPTIVETHRESHOLD_PROCESSOR_HPP_ */

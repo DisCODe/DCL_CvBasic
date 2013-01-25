@@ -9,6 +9,8 @@
 #include "CvAdaptiveThreshold.hpp"
 #include "Common/Logger.hpp"
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 namespace Processors {
 namespace CvAdaptiveThreshold {
 
@@ -36,19 +38,21 @@ CvAdaptiveThreshold_Processor::~CvAdaptiveThreshold_Processor()
 	LOG(LTRACE) << "Good bye CvAdaptiveThreshold_Processor\n";
 }
 
+void CvAdaptiveThreshold_Processor::prepareInterface() {
+	
+	// Register data streams, events and event handlers HERE!
+	h_onNewImage.setup(this, &CvAdaptiveThreshold_Processor::onNewImage);
+	registerHandler("onNewImage", &h_onNewImage);
+	addDependency("onNewImage", &in_img);
+
+	registerStream("in_img", &in_img);
+	registerStream("out_img", &out_img);
+}
+
 bool CvAdaptiveThreshold_Processor::onInit()
 {
 	LOG(LTRACE) << "CvAdaptiveThreshold_Processor::initialize\n";
 
-	// Register data streams, events and event handlers HERE!
-	h_onNewImage.setup(this, &CvAdaptiveThreshold_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	registerStream("in_img", &in_img);
-
-	newImage = registerEvent("newImage");
-
-	registerStream("out_img", &out_img);
 	return true;
 }
 
@@ -56,12 +60,6 @@ bool CvAdaptiveThreshold_Processor::onFinish()
 {
 	LOG(LTRACE) << "CvAdaptiveThreshold_Processor::finish\n";
 
-	return true;
-}
-
-bool CvAdaptiveThreshold_Processor::onStep()
-{
-	LOG(LTRACE) << "CvAdaptiveThreshold_Processor::step\n";
 	return true;
 }
 
@@ -100,7 +98,6 @@ void CvAdaptiveThreshold_Processor::onNewImage()
 
 	adaptiveThreshold(image, thresholdedImage, maxValue, aM, tT, blockSize, C);
 	out_img.write(thresholdedImage);
-	newImage->raise();
 }
 
 }//: namespace CvAdaptiveThreshold
