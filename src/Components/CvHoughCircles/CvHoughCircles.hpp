@@ -8,12 +8,11 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
 #include "Types/Circles/Circles.hpp"
 
-#include <cv.h>
+#include <opencv2/core/core.hpp>
 using namespace cv;
 
 namespace Processors {
@@ -36,6 +35,8 @@ public:
 	 */
 	virtual ~CvHoughCircles_Processor();
 
+	void prepareInterface();
+
 protected:
 
 	/*!
@@ -47,11 +48,6 @@ protected:
 	 * Disconnect source from device, closes streams, etc.
 	 */
 	bool onFinish();
-
-	/*!
-	 * Retrieves data from device.
-	 */
-	bool onStep();
 
 	/*!
 	 * Start component
@@ -77,7 +73,6 @@ private:
 	Base::DataStreamIn <cv::Mat> in_img;
 
 	Base::DataStreamOut <Types::Circles> out_circles;
-	Base::Event* newCircles;
 
 	void onNewImage();
 };
@@ -89,6 +84,6 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("CvHoughCircles", Processors::CvHoughCircles::CvHoughCircles_Processor, Common::Panel_Empty)
+REGISTER_COMPONENT("CvHoughCircles", Processors::CvHoughCircles::CvHoughCircles_Processor)
 
 #endif /* CVHOUGHCIRCLES_PROCESSOR_HPP_ */

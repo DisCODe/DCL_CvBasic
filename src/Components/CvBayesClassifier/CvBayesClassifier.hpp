@@ -123,7 +123,7 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn<vector<Moments> > in_moments;
 
-	// Flag: if set, the bayes recognition
+	// Flag: if set, the bayes recognition.
 	Base::Property<bool> recognize;
 
 	// Class of the incoming training example.
@@ -131,6 +131,15 @@ protected:
 
 	// Name of file.
 	Base::Property<std::string> filename;
+
+/*	// Flag: if set, the bayes uses the moments for training.
+	Base::Property<bool> moments;
+
+	// Flag: if set, the bayes uses the central moments for training.
+	Base::Property<bool> central_moments;
+
+	// Flag: if set, the bayes uses the normalized moments for training.
+	Base::Property<bool> normalized_moments;*/
 
 private:
 	// Classifier.
@@ -145,7 +154,7 @@ private:
 	// Class names
 	vector<std::string> classes;
 
-	// Flag used for memorizing that user demanded to add the incomming moments to dataset.
+	// Flag used for memorizing that user demanded to add the incoming moments to dataset.
 	bool add;
 
 };
