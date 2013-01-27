@@ -9,10 +9,10 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
-//#include "EventHandler2.hpp"
+
+#include "set"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -22,6 +22,7 @@ using namespace cv;
 
 namespace Processors {
 namespace CvBayesClassifier {
+
 
 /*!
  * \class CvBayesClassifier
@@ -78,9 +79,9 @@ protected:
 
 
 	/// Event handler.
-	Base::EventHandler<CvBayesClassifier> h_onTraining;
+	Base::EventHandler<CvBayesClassifier> h_onBayesTraining;
 	/// Train the classifier with the possessed dataset.
-	void onTraining();
+	void onBayesTraining();
 
 
 	// Handler activated when user will trigger "add to dataset"
@@ -104,16 +105,19 @@ protected:
 	void onFilenameChanged(const std::string & old_filename, const std::string & new_filename);
 
 	// Handler activated when user will trigger "save bayes"
-	Base::EventHandler<CvBayesClassifier> h_onSaveBayes;
+	Base::EventHandler<CvBayesClassifier> h_onBayesSave;
 	// Saves the bayes internal state to an xml file.
-	void onSaveBayes();
+	void onBayesSave();
 
 	// Handler activated when user will trigger "load bayes"
-	Base::EventHandler<CvBayesClassifier> h_onLoadBayes;
+	Base::EventHandler<CvBayesClassifier> h_onBayesLoad;
 	// Loads the model state from an xml file.
-	void onLoadBayes();
+	void onBayesLoad();
 
-
+	// Handler activated when user will trigger "Clear bayes"
+	Base::EventHandler<CvBayesClassifier> h_onBayesClear;
+	// Loads clears the bayes settings.
+	void onBayesClear();
 
 	/// Event handler.
 	Base::EventHandler<CvBayesClassifier> h_onNewData;
@@ -123,8 +127,21 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn<vector<Moments> > in_moments;
 
+	// Flag: if set, the Bayes uses spatial moments.
+	Base::Property<bool> use_spatial;
+
+	// Flag: if set, the bayes uses central moments.
+	Base::Property<bool> use_central;
+
+	// Flag: if set, the bayes uses nomalized central moments.
+	Base::Property<bool> use_normalized_central;
+
+
+	// Flag: if set, the bayes will add every sample to dataset.
+	Base::Property<bool> continuousCollection;
+
 	// Flag: if set, the bayes recognition.
-	Base::Property<bool> recognize;
+	Base::Property<bool> continuousRecognition;
 
 	// Class of the incoming training example.
 	Base::Property<short> trainingClass;
@@ -132,17 +149,11 @@ protected:
 	// Name of file.
 	Base::Property<std::string> filename;
 
-/*	// Flag: if set, the bayes uses the moments for training.
-	Base::Property<bool> moments;
-
-	// Flag: if set, the bayes uses the central moments for training.
-	Base::Property<bool> central_moments;
-
-	// Flag: if set, the bayes uses the normalized moments for training.
-	Base::Property<bool> normalized_moments;*/
+	// Checks whether such a set of moments alread exists in dataset.
+	bool isAlreadyPresent(const vector<Moments>& dataset_, const Moments &m_);
 
 private:
-	// Classifier.
+	// Classifier.true
 	CvNormalBayesClassifier bayes;
 
 	// The vector of vectors of moments used for training
@@ -157,6 +168,8 @@ private:
 	// Flag used for memorizing that user demanded to add the incoming moments to dataset.
 	bool add;
 
+	// Number of features used as inputs for Bayes classfier.
+	short number_of_features;
 };
 
 } //: namespace CvBayesClassifier
