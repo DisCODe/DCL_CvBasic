@@ -52,16 +52,16 @@ Sequence::~Sequence() {
 void Sequence::prepareInterface() {
 	// Register handlers.
 	h_onTrigger.setup(this, &Sequence::onTrigger);
-	registerHandler("onTrigger", &h_onTrigger);
+	registerHandler("Trigger", &h_onTrigger);
 
 	h_onLoadImage.setup(this, &Sequence::onLoadImage);
 	registerHandler("onLoadImage", &h_onLoadImage);
 
 	h_onLoadNextImage.setup(this, &Sequence::onLoadNextImage);
-	registerHandler("onLoadNextImage", &h_onLoadNextImage);
+	registerHandler("Load next image", &h_onLoadNextImage);
 
 	h_onSequenceReload.setup(this, &Sequence::onSequenceReload);
-	registerHandler("onSequenceReload", &h_onSequenceReload);
+	registerHandler("Reload sequence", &h_onSequenceReload);
 
 	// Register streams.
 	registerStream("out_img", &out_img);

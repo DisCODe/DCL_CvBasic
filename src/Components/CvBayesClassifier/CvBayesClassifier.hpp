@@ -9,10 +9,10 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
-//#include "EventHandler2.hpp"
+
+#include "set"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -22,6 +22,7 @@ using namespace cv;
 
 namespace Processors {
 namespace CvBayesClassifier {
+
 
 /*!
  * \class CvBayesClassifier
@@ -70,21 +71,23 @@ protected:
 	 */
 	bool onStop();
 
+	/// Returns matrix with samples.
+	void prepareSampleMatrix(const vector<Moments>& vector_, cv::Mat& mat_);
+
+	/// Returns vector with responses.
+	void prepareResponseVector(cv::Mat& resp_mat_);
+
+
 	/// Event handler.
-	Base::EventHandler<CvBayesClassifier> h_onTraining;
+	Base::EventHandler<CvBayesClassifier> h_onBayesTraining;
 	/// Train the classifier with the possessed dataset.
-	void onTraining();
+	void onBayesTraining();
 
 
 	// Handler activated when user will trigger "add to dataset"
 	Base::EventHandler<CvBayesClassifier> h_onAddToDataset;
 	// Sets the add_set flag.
 	void onAddToDataset();
-	
-	// Handler activated when user will trigger "predict data"
-	Base::EventHandler<CvBayesClassifier> h_onPredict;
-	// Sets the predict flag.
-	void onPredict();
 
 
 	// Handler activated when user will trigger "clear whole dataset"
@@ -92,16 +95,29 @@ protected:
 	// Adds received observation to dataset.
 	void onClearDataset();
 
-	
-	// Handler activated when user will trigger "save params"
-	Base::EventHandler<CvBayesClassifier> h_onSaveParams;
-	// Save classifier parameters to file
-	void onSaveParams();
-	
-	// Handler activated when user will trigger "load params"
-	Base::EventHandler<CvBayesClassifier> h_onLoadParams;
-	// Load classifier parameters from file
-	void onLoadParams();
+
+	// Handler activated when user will trigger "display dataset"
+	Base::EventHandler<CvBayesClassifier> h_onDisplayDataset;
+	// Displays the dataset.
+	void onDisplayDataset();
+
+	// Updates filename
+	void onFilenameChanged(const std::string & old_filename, const std::string & new_filename);
+
+	// Handler activated when user will trigger "save bayes"
+	Base::EventHandler<CvBayesClassifier> h_onBayesSave;
+	// Saves the bayes internal state to an xml file.
+	void onBayesSave();
+
+	// Handler activated when user will trigger "load bayes"
+	Base::EventHandler<CvBayesClassifier> h_onBayesLoad;
+	// Loads the model state from an xml file.
+	void onBayesLoad();
+
+	// Handler activated when user will trigger "Clear bayes"
+	Base::EventHandler<CvBayesClassifier> h_onBayesClear;
+	// Loads clears the bayes settings.
+	void onBayesClear();
 
 	/// Event handler.
 	Base::EventHandler<CvBayesClassifier> h_onNewData;
@@ -111,11 +127,33 @@ protected:
 	/// Input data stream
 	Base::DataStreamIn<vector<Moments> > in_moments;
 
-	// Class of the incomming training example.
+	// Flag: if set, the Bayes uses spatial moments.
+	Base::Property<bool> use_spatial;
+
+	// Flag: if set, the bayes uses central moments.
+	Base::Property<bool> use_central;
+
+	// Flag: if set, the bayes uses nomalized central moments.
+	Base::Property<bool> use_normalized_central;
+
+
+	// Flag: if set, the bayes will add every sample to dataset.
+	Base::Property<bool> continuousCollection;
+
+	// Flag: if set, the bayes recognition.
+	Base::Property<bool> continuousRecognition;
+
+	// Class of the incoming training example.
 	Base::Property<short> trainingClass;
 
+	// Name of file.
+	Base::Property<std::string> filename;
+
+	// Checks whether such a set of moments alread exists in dataset.
+	bool isAlreadyPresent(const vector<Moments>& dataset_, const Moments &m_);
+
 private:
-	// Classifier.
+	// Classifier.true
 	CvNormalBayesClassifier bayes;
 
 	// The vector of vectors of moments used for training
@@ -127,11 +165,11 @@ private:
 	// Class names
 	vector<std::string> classes;
 
-	// Flag used for memorizing that user demanded to add the incomming moments to dataset.
+	// Flag used for memorizing that user demanded to add the incoming moments to dataset.
 	bool add;
 
-	// Flag used for memorizing that user demanded to predict incomming moments.
-	bool predict;
+	// Number of features used as inputs for Bayes classfier.
+	short number_of_features;
 };
 
 } //: namespace CvBayesClassifier
