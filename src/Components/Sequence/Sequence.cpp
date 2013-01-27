@@ -118,7 +118,7 @@ void Sequence::onLoadImage() {
 
 	CLOG(LTRACE) << "Sequence: reading image " << files[frame];
 	try {
-		img = cv::imread(files[frame], -1);
+		img = cv::imread(files[frame], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
 	} catch (...) {
 		CLOG(LWARNING) << name() << ": image reading failed! ["
 				<< files[frame] << "]";
@@ -173,7 +173,7 @@ bool Sequence::findFiles() {
 
 	CLOG(LINFO) << "Sequence loaded.";
 	BOOST_FOREACH(std::string fname, files)
-		CLOG(LINFO) << fname;
+	CLOG(LINFO) << fname;
 
 	return !files.empty();
 }

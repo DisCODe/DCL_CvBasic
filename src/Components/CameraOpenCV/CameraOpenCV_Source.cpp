@@ -7,10 +7,10 @@
 
 #include <iostream>
 
+#include <boost/bind.hpp>
+
 #include "CameraOpenCV_Source.hpp"
 #include "Logger.hpp"
-
-#include <boost/bind.hpp>
 
 namespace Sources {
 namespace CameraOpenCV {

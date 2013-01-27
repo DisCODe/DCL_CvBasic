@@ -4,41 +4,39 @@
  * \author Tomek Kornuta,,,
  */
 
-#ifndef CVSIFT_HPP_
-#define CVSIFT_HPP_
+#ifndef SKELETONIZATION_HPP_
+#define SKELETONIZATION_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
+#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
-#include "Types/Features.hpp"
+#include "EventHandler2.hpp"
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/features2d/features2d.hpp>
-
+#include <opencv2/imgproc/imgproc.hpp>
 
 namespace Processors {
-namespace CvSIFT {
-
-using namespace cv;
+namespace Skeletonization {
 
 /*!
- * \class CvSIFT
- * \brief CvSIFT processor class.
+ * \class Skeletonization
+ * \brief Skeletonization processor class.
  *
- * CvSIFT processor.
+ * Skeletonization processor.
  */
-class CvSIFT: public Base::Component {
+class Skeletonization: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	CvSIFT(const std::string & name = "CvSIFT");
+	Skeletonization(const std::string & name = "Skeletonization");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~CvSIFT();
+	virtual ~Skeletonization();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -75,25 +73,22 @@ protected:
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <CvSIFT> h_onNewImage;
+	Base::EventHandler <Skeletonization> h_onNewImage;
 
-	/// Input data stream
-	Base::DataStreamIn <Mat> in_img;
+	/// Input image
+	Base::DataStreamIn <cv::Mat> in_img;
 
-	/// Output data stream containing extracted features
-	Base::DataStreamOut <Types::Features> out_features;
-
-	/// Output data stream containing feature descriptors
-	Base::DataStreamOut <cv::Mat> out_descriptors;
+	/// Output data stream - image.
+	Base::DataStreamOut <cv::Mat> out_img;
 
 };
 
-} //: namespace CvSIFT
+} //: namespace Skeletonization
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CvSIFT", Processors::CvSIFT::CvSIFT)
+REGISTER_COMPONENT("Skeletonization", Processors::Skeletonization::Skeletonization)
 
-#endif /* CVSIFT_HPP_ */
+#endif /* SKELETONIZATION_HPP_ */

@@ -9,6 +9,7 @@
 
 #include "Movie_Source.hpp"
 
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 
 namespace Sources {

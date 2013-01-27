@@ -1,4 +1,8 @@
 # Add all components here using ADD_COMPONENT(<COMPONENT_DIRECTORY>)
+ADD_COMPONENT(CvHoughCircles)
+
+ADD_COMPONENT(CvAdaptiveThreshold)
+
 ADD_COMPONENT(CvFindChessboardCorners)
  
 ADD_COMPONENT(CvThreshold)
@@ -33,6 +37,8 @@ ADD_COMPONENT(RGBLUT)
 
 ADD_COMPONENT(HSVLUT)
 
+ADD_COMPONENT(ImageWriter)
+
 ADD_COMPONENT(Sum)
 
 ADD_COMPONENT(CvCanny)
@@ -40,3 +46,15 @@ ADD_COMPONENT(CvCanny)
 ADD_COMPONENT(CvHarris)
 
 ADD_COMPONENT(CvSIFT)
+
+ADD_COMPONENT(CvFlann)
+
+ADD_COMPONENT(CvSURF)
+
+ADD_COMPONENT(CvContour)
+
+ADD_COMPONENT(CvMoments)
+
+ADD_COMPONENT(Skeletonization)
+
+ADD_COMPONENT(CvBayesClassifier)

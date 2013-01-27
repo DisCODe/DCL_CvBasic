@@ -79,7 +79,7 @@
  */
 
 namespace Types {
-	class Drawable;
+class Drawable;
 }
 
 namespace Sinks {
@@ -91,8 +91,7 @@ using namespace cv;
  * \class CvWindow_Sink
  * \brief Creates a window and displays the image
  */
-class CvWindow_Sink: public Base::Component
-{
+class CvWindow_Sink: public Base::Component {
 public:
 	/*!
 	 * Constructor.
@@ -139,6 +138,15 @@ protected:
 	void onNewImageN(int n);
 
 	/*!
+	 * Event handler function - for saving of a single selected image at once.
+	 */
+	void onSaveImageN(int n);
+
+	/*!
+	 * Event handler function - for saving of all images.
+	 */
+	void onSaveAllImages();
+	/*!
 	 * Event handler function.
 	 */
 	void onRefresh();
@@ -149,32 +157,49 @@ protected:
 	/*!
 	 * Callback called when title is changed
 	 */
-	void onTitleCahnged(const std::string & old_title, const std::string & new_title);
+	void onTitleChanged(const std::string & old_title,
+			const std::string & new_title);
+
+	/*!
+	 * Callback called when filename is changed
+	 */
+	void onFilenameChanged(const std::string & old_filename,
+			const std::string & new_filename);
+
+	/*!
+	 * Callback called when dir is changed
+	 */
+	void onDirChanged(const std::string & old_dir, const std::string & new_dir);
+
+	/// Event handler.
+	Base::EventHandler<CvWindow_Sink> h_onSaveAllImages;
 
 	/// Event handlers
-	std::vector< Base::EventHandler2* > handlers;
-
+	std::vector<Base::EventHandler2*> handlers;
 
 	/// Image to be drawn
-	std::vector< Base::DataStreamIn<Mat, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex> *> in_img;
+	std::vector<Base::DataStreamIn<Mat, Base::DataStreamBuffer::Newest,
+			Base::Synchronization::Mutex> *> in_img;
 
 	/// Additional data to draw
-	std::vector< Base::DataStreamInPtr<Types::Drawable, Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex> *> in_draw;
+	std::vector<Base::DataStreamInPtr<Types::Drawable,
+			Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex> *>
+			in_draw;
 
 	/// Image to be drawn.
-	std::vector< cv::Mat > img;
+	std::vector<cv::Mat> img;
 
-	std::vector< boost::shared_ptr<Types::Drawable> > to_draw;
+	std::vector<boost::shared_ptr<Types::Drawable> > to_draw;
 
-
-
-
+	std::vector<std::string> titles;
 	Base::Property<std::string> title;
+
 	Base::Property<int> count;
 
 	bool firststep;
 
-	std::vector<std::string> titles;
+	Base::Property<std::string> filename;
+	Base::Property<std::string> dir;
 };
 
 }//: namespace CvWindow

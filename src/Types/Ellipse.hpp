@@ -42,6 +42,20 @@ public:
 		return ret;
 	}
 
+	/// Returns area (based on width and height, not number of pixels).
+	uint32_t getArea() const {
+		return rect_.size.width * rect_.size.height;
+	}
+
+/*	/// Set data basing on given rotated rectangle.
+	Ellipse & operator=(const cv::RotatedRect &rhs) {
+		rect_.center.x = rhs.center.x;
+		rect_.center.y = rhs.center.y;
+		rect_.size.width = rhs.size.width;
+		rect_.size.height = rhs.size.height;
+		rect_.angle = rhs.angle;
+	}*/
+
 private:
 	const cv::RotatedRect rect_;
 };

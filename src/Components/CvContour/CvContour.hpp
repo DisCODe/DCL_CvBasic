@@ -4,41 +4,42 @@
  * \author Tomek Kornuta,,,
  */
 
-#ifndef CVSIFT_HPP_
-#define CVSIFT_HPP_
+#ifndef CVCONTOUR_HPP_
+#define CVCONTOUR_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
+#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Property.hpp"
-#include "Types/Features.hpp"
+#include "EventHandler2.hpp"
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/features2d/features2d.hpp>
-
-
-namespace Processors {
-namespace CvSIFT {
+#include <opencv2/imgproc/imgproc.hpp>
 
 using namespace cv;
 
+namespace Processors {
+namespace CvContour {
+
+
 /*!
- * \class CvSIFT
- * \brief CvSIFT processor class.
+ * \class CvContour
+ * \brief CvContour processor class.
  *
- * CvSIFT processor.
+ * CvContour processor.
  */
-class CvSIFT: public Base::Component {
+class CvContour: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	CvSIFT(const std::string & name = "CvSIFT");
+	CvContour(const std::string & name = "CvContour");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~CvSIFT();
+	virtual ~CvContour();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -75,25 +76,23 @@ protected:
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <CvSIFT> h_onNewImage;
+	Base::EventHandler <CvContour> h_onNewImage;
 
 	/// Input data stream
-	Base::DataStreamIn <Mat> in_img;
+	Base::DataStreamIn <cv::Mat> in_img;
 
-	/// Output data stream containing extracted features
-	Base::DataStreamOut <Types::Features> out_features;
-
-	/// Output data stream containing feature descriptors
-	Base::DataStreamOut <cv::Mat> out_descriptors;
+	/// Output data stream containing extracted contours
+	Base::DataStreamOut <vector<vector<Point> > > out_contours;
+	Base::DataStreamOut <cv::Mat> out_img;
 
 };
 
-} //: namespace CvSIFT
+} //: namespace CvContour
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CvSIFT", Processors::CvSIFT::CvSIFT)
+REGISTER_COMPONENT("CvContour", Processors::CvContour::CvContour)
 
-#endif /* CVSIFT_HPP_ */
+#endif /* CVCONTOUR_HPP_ */
