@@ -20,10 +20,10 @@ CvBayesClassifier::CvBayesClassifier(const std::string & name) :
 			continuousRecognition("Recognition.continuous", false),
 			continuousCollection("Training.continuous samples collection", false),
 			trainingClass("Training.class", 1),
-			filename("Bayes.filename", boost::bind(&CvBayesClassifier::onFilenameChanged, this, _1, _2), name),
-			use_spatial("Bayes.Spatial moments", true),
-			use_central("Bayes.Central moments", true),
-			use_normalized_central("Bayes.Normalized central moments", true)
+			filename("Classifier.filename", boost::bind(&CvBayesClassifier::onFilenameChanged, this, _1, _2), name),
+			use_spatial("Classifier.Spatial moments", true),
+			use_central("Classifier.Central moments", true),
+			use_normalized_central("Classifier.Normalized central moments", true)
 {
 	// Register properties.
 	registerProperty(continuousRecognition);
@@ -62,7 +62,7 @@ void CvBayesClassifier::prepareInterface() {
 
 	// Bayes: clear.
 	h_onBayesClear.setup(this, &CvBayesClassifier::onBayesClear);
-	registerHandler("Bayes clear", &h_onBayesClear);
+	registerHandler("Bayes reset", &h_onBayesClear);
 
 	// Bayes: Training.
 	h_onBayesTraining.setup(this, &CvBayesClassifier::onBayesTraining);
