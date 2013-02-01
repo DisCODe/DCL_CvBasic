@@ -47,6 +47,10 @@ void CameraOpenCV_Source::prepareInterface() {
 	h_onTrigger.setup(this, &CameraOpenCV_Source::onTrigger);
 	registerHandler("onTrigger", &h_onTrigger);
 
+	h_onGrabFrame.setup(this, &CameraOpenCV_Source::onGrabFrame);
+	registerHandler("onGrabFrame", &h_onGrabFrame);
+	addDependency("onGrabFrame", NULL);
+
 	registerStream("out_img", &out_img);
 }
 
@@ -85,25 +89,27 @@ bool CameraOpenCV_Source::onFinish() {
 }
 
 
-bool CameraOpenCV_Source::onStep() {
+void CameraOpenCV_Source::onGrabFrame() {
+	if (m_change_device)
+		changeDevice();
+
 	if (!valid)
-		return true;
+		return;
 
 	if (m_triggered && !trig)
-		return true;
+		return;
 
 	trig = false;
 	cap >> frame;
 
 	if (frame.empty()) {
-		return false;
+		return;
 	}
 
 	LOG(LTRACE) << "CameraOpenCV: got frame!\n";
 
 	out_img.write(frame);
 
-	return true;
 }
 
 bool CameraOpenCV_Source::onStart() {
@@ -120,16 +126,20 @@ void CameraOpenCV_Source::onTrigger() {
 }
 
 void CameraOpenCV_Source::onDeviceCahnged(int old_device, int new_device) {
+	if (!running()) return;
+	m_change_device = true;
+}
+
+void CameraOpenCV_Source::changeDevice() {
+	m_change_device = false;
 	valid = false;
 	cap.release();
-	cap.open(new_device);
+	cap.open(m_device);
 
 	if (!cap.isOpened()) {
 		LOG(LWARNING) << "Couldn't set new device!";
-		m_device = old_device;
 	}
 
-	cap.open(m_device);
 	valid = true;
 }
 
