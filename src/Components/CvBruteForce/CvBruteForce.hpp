@@ -1,11 +1,12 @@
 /*!
  * \file
  * \brief 
- * \author Tomek Kornuta,,,
+ * \author Jan Figat
+ * \e-mail jan.figat@gmail.com
  */
 
-#ifndef CVFLANN_HPP_
-#define CVFLANN_HPP_
+#ifndef CVBRUTEFORCE_HPP_
+#define CVBRUTEFORCE_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -22,27 +23,27 @@
 
 
 namespace Processors {
-namespace CvFlann {
+namespace CvBruteForce {
 
 using namespace cv;
 
 /*!
- * \class CvFlann
- * \brief CvFlann processor class.
+ * \class CvBruteForce
+ * \brief CvBruteForce processor class.
  *
- * CvFlann processor.
+ * CvBruteForce processor.
  */
-class CvFlann: public Base::Component {
+class CvBruteForce: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	CvFlann(const std::string & name = "CvFlann");
+	CvBruteForce(const std::string & name = "CvBruteForce");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~CvFlann();
+	virtual ~CvBruteForce();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -79,7 +80,7 @@ protected:
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <CvFlann> h_onNewImage;
+	Base::EventHandler <CvBruteForce> h_onNewImage;
 
 	/// Input data stream containing extracted features.
 	Base::DataStreamIn <Types::Features> in_features0;
@@ -107,12 +108,12 @@ protected:
 
 };
 
-} //: namespace CvFlann
+} //: namespace CvBruteForce
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CvFlann", Processors::CvFlann::CvFlann)
+REGISTER_COMPONENT("CvBruteForce", Processors::CvBruteForce::CvBruteForce)
 
-#endif /* CVFLANN_HPP_ */
+#endif /* CVBRUTEFORCE_HPP_ */

@@ -1,34 +1,35 @@
 /*!
  * \file
- * \brief
- * \author Tomek Kornuta,,,
+ * \brief ORB - oriented BRIEF
+ * \author Jan Figat,
+ * \e-mail jan.figat@gmail.com
  */
 
 #include <memory>
 #include <string>
 
-#include "CvSURF.hpp"
+#include "CvORB.hpp"
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
 
 namespace Processors {
-namespace CvSURF {
+namespace CvORB {
 
-CvSURF::CvSURF(const std::string & name) :
-		Base::Component(name),
-        minHessian("minHessian", 400, "minHessian")
-{
-	// Register properties.
-	registerProperty(minHessian);
+CvORB::CvORB(const std::string & name) :
+        Base::Component(name),
+        nfeatures("nfeatures", 500, "nfeatures")
+		{
+			// Register properties.
+            registerProperty(nfeatures);
+		}
+
+CvORB::~CvORB() {
 }
 
-CvSURF::~CvSURF() {
-}
-
-void CvSURF::prepareInterface() {
+void CvORB::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvSURF::onNewImage);
+	h_onNewImage.setup(this, &CvORB::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 	addDependency("onNewImage", &in_img);
 
@@ -38,41 +39,40 @@ void CvSURF::prepareInterface() {
 	registerStream("out_descriptors", &out_descriptors);
 }
 
-bool CvSURF::onInit() {
+bool CvORB::onInit() {
 
 	return true;
 }
 
-bool CvSURF::onFinish() {
+bool CvORB::onFinish() {
 	return true;
 }
 
-bool CvSURF::onStop() {
+bool CvORB::onStop() {
 	return true;
 }
 
-bool CvSURF::onStart() {
+bool CvORB::onStart() {
 	return true;
 }
 
-void CvSURF::onNewImage()
+void CvORB::onNewImage()
 {
-	LOG(LTRACE) << "CvSURF::onNewImage\n";
+	LOG(LTRACE) << "CvORB::onNewImage\n";
 	try {
 		// Input: a grayscale image.
 		cv::Mat input = in_img.read();
 		cv::Mat gray;
 		cvtColor(input, gray, COLOR_BGR2GRAY);
 
-
-		//-- Step 1: Detect the keypoints using SURF Detector.
-		SurfFeatureDetector detector( minHessian );
+		//-- Step 1: Detect the keypoints using ORB Detector.
+        cv::OrbFeatureDetector detector( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
 		std::vector<KeyPoint> keypoints;
 		detector.detect( gray, keypoints );
 
 
 		//-- Step 2: Calculate descriptors (feature vectors).
-        SurfDescriptorExtractor extractor;
+        cv::OrbDescriptorExtractor extractor;
 		Mat descriptors;
 		extractor.compute( gray, keypoints, descriptors);
 
@@ -83,11 +83,11 @@ void CvSURF::onNewImage()
 		// Write descriptors to the output.
 		out_descriptors.write(descriptors);
 	} catch (...) {
-		LOG(LERROR) << "CvSURF::onNewImage failed\n";
+		LOG(LERROR) << "CvORB::onNewImage failed\n";
 	}
 }
 
 
 
-} //: namespace CvSURF
+} //: namespace CvORB
 } //: namespace Processors
