@@ -15,6 +15,13 @@
 
 #include <opencv2/opencv.hpp>
 
+#if CV_MAJOR_VERSION == 2
+#if CV_MINOR_VERSION > 4
+#include <opencv2/nonfree/features2d.hpp>
+#endif
+#elif CV_MAJOR_VERSION == 3
+#include <opencv2/nonfree/features2d.hpp>
+#endif
 
 namespace Processors {
 namespace CvSURF {

@@ -6,6 +6,8 @@
 
 #include <memory>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 #include "ImageWriter.hpp"
 #include "Common/Logger.hpp"
@@ -13,6 +15,7 @@
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace Processors {
 namespace ImageWriter {
@@ -97,10 +100,15 @@ bool ImageWriter::onStart() {
 void ImageWriter::write_image_N(int n) {
 	CLOG(LTRACE) << name() << "::onNewImage(" << n << ")";
 
+	boost::posix_time::ptime tm = boost::posix_time::microsec_clock::local_time();
+
 	try {
 		if(!in_img[n]->empty()){
 			counts[n] = counts[n] + 1;
-			std::string fname = std::string(directory) + "/" + base_names[n] + boost::lexical_cast<std::string>(counts[n]) + "." + formats[n];
+			std::stringstream ss;
+			ss << std::setw(digits) << std::setfill('0') << counts[n];
+			//std::string fname = std::string(directory) + "/" + base_names[n] + boost::lexical_cast<std::string>(counts[n]) + "." + formats[n];
+			std::string fname = std::string(directory) + "/" + boost::posix_time::to_iso_extended_string(tm) + "_" + base_names[n] + "." + formats[n];
 			cv::imwrite(fname, in_img[n]->read());
 			CLOG(LNOTICE) << "Written: " << fname;
 		}
