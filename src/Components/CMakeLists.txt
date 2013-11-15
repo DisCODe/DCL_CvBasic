@@ -58,3 +58,5 @@ ADD_COMPONENT(CvMoments)
 ADD_COMPONENT(Skeletonization)
 
 ADD_COMPONENT(CvBayesClassifier)
+
+ADD_COMPONENT(CvHoughLines)

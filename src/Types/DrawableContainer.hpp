@@ -11,7 +11,7 @@
 
 #include "Drawable.hpp"
 
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 #include <boost/foreach.hpp>
@@ -22,7 +22,7 @@ class DrawableContainer : public Drawable {
 public:
 	~DrawableContainer() {}
 
-	virtual void draw(cv::Mat & image, CvScalar color, int offsetX = 0, int offsetY = 0) {
+	virtual void draw(cv::Mat & image, cv::Scalar color, int offsetX = 0, int offsetY = 0) {
 		BOOST_FOREACH(Drawable * item, items) {
 			item->draw(image, color, offsetX, offsetY);
 		}

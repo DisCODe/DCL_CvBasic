@@ -152,11 +152,12 @@ void CvWindow_Sink::onNewImageN(int n) {
 
 		if (to_draw[n]) {
 			to_draw[n]->draw(img[n], CV_RGB(255,0,255));
-			to_draw[n] = boost::shared_ptr<Types::Drawable>();
+			// TODO: dodać wygaszanie starszych drawable, np. przez 10 odświeżeń
+			//to_draw[n] = boost::shared_ptr<Types::Drawable>();
 		}
 
 		// Display image.
-		onStep();
+		//onStep();
 	} catch (std::exception &ex) {
 		CLOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
 	}
