@@ -15,8 +15,12 @@ namespace Processors {
 namespace CvAdaptiveThreshold {
 
 CvAdaptiveThreshold_Processor::CvAdaptiveThreshold_Processor(const std::string & name) :
-	Base::Component(name), maxValue("maxValue"), method("method", string("ADAPTIVE_THRESH_MEAN_C"), "combo"),
-			thresholdType("thresholdType", string("THRESH_BINARY"), "combo"), blockSize("blockSize"), C("C")
+	Base::Component(name),
+	maxValue("maxValue", 255, "range"),
+	method("method", string("ADAPTIVE_THRESH_MEAN_C"), "combo"),
+	thresholdType("thresholdType", string("THRESH_BINARY"), "combo"),
+	blockSize("blockSize", 5, "range"),
+	C("C", 3, "range")
 {
 	LOG(LTRACE) << "Hello CvAdaptiveThreshold_Processor\n";
 
@@ -24,6 +28,12 @@ CvAdaptiveThreshold_Processor::CvAdaptiveThreshold_Processor(const std::string &
 	method.addConstraint("ADAPTIVE_THRESH_GAUSSIAN_C");
 	thresholdType.addConstraint("THRESH_BINARY");
 	thresholdType.addConstraint("THRESH_BINARY_INV");
+	maxValue.addConstraint("0");
+	maxValue.addConstraint("255");
+	blockSize.addConstraint("0");
+	blockSize.addConstraint("10");
+	C.addConstraint("0");
+	C.addConstraint("255");
 
 	registerProperty(maxValue);
 	registerProperty(method);
@@ -96,7 +106,7 @@ void CvAdaptiveThreshold_Processor::onNewImage()
 				<< ")";
 	}
 
-	adaptiveThreshold(image, thresholdedImage, maxValue, aM, tT, blockSize, C);
+	adaptiveThreshold(image, thresholdedImage, maxValue, aM, tT, blockSize*2+1, C);
 	out_img.write(thresholdedImage);
 }
 
