@@ -32,6 +32,14 @@ public:
 		items.push_back(it);
 	}
 
+	Drawable * get(size_t id) {
+		return items[id];
+	}
+
+	size_t size() {
+		return items.size();
+	}
+
 	void clear() {
 		items.clear();
 	}

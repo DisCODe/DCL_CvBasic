@@ -55,6 +55,14 @@ public:
 		return fabs(A * p.x + B * p.y + C) / sqrt(A * A + B * B);
 	}
 
+	// returns angle in range (-pi/2, pi/2]
+	double getAngle() {
+		if (B == 0)
+			return M_PI_2;
+		else
+			return atan(A);
+	}
+
 
 	cv::Point getP1(){
 		return p1;
