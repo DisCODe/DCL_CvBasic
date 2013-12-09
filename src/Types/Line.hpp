@@ -42,7 +42,7 @@ public:
 		return ret;
 	}
 
-	virtual void draw(cv::Mat& image, CvScalar color, int offsetX = 0, int offsetY = 0)
+	virtual void draw(cv::Mat& image, cv::Scalar color, int offsetX = 0, int offsetY = 0)
 	{
 		cv::line(image, p1, p2, getCol(),2);
 	}
@@ -53,6 +53,14 @@ public:
 		//			computeLineEquation();
 		//		}
 		return fabs(A * p.x + B * p.y + C) / sqrt(A * A + B * B);
+	}
+
+	// returns angle in range (-pi/2, pi/2]
+	double getAngle() {
+		if (B == 0)
+			return M_PI_2;
+		else
+			return atan(A);
 	}
 
 

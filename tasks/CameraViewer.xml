@@ -15,9 +15,9 @@
 	<!-- task definition -->
 	<Subtasks>
 		<Subtask name="Processing">
-			<Executor name="Exec1" period="0.0">
+			<Executor name="Exec1" period="0.01">
 				<Component name="Source" type="CvBasic:CameraOpenCV" priority="1" bump="0">
-					<param name="device">1</param>
+					<param name="device">0</param>
 				</Component>
 			</Executor>
 		</Subtask>

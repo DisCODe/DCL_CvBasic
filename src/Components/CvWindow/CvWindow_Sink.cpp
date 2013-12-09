@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <ctime>
 
 #include "CvWindow_Sink.hpp"
 #include "Logger.hpp"
@@ -151,11 +152,12 @@ void CvWindow_Sink::onNewImageN(int n) {
 
 		if (to_draw[n]) {
 			to_draw[n]->draw(img[n], CV_RGB(255,0,255));
-			to_draw[n] = boost::shared_ptr<Types::Drawable>();
+			// TODO: dodać wygaszanie starszych drawable, np. przez 10 odświeżeń
+			//to_draw[n] = boost::shared_ptr<Types::Drawable>();
 		}
 
 		// Display image.
-		onStep();
+		//onStep();
 	} catch (std::exception &ex) {
 		CLOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
 	}
@@ -216,6 +218,15 @@ void CvWindow_Sink::onSaveImageN(int n) {
 void CvWindow_Sink::onSaveAllImages() {
 	CLOG(LTRACE) << name() << "::onSaveAllImages";
 
+	std::time_t rawtime;
+	std::tm* timeinfo;
+	char buffer [80];
+
+	std::time(&rawtime);
+	timeinfo = std::localtime(&rawtime);
+
+	std::strftime(buffer,80,"%Y-%m-%d-%H-%M-%S",timeinfo);
+
 	try {
 		for (int i = 0; i < count; ++i) {
 			char id = '0' + i;
@@ -224,7 +235,7 @@ void CvWindow_Sink::onSaveAllImages() {
 				LOG(LWARNING) << name() << ": image " << i << " empty";
 			} else {
 				// Save image.
-				std::string tmp_name = std::string(dir) + std::string("/") + std::string(filename) + id + std::string(".png");
+				std::string tmp_name = std::string(dir) + std::string("/") + std::string(filename) + id + "_" + buffer + std::string(".png");
 				imwrite(tmp_name, img[i]);
 				CLOG(LINFO) << "Window " << name() << " saved to file " << tmp_name <<std::endl;
 			}
