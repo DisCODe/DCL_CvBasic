@@ -1,11 +1,12 @@
 /*!
  * \file
  * \brief 
- * \author Tomek Kornuta,,,
+ * \author Jan Figat,
+ * \e-mail jan.figat@gmail.com
  */
 
-#ifndef CVSURF_HPP_
-#define CVSURF_HPP_
+#ifndef CvBRISK_HPP_
+#define CvBRISK_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -14,33 +15,36 @@
 #include "Types/Features.hpp"
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/nonfree/features2d.hpp>
+//#include "opencv2/nonfree/nonfree.hpp"
+#include <opencv2/features2d/features2d.hpp>
 
-#include "opencv2/features2d/features2d.hpp" 
-#include "opencv2/nonfree/features2d.hpp" 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 
 namespace Processors {
-namespace CvSURF {
+namespace CvBRISK {
 
 using namespace cv;
 
 /*!
- * \class CvSURF
- * \brief CvSURF processor class.
+ * \class CvBRISK
+ * \brief CvBRISK processor class.
  *
- * CvSURF processor.
+ * CvBRISK processor.
  */
-class CvSURF: public Base::Component {
+class CvBRISK: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	CvSURF(const std::string & name = "CvSURF");
+	CvBRISK(const std::string & name = "CvBRISK");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~CvSURF();
+	virtual ~CvBRISK();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -77,7 +81,7 @@ protected:
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <CvSURF> h_onNewImage;
+	Base::EventHandler <CvBRISK> h_onNewImage;
 
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat> in_img;
@@ -85,20 +89,20 @@ protected:
 	/// Output data stream containing extracted features
 	Base::DataStreamOut <Types::Features> out_features;
 
-	/// Output data stream containing feature descriptors
+    /// Output data stream containing feature descriptors
 	Base::DataStreamOut <cv::Mat> out_descriptors;
 
-	// Hessian
-	Base::Property<int> minHessian;
+    // threshold
+    Base::Property<int> thresh;
 
 };
 
-} //: namespace CvSURF
+} //: namespace CvBRISK
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CvSURF", Processors::CvSURF::CvSURF)
+REGISTER_COMPONENT("CvBRISK", Processors::CvBRISK::CvBRISK)
 
-#endif /* CVSURF_HPP_ */
+#endif /* CvBRISK_HPP_ */

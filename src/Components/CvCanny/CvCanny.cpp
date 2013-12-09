@@ -70,6 +70,8 @@ void CvCanny::onNewImage()
 	LOG(LTRACE) << "CvCanny::onNewImage\n";
 	try {
 		cv::Mat in = in_img.read();
+		cv::Mat gray;
+		cvtColor(in, gray, COLOR_BGR2GRAY);
 
 		// Create a matrix with the adequate size and depth.
 		cv::Mat out;

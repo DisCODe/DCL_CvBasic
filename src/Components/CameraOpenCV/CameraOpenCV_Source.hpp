@@ -57,11 +57,6 @@ protected:
 	bool onFinish();
 
 	/*!
-	 * Retrieves data from device.
-	 */
-	bool onStep();
-
-	/*!
 	 * Start component
 	 */
 	bool onStart();
@@ -79,6 +74,14 @@ protected:
 
 	/// Event handler.
 	Base::EventHandler<CameraOpenCV_Source> h_onTrigger;
+
+	/*!
+	 * Event handler function.
+	 */
+	void onGrabFrame();
+
+	/// Event handler.
+	Base::EventHandler<CameraOpenCV_Source> h_onGrabFrame;
 
 	/// Output data stream
 	Base::DataStreamOut<Mat> out_img;
@@ -99,6 +102,10 @@ protected:
 	void onDeviceCahnged(int old_device, int new_device);
 
 	bool valid;
+
+	bool m_change_device;
+
+	void changeDevice();
 };
 
 }//: namespace CameraOpenCV
