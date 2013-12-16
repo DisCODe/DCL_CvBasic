@@ -2,6 +2,7 @@
  * \file
  * \brief
  * \author Tomek Kornuta,,,
+	modified by Jan Figat
  */
 
 #include <memory>
@@ -69,7 +70,11 @@ void CvHarris::onNewImage()
 	LOG(LTRACE) << "CvHarris::onNewImage\n";
 	try {
 		// Input: a grayscale image.
+			//cv::Mat grayImage;
+			//cv::cvtColor(in_img.read(), grayImage, cv::COLOR_BGR2GRAY);
+			//cv::Mat in = grayImage;
 		cv::Mat in = in_img.read();
+
 
 		Mat dst, dst_norm, dst_norm_scaled;
 		dst = Mat::zeros( in.size(), CV_32FC1 );

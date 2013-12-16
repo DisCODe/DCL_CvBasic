@@ -9,7 +9,8 @@ Basic OpenCV-based components, in most cases just wrappers.
 Dependencies
 ------------
 
-OpenCV >= 2.1.0
+Depends on the CvCoreTypes DCL.
+According to the current changes in the partial commercialization of the OpenCV, several CvBasic components (mainly encapsulating features such as SIFT, SURF, ORB etc.) require version 2.4.6.1.
 
 Maintainer
 ----------

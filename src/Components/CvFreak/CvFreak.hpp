@@ -1,11 +1,12 @@
 /*!
  * \file
  * \brief 
- * \author Tomek Kornuta,,,
+ * \author Jan Figat
+ * \e-mail jan.figat@gmail.com
  */
 
-#ifndef CVSURF_HPP_
-#define CVSURF_HPP_
+#ifndef CVFREAK_HPP_
+#define CVFREAK_HPP_
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
@@ -13,43 +14,35 @@
 #include "Property.hpp"
 #include "Types/Features.hpp"
 
-
 #include <opencv2/opencv.hpp>
-#include <opencv2/nonfree/features2d.hpp>
 
-/*
-#if CV_MAJOR_VERSION == 2
-#if CV_MINOR_VERSION > 4
-#include <opencv2/nonfree/features2d.hpp>
-#endif
-#elif CV_MAJOR_VERSION == 3
-#include <opencv2/nonfree/features2d.hpp>
-#endif
-*/
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 
 namespace Processors {
-namespace CvSURF {
+namespace CvFreak {
 
 using namespace cv;
 
 /*!
- * \class CvSURF
- * \brief CvSURF processor class.
+ * \class CvFreak
+ * \brief CvFreak processor class.
  *
- * CvSURF processor.
  */
-class CvSURF: public Base::Component {
+class CvFreak: public Base::Component {
 public:
 	/*!
 	 * Constructor.
 	 */
-	CvSURF(const std::string & name = "CvSURF");
+	CvFreak(const std::string & name = "CvFreak");
 
 	/*!
 	 * Destructor
 	 */
-	virtual ~CvSURF();
+	virtual ~CvFreak();
 
 	/*!
 	 * Prepare components interface (register streams and handlers).
@@ -86,7 +79,7 @@ protected:
 	void onNewImage();
 
 	/// Event handler.
-	Base::EventHandler <CvSURF> h_onNewImage;
+	Base::EventHandler <CvFreak> h_onNewImage;
 
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat> in_img;
@@ -94,20 +87,18 @@ protected:
 	/// Output data stream containing extracted features
 	Base::DataStreamOut <Types::Features> out_features;
 
-	/// Output data stream containing feature descriptors
+    /// Output data stream containing feature descriptors
 	Base::DataStreamOut <cv::Mat> out_descriptors;
 
-	// Hessian
-	Base::Property<int> minHessian;
 
 };
 
-} //: namespace CvSURF
+} //: namespace CvFreak
 } //: namespace Processors
 
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CvSURF", Processors::CvSURF::CvSURF)
+REGISTER_COMPONENT("CvFreak", Processors::CvFreak::CvFreak)
 
-#endif /* CVSURF_HPP_ */
+#endif /* CVFREAK_HPP_ */

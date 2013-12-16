@@ -1,34 +1,35 @@
 /*!
  * \file
- * \brief
- * \author Tomek Kornuta,,,
+ * \brief BRIEF
+ * \author Jan Figat,
+ * \e-mail jan.figat@gmail.com
  */
 
 #include <memory>
 #include <string>
 
-#include "CvSURF.hpp"
+#include "CvBRIEF.hpp"
 #include "Common/Logger.hpp"
 
 #include <boost/bind.hpp>
 
 namespace Processors {
-namespace CvSURF {
+namespace CvBRIEF {
 
-CvSURF::CvSURF(const std::string & name) :
-		Base::Component(name),
-        minHessian("minHessian", 400, "minHessian")
-{
-	// Register properties.
-	registerProperty(minHessian);
+CvBRIEF::CvBRIEF(const std::string & name) :
+        Base::Component(name)
+		{
+			// Register properties.
+
+
+		}
+
+CvBRIEF::~CvBRIEF() {
 }
 
-CvSURF::~CvSURF() {
-}
-
-void CvSURF::prepareInterface() {
+void CvBRIEF::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvSURF::onNewImage);
+	h_onNewImage.setup(this, &CvBRIEF::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 	addDependency("onNewImage", &in_img);
 
@@ -38,41 +39,41 @@ void CvSURF::prepareInterface() {
 	registerStream("out_descriptors", &out_descriptors);
 }
 
-bool CvSURF::onInit() {
+bool CvBRIEF::onInit() {
 
 	return true;
 }
 
-bool CvSURF::onFinish() {
+bool CvBRIEF::onFinish() {
 	return true;
 }
 
-bool CvSURF::onStop() {
+bool CvBRIEF::onStop() {
 	return true;
 }
 
-bool CvSURF::onStart() {
+bool CvBRIEF::onStart() {
 	return true;
 }
 
-void CvSURF::onNewImage()
+void CvBRIEF::onNewImage()
 {
-	LOG(LTRACE) << "CvSURF::onNewImage\n";
+	LOG(LTRACE) << "CvBRIEF::onNewImage\n";
 	try {
 		// Input: a grayscale image.
-		cv::Mat input = in_img.read();
+		cv::Mat img = in_img.read();
 		cv::Mat gray;
-		cvtColor(input, gray, COLOR_BGR2GRAY);
+		//cvtColor(img,yuv, COLOR_BGR2YCrCb);
+		cvtColor(img, gray, COLOR_BGR2GRAY);
 
-
-		//-- Step 1: Detect the keypoints using SURF Detector.
-		SurfFeatureDetector detector( minHessian );
+		//-- Step 1: Detect the keypoints using FAST Detector.
+		cv::FastFeatureDetector detector(10);
 		std::vector<KeyPoint> keypoints;
 		detector.detect( gray, keypoints );
 
 
 		//-- Step 2: Calculate descriptors (feature vectors).
-        SurfDescriptorExtractor extractor;
+		cv::BriefDescriptorExtractor extractor(32); //this is really 32 x 8 matches since they are binary matches packed into bytes
 		Mat descriptors;
 		extractor.compute( gray, keypoints, descriptors);
 
@@ -83,11 +84,11 @@ void CvSURF::onNewImage()
 		// Write descriptors to the output.
 		out_descriptors.write(descriptors);
 	} catch (...) {
-		LOG(LERROR) << "CvSURF::onNewImage failed\n";
+		LOG(LERROR) << "CvBRIEF::onNewImage failed\n";
 	}
 }
 
 
 
-} //: namespace CvSURF
+} //: namespace CvBRIEF
 } //: namespace Processors
