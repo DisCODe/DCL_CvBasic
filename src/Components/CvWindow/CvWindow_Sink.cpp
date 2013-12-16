@@ -14,6 +14,7 @@
 #include "CvWindow_Sink.hpp"
 #include "Logger.hpp"
 #include "Types/Drawable.hpp"
+#include "Types/DrawableContainer.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
@@ -69,9 +70,11 @@ void CvWindow_Sink::prepareInterface() {
 				(Base::DataStreamInterface*) (in_img[i]));
 		addDependency(std::string("onNewImage") + id, stream);
 
-		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable,
-				Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex>);
+		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable>);
 		registerStream(std::string("in_draw") + id, in_draw[i]);
+
+		out_point.push_back(new Base::DataStreamOut<cv::Point>);
+		registerStream(std::string("out_point") + id, out_point[i]);
 
 		// save handlers
 		hand = new Base::EventHandler2;
@@ -146,8 +149,10 @@ void CvWindow_Sink::onNewImageN(int n) {
 			img[n] = in_img[n]->read().clone();
 		}
 
-		if (!in_draw[n]->empty()) {
-			to_draw[n] = in_draw[n]->read();
+		Types::DrawableContainer ctr;
+		while (!in_draw[n]->empty()) {
+			ctr.add(in_draw[n]->read()->clone());
+			to_draw[n] = boost::shared_ptr<Types::Drawable>(ctr.clone());
 		}
 
 		if (to_draw[n]) {

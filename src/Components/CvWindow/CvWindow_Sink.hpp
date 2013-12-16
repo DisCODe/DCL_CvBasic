@@ -182,9 +182,10 @@ protected:
 			Base::Synchronization::Mutex> *> in_img;
 
 	/// Additional data to draw
-	std::vector<Base::DataStreamInPtr<Types::Drawable,
-			Base::DataStreamBuffer::Newest, Base::Synchronization::Mutex> *>
+	std::vector<Base::DataStreamInPtr<Types::Drawable> *>
 			in_draw;
+
+	std::vector<Base::DataStreamOut<cv::Point> *> out_point;
 
 	/// Image to be drawn.
 	std::vector<cv::Mat> img;
