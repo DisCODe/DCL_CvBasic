@@ -210,9 +210,13 @@ void CvWindow_Sink::onSaveImageN(int n) {
 	CLOG(LTRACE) << name() << "::onSaveImageN(" << n << ")";
 
 	try {
+		// Change compression to lowest.
+	        vector<int> param;
+	        param.push_back(CV_IMWRITE_PNG_COMPRESSION);
+	        param.push_back(0); // MAX_MEM_LEVEL = 9 
 		// Save image.
 		std::string tmp_name = std::string(dir) + std::string("/") + std::string(filename) + std::string(".png");
-		imwrite(tmp_name, img[n]);
+		imwrite(tmp_name, img[n], param);
 		CLOG(LINFO) << "Window " << name() << " saved to file " << tmp_name <<std::endl;
 
 	} catch (std::exception &ex) {
@@ -232,6 +236,11 @@ void CvWindow_Sink::onSaveAllImages() {
 
 	std::strftime(buffer,80,"%Y-%m-%d-%H-%M-%S",timeinfo);
 
+	// Change compression to lowest.
+        vector<int> param;
+	param.push_back(CV_IMWRITE_PNG_COMPRESSION);
+	param.push_back(0); // MAX_MEM_LEVEL = 9 
+
 	try {
 		for (int i = 0; i < count; ++i) {
 			char id = '0' + i;
@@ -241,7 +250,7 @@ void CvWindow_Sink::onSaveAllImages() {
 			} else {
 				// Save image.
 				std::string tmp_name = std::string(dir) + std::string("/") + std::string(filename) + id + "_" + buffer + std::string(".png");
-				imwrite(tmp_name, img[i]);
+				imwrite(tmp_name, img[i], param);
 				CLOG(LINFO) << "Window " << name() << " saved to file " << tmp_name <<std::endl;
 			}
 		}
