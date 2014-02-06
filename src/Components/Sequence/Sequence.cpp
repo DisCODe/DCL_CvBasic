@@ -181,6 +181,7 @@ bool Sequence::findFiles() {
 }
 
 void Sequence::onTrigger() {
+	in_trigger.read();
 	trig = true;
 }
 

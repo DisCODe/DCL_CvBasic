@@ -29,7 +29,6 @@ registerStream("out_trigger", &out_trigger);
 	// Register handlers
 	h_trigger.setup(boost::bind(&Trigger::trigger, this));
 	registerHandler("trigger", &h_trigger);
-	addDependency("trigger", NULL);
 
 }
 
