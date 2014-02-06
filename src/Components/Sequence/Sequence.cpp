@@ -65,6 +65,7 @@ void Sequence::prepareInterface() {
 
 	// Register streams.
 	registerStream("out_img", &out_img);
+	registerStream("in_trigger", &in_trigger);
 
 	// Add dependencies.
 	addDependency("onLoadImage", NULL);
