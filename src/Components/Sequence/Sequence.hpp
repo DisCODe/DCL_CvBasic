@@ -119,6 +119,9 @@ protected:
 	 */
 	bool onStop();
 
+	/// Input data stream
+	Base::DataStreamIn<bool> in_trigger;
+
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 

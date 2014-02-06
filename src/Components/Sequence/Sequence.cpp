@@ -53,7 +53,7 @@ void Sequence::prepareInterface() {
 	// Register handlers.
 	h_onTrigger.setup(this, &Sequence::onTrigger);
 	registerHandler("Trigger", &h_onTrigger);
-
+	
 	h_onLoadImage.setup(this, &Sequence::onLoadImage);
 	registerHandler("onLoadImage", &h_onLoadImage);
 
@@ -68,6 +68,7 @@ void Sequence::prepareInterface() {
 
 	// Add dependencies.
 	addDependency("onLoadImage", NULL);
+	addDependency("Trigger", &in_trigger);
 }
 
 bool Sequence::onInit() {
