@@ -53,7 +53,7 @@ void Sequence::prepareInterface() {
 	// Register handlers.
 	h_onTrigger.setup(this, &Sequence::onTrigger);
 	registerHandler("Trigger", &h_onTrigger);
-
+	
 	h_onLoadImage.setup(this, &Sequence::onLoadImage);
 	registerHandler("onLoadImage", &h_onLoadImage);
 
@@ -65,9 +65,11 @@ void Sequence::prepareInterface() {
 
 	// Register streams.
 	registerStream("out_img", &out_img);
+	registerStream("in_trigger", &in_trigger);
 
 	// Add dependencies.
 	addDependency("onLoadImage", NULL);
+	addDependency("Trigger", &in_trigger);
 }
 
 bool Sequence::onInit() {
@@ -179,6 +181,7 @@ bool Sequence::findFiles() {
 }
 
 void Sequence::onTrigger() {
+	in_trigger.read();
 	trig = true;
 }
 
