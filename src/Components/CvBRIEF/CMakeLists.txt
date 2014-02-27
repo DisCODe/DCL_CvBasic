@@ -7,6 +7,8 @@ FILE(GLOB files *.cpp)
 # Find OpenCV library files
 FIND_PACKAGE( OpenCV REQUIRED )
 
+IF (${OpenCV_VERSION} VERSION_GREATER 2.3.9)
+
 # Create an executable file from sources:
 ADD_LIBRARY(CvBRIEF SHARED ${files})
 
@@ -14,3 +16,9 @@ ADD_LIBRARY(CvBRIEF SHARED ${files})
 TARGET_LINK_LIBRARIES(CvBRIEF ${DisCODe_LIBRARIES} ${OpenCV_LIBS})
 
 INSTALL_COMPONENT(CvBRIEF)
+
+ELSE ()
+
+MESSAGE ( STATUS "Skipping BRIEF - required OpenCV 2.4. Detected OpenCV ${OpenCV_VERSION}." )
+
+ENDIF ()
