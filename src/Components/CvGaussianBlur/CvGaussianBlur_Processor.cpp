@@ -94,7 +94,7 @@ void CvGaussianBlur_Processor::onNewImage()
 	try {
 		cv::Mat img = in_img.read();
 		cv::Mat gray;
-		cvtColor(img, gray, COLOR_BGR2GRAY);
+		//cvtColor(img, gray, COLOR_BGR2GRAY);
 		//cv::Mat out = img.clone();
 		cv::GaussianBlur(img, img, cv::Size(kernel_width, kernel_height), sigmax, sigmay);
 		out_img.write(img);
