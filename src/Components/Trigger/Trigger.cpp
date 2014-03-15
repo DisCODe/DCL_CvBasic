@@ -50,7 +50,8 @@ bool Trigger::onStart() {
 }
 
 void Trigger::trigger() {
-	out_trigger.write(true);
+    Base::UnitType t;
+    out_trigger.write(t);
 }
 
 

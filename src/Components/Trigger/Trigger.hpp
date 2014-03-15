@@ -71,7 +71,7 @@ protected:
 
 // Output data streams
 
-		Base::DataStreamOut<bool> out_trigger;
+        Base::DataStreamOut<Base::UnitType> out_trigger;
 	// Handlers
 	Base::EventHandler2 h_trigger;
 

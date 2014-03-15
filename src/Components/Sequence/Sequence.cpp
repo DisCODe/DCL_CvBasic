@@ -50,26 +50,34 @@ Sequence::~Sequence() {
 
 
 void Sequence::prepareInterface() {
-	// Register handlers.
-	h_onTrigger.setup(this, &Sequence::onTrigger);
-	registerHandler("Trigger", &h_onTrigger);
-	
+    // Register streams.
+    registerStream("out_img", &out_img);
+    registerStream("in_load_next_image_trigger", &in_load_next_image_trigger);
+
+    // Register handlers - loads image, NULL dependency.
 	h_onLoadImage.setup(this, &Sequence::onLoadImage);
 	registerHandler("onLoadImage", &h_onLoadImage);
+    addDependency("onLoadImage", NULL);
 
-	h_onLoadNextImage.setup(this, &Sequence::onLoadNextImage);
-	registerHandler("Load next image", &h_onLoadNextImage);
+    // Register handlers - next image, can be triggered manually (from GUI) or by new data present in_load_next_image_trigger dataport.
+    // 1st version - manually.
+    h_onLoadNextImage.setup(this, &Sequence::onLoadNextImage);
+    registerHandler("Next image", &h_onLoadNextImage);
 
-	h_onSequenceReload.setup(this, &Sequence::onSequenceReload);
-	registerHandler("Reload sequence", &h_onSequenceReload);
+    // 2nd version - external tritter.
+    h_onTriggeredLoadNextImage.setup(this, &Sequence::onTriggeredLoadNextImage);
+    registerHandler("onTriggeredLoadNextImage", &h_onTriggeredLoadNextImage);
+    addDependency("onTriggeredLoadNextImage", &in_load_next_image_trigger);
 
-	// Register streams.
-	registerStream("out_img", &out_img);
-	registerStream("in_trigger", &in_trigger);
 
-	// Add dependencies.
-	addDependency("onLoadImage", NULL);
-	addDependency("Trigger", &in_trigger);
+    // Register handlers - reloads sequence, triggered manually.
+    h_onSequenceReload.setup(this, &Sequence::onSequenceReload);
+    registerHandler("Reload sequence", &h_onSequenceReload);
+
+    // Register handlers - trigger (load frame), triggered manually.
+    h_onRefreshImage.setup(this, &Sequence::onRefreshImage);
+    registerHandler("Refresh image", &h_onRefreshImage);
+
 }
 
 bool Sequence::onInit() {
@@ -130,6 +138,20 @@ void Sequence::onLoadImage() {
 	out_img.write(img);
 }
 
+
+void Sequence::onRefreshImage(){
+    CLOG(LDEBUG) << "Sequence::onRefreshImage - trigger";
+    trig = true;
+}
+
+
+void Sequence::onTriggeredLoadNextImage(){
+    CLOG(LDEBUG) << "Sequence::onTriggeredLoadNextImage - next image from the sequence will be loaded";
+    in_load_next_image_trigger.read();
+    frame++;
+}
+
+
 void Sequence::onLoadNextImage(){
 	CLOG(LDEBUG) << "Sequence::onLoadNextImage - next image from the sequence will be loaded";
 	frame++;
@@ -149,8 +171,6 @@ void Sequence::onSequenceReload() {
 		frame = -1;
 	}
 }
-
-
 
 
 bool Sequence::onStep() {
@@ -178,11 +198,6 @@ bool Sequence::findFiles() {
 	CLOG(LINFO) << fname;
 
 	return !files.empty();
-}
-
-void Sequence::onTrigger() {
-	in_trigger.read();
-	trig = true;
 }
 
 }//: namespace Sequence

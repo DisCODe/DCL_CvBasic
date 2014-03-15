@@ -119,31 +119,35 @@ protected:
 	 */
 	bool onStop();
 
-	/// Input data stream
-	Base::DataStreamIn<bool> in_trigger;
+    /// Trigger - used for loading next image in case of several sequences present.
+    Base::DataStreamIn<Base::UnitType> in_load_next_image_trigger;
 
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 
 
-	/*!
-	 * Event handler function.
-	 */
-	void onTrigger();
-
 	/// Event handler.
-	Base::EventHandler<Sequence> h_onTrigger;
+//    Base::EventHandler<Sequence> h_on_load_next_image_trigger;
 
-	/*!
-	 * Event handler function - moves image index to the next frame of the sequence.
-	 */
-	void onLoadNextImage();
+    /*!
+     * Event handler function - moves image index to the next frame of the sequence.
+     */
+    void onLoadNextImage();
 
-	/// Event handler - moves image index to the next frame of the sequence.
-	Base::EventHandler<Sequence> h_onLoadNextImage;
+    /// Event handler - moves image index to the next frame of the sequence.
+    Base::EventHandler<Sequence> h_onLoadNextImage;
 
 
-	/*!
+    /*!
+     * Event handler function - moves image index to the next frame of the sequence, externally triggered version.
+     */
+    void onTriggeredLoadNextImage();
+
+    /// Event handler - moves image index to the next frame of the sequence, externally triggered version.
+    Base::EventHandler<Sequence> h_onTriggeredLoadNextImage;
+
+
+    /*!
 	 * Event handler function - loads image from the sequence.
 	 */
 	void onLoadImage();
@@ -158,6 +162,14 @@ protected:
 
 	/// Event handler - reload the sequence.
 	Base::EventHandler<Sequence> h_onSequenceReload;
+
+    /*!
+     * Event handler function - triggers image refresh.
+     */
+    void onRefreshImage();
+
+    /// Event handler - refreshes the image (old or new, depending on the rest of settings.
+    Base::EventHandler<Sequence> h_onRefreshImage;
 
 private:
 	/**
@@ -178,7 +190,7 @@ private:
 	/// Index of current frame.
 	int frame;
 
-	/// Flag indicating thethwe the image was already loaded or not.
+    /// Flag indicating whether the image was already loaded or not.
 	bool trig;
 
 	/// Directory containing the images sequence.
