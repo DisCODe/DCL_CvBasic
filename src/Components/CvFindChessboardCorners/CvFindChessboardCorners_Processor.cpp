@@ -217,7 +217,7 @@ void CvFindChessboardCorners_Processor::onNewImage()
 		if(found)
 			std::cout<<"Dots founded!!!\n\n\n";
 		else
-			std::cout<<"Dupa\nDupa\nDupa\n";
+			std::cout<<"D\n";
 		// działa 11x4!!!! zajebiście!!! To jest zajebisty dzień :D
 
 		LOG(LTRACE) << "findChessboardCorners() execution time: " << timer.elapsed() << " s\n";
