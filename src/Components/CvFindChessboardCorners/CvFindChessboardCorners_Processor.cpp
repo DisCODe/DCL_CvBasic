@@ -16,6 +16,7 @@ using namespace std;
 using namespace boost;
 using namespace cv;
 using namespace Types::Objects3D;
+static int counter= 0;
 
 CvFindChessboardCorners_Processor::CvFindChessboardCorners_Processor(const std::string & name) :
 	Component(name),
@@ -126,11 +127,17 @@ void CvFindChessboardCorners_Processor::initChessboard() {
 
 	// Initialize modelPoints - localization of the chessboard corners in Cartesian space.
 	vector <Point3f> modelPoints;
-	for (int i = 0; i < prop_height; ++i) {
+	//chessboard
+	/*for (int i = 0; i < prop_height; ++i) {
 		for (int j = 0; j < prop_width; ++j) {
 			modelPoints.push_back(Point3f(-j * prop_square_height, -i * prop_square_width, 0));
 		}
-	}
+	}*/
+	// dots
+	for( int i = 0; i < prop_height; i++ )
+            for( int j = 0; j < prop_width; j++ )
+                modelPoints.push_back(Point3f(float((2*j + i % 2)*prop_square_height),float(i*prop_square_width), 0));
+
 	// Set model points.
 	chessboard->setModelPoints(modelPoints);
 }
@@ -197,14 +204,21 @@ void CvFindChessboardCorners_Processor::onNewImage()
 
 		// Find chessboard corners.
 		if (prop_scale) {
-			found = findChessboardCorners(sub_img, chessboardSize, corners, findChessboardCornersFlags);
+			found = findCirclesGrid(sub_img, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
+			//found = findChessboardCorners(sub_img, chessboardSize, corners, findChessboardCornersFlags);
 			for (size_t i = 0; i < corners.size(); ++i) {
 				corners[i].x *= prop_scale_factor;
 				corners[i].y *= prop_scale_factor;
 			}
 		} else {
-			found = findChessboardCorners(image, chessboardSize, corners, findChessboardCornersFlags);
+			found = findCirclesGrid(image, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
+			//found = findChessboardCorners(image, chessboardSize, corners, findChessboardCornersFlags);
 		}
+		if(found)
+			std::cout<<"Dots founded!!!\n\n\n";
+		else
+			std::cout<<"Dupa\nDupa\nDupa\n";
+		// działa 11x4!!!! zajebiście!!! To jest zajebisty dzień :D
 
 		LOG(LTRACE) << "findChessboardCorners() execution time: " << timer.elapsed() << " s\n";
 
@@ -216,9 +230,24 @@ void CvFindChessboardCorners_Processor::onNewImage()
 				cornerSubPix(image, corners, Size(prop_subpix_window, prop_subpix_window), Size(1, 1), TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 50, 1e-3));
 			}
 
-			// Set image points and write the result to ourput stream.
+			// Set image points and write the result to output stream.
+
+			/*if(counter==5)
+			{
+				for(unsigned int i = 0; i < corners.size(); ++i)
+				{
+					std::cout << "Image corner: " << corners[i] << std::endl;
+				}
+				counter=0;
+					
+			}
+			*/
+			
 			chessboard->setImagePoints(corners);
 			out_chessboard.write(*chessboard);
+
+			//std::vector <cv::Point2f> corners2 = chessboard->getImagePoints();
+			//counter++;
 
 			// Recalculate the image chessboard pose in form of <X,Y,0,alpha>.
 			Types::ImagePosition imagePosition;
@@ -239,6 +268,9 @@ void CvFindChessboardCorners_Processor::onNewImage()
 	} catch (const Exception& e) {
 		LOG(LERROR) << e.what() << "\n";
 	}
+
+	
+	
 	LOG(LTRACE) << "void CvFindChessboardCorners_Processor::onNewImage() end\n";
 }
 
