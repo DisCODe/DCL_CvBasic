@@ -125,6 +125,8 @@ private:
 	Base::DataStreamOut <Types::Objects3D::Chessboard> out_chessboard;
 	Base::DataStreamOut <Types::ImagePosition> out_imagePosition;
 
+	Base::DataStreamOut <cv::Mat> out_img;
+
 	/** Located corners.*/
 	std::vector<cv::Point2f> corners;
 

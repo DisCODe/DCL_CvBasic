@@ -93,6 +93,7 @@ void CvFindCirclesGrid_Processor::prepareInterface() {
 	registerStream("in_img", &in_img);
 	registerStream("out_chessboard", &out_chessboard);
 	registerStream("out_imagePosition", &out_imagePosition);
+	registerStream("out_img", &out_img);
 
 	addDependency("onNewImage", &in_img);
 }
@@ -127,13 +128,7 @@ void CvFindCirclesGrid_Processor::initChessboard() {
 
 	// Initialize modelPoints - localization of the chessboard corners in Cartesian space.
 	vector <Point3f> modelPoints;
-	//chessboard
-	/*for (int i = 0; i < prop_height; ++i) {
-		for (int j = 0; j < prop_width; ++j) {
-			modelPoints.push_back(Point3f(-j * prop_square_height, -i * prop_square_width, 0));
-		}
-	}*/
-	// dots
+
 	for( int i = 0; i < prop_height; i++ )
             for( int j = 0; j < prop_width; j++ )
                 modelPoints.push_back(Point3f(float((2*j + i % 2)*prop_square_height),float(i*prop_square_width), 0));
@@ -205,7 +200,6 @@ void CvFindCirclesGrid_Processor::onNewImage()
 		// Find chessboard corners.
 		if (prop_scale) {
 			found = findCirclesGrid(sub_img, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
-			//found = findChessboardCorners(sub_img, chessboardSize, corners, findChessboardCornersFlags);
 			for (size_t i = 0; i < corners.size(); ++i) {
 				corners[i].x *= prop_scale_factor;
 				corners[i].y *= prop_scale_factor;
@@ -213,17 +207,18 @@ void CvFindCirclesGrid_Processor::onNewImage()
 
 		} else {
 			found = findCirclesGrid(image, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
-			//found = findChessboardCorners(image, chessboardSize, corners, findChessboardCornersFlags);
+
 		}
 
 		// check if found, if not-invert colors and try again
 		if(found){
 			std::cout<<"Dots founded!!!\n\n\n";
-		}/*
+		}
+		/*
 		else{
 			// invert colors
+			std::cout<<"Invert colors\n";
 			cv::Size size = image.size();
-			std::cout<<"Clone to tmp\n";
 			Mat tmp_img=image.clone();
 			if (image.isContinuous() && tmp_img.isContinuous()) {
         			size.width *= size.height;
@@ -242,26 +237,31 @@ void CvFindCirclesGrid_Processor::onNewImage()
 				tmp_p[j+2]  = 255-rgb_p[j + 2];
 			    }
 			}
-			//std::cout<<"Write\n";
-			//out_img.write(tmp_img);
+			image = tmp_img;
+			std::cout<<"Write\n";
+			out_img.write(tmp_img);
 
 			// try again
+			cv::resize(image, sub_img, Size(), 1.0 / prop_scale_factor, 1.0 / prop_scale_factor, prop_interpolation_type);
 			if (prop_scale) {
-			found = findCirclesGrid(sub_img, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
-			//found = findChessboardCorners(sub_img, chessboardSize, corners, findChessboardCornersFlags);
-			for (size_t i = 0; i < corners.size(); ++i) {
-				corners[i].x *= prop_scale_factor;
-				corners[i].y *= prop_scale_factor;
-			}
-
-			} else {
+				found = findCirclesGrid(sub_img, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
+				for (size_t i = 0; i < corners.size(); ++i) {
+					corners[i].x *= prop_scale_factor;
+					corners[i].y *= prop_scale_factor;
+				}
+			} 
+			else {
 				found = findCirclesGrid(image, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
-				//found = findChessboardCorners(image, chessboardSize, corners, findChessboardCornersFlags);
 			}
-
-			std::cout<<"D\n";
+			if(found){
+				std::cout<<"Dots founded!!!\n\n\n";
+			}
+			else
+				std::cout<<"D\n";
+			
 		}
 		*/
+
 		LOG(LTRACE) << "findChessboardCorners() execution time: " << timer.elapsed() << " s\n";
 
 		if (found) {
@@ -281,7 +281,6 @@ void CvFindCirclesGrid_Processor::onNewImage()
 					std::cout << "Image corner: " << corners[i] << std::endl;
 				}
 				counter=0;
-					
 			}
 			*/
 			
