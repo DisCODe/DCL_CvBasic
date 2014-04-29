@@ -4,6 +4,8 @@
 ADD_COMPONENT(CvAdaptiveThreshold)
 
 ADD_COMPONENT(CvFindChessboardCorners)
+
+ADD_COMPONENT(CvFindCirclesGrid)
  
 ADD_COMPONENT(CvThreshold)
 
