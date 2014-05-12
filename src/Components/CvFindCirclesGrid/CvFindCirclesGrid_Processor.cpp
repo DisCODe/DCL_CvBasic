@@ -213,36 +213,42 @@ void CvFindCirclesGrid_Processor::onNewImage()
 		// check if found, if not-invert colors and try again
 		if(found){
 			std::cout<<"Dots founded!!!\n\n\n";
+			//out_img.write(image);
 		}
-		/*
 		else{
 			// invert colors
-			std::cout<<"Invert colors\n";
-			cv::Size size = image.size();
+			
+			std::cout<<"Dots not founded\nInvert colors\n";
 			Mat tmp_img=image.clone();
-			if (image.isContinuous() && tmp_img.isContinuous()) {
-        			size.width *= size.height;
-        			size.height = 1;
-        		}
+			cv::Size size = tmp_img.size();
+			    
+			if (tmp_img.isContinuous()) 
+			{
+				  size.width *= size.height;
+				  size.height = 1;
+			}
         		size.width *= 3;
+			std::cout<<"size.width "<< size.width<<"\tsize.height "<< size.height<<"\n";
 			for (int i = 0; i < size.height; i++)
 			{
-			    const uchar* rgb_p = image.ptr <uchar> (i);
 			    uchar* tmp_p = tmp_img.ptr <uchar> (i);
 			    int j, k = 0;
-			    for (j = 0; j < size.width; j += 3)
+			    //std::cout<<"1\n";
+			    //int(size.width/3)
+			    for (j = 0; j < int(size.width/3)/*203000*//*size.width*/; j += 3)
 			    {
-				tmp_p[j] = 255-rgb_p[j];
-				tmp_p[j+1]  = 255-rgb_p[j + 1];
-				tmp_p[j+2]  = 255-rgb_p[j + 2];
+				tmp_p[j] = 255-tmp_p[j];
+				tmp_p[j+1]  = 255-tmp_p[j + 1];
+				tmp_p[j+2]  = 255-tmp_p[j + 2];
 			    }
+			    std::cout<<"4\n";
 			}
-			image = tmp_img;
-			std::cout<<"Write\n";
-			out_img.write(tmp_img);
-
+			
+			//image = tmp_img;
+			
 			// try again
-			cv::resize(image, sub_img, Size(), 1.0 / prop_scale_factor, 1.0 / prop_scale_factor, prop_interpolation_type);
+			cv::resize(tmp_img, sub_img, Size(), 1.0 / prop_scale_factor, 1.0 / prop_scale_factor, prop_interpolation_type);
+			
 			if (prop_scale) {
 				found = findCirclesGrid(sub_img, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
 				for (size_t i = 0; i < corners.size(); ++i) {
@@ -251,16 +257,17 @@ void CvFindCirclesGrid_Processor::onNewImage()
 				}
 			} 
 			else {
-				found = findCirclesGrid(image, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
+				found = findCirclesGrid(tmp_img, chessboardSize, corners, CALIB_CB_ASYMMETRIC_GRID);
 			}
 			if(found){
 				std::cout<<"Dots founded!!!\n\n\n";
 			}
 			else
-				std::cout<<"D\n";
+				std::cout<<"DOTS NOT FOUNDED AFTER INVERSION!!!\n";
 			
+			std::cout<<"Write\n";
+			out_img.write(tmp_img);
 		}
-		*/
 
 		LOG(LTRACE) << "findChessboardCorners() execution time: " << timer.elapsed() << " s\n";
 
