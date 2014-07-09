@@ -51,7 +51,7 @@ void ImageWriter::prepareInterface() {
 		handlers.push_back(hand);
 		registerHandler(std::string("write_image_")+id, hand);
 
-		Base::DataStreamIn<cv::Mat> * stream = new Base::DataStreamIn<cv::Mat>;
+		Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest> * stream = new Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest>;
 		in_img.push_back(stream);
 		registerStream( std::string("in_img_")+id, (Base::DataStreamInterface*)(in_img[i]));
 		addDependency(std::string("write_image_")+id, stream);

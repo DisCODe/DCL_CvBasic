@@ -67,7 +67,7 @@ protected:
 	bool onStop();
 
 	/// Image to be drawn
-	std::vector< Base::DataStreamIn<cv::Mat> *> in_img;
+	std::vector< Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest> *> in_img;
 
 	/// Event handlers
 	std::vector< Base::EventHandler2* > handlers;

@@ -5,7 +5,7 @@
  */
 
 #ifndef SKELETONIZATION_HPP_
-#define SKELETONIZATION_HPP_
+#define SKELETONIZATION_HPP_ 
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
