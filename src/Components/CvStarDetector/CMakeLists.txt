@@ -7,7 +7,8 @@ FILE(GLOB files *.cpp)
 # Find OpenCV library files
 FIND_PACKAGE( OpenCV REQUIRED )
 
-IF (${OpenCV_VERSION} VERSION_GREATER 2.3.9)
+FIND_FILE(NONFREE_INCLUDE "opencv2/nonfree/features2d.hpp" PATHS ${OpenCV_INCLUDE_DIRS})
+IF (${OpenCV_VERSION} VERSION_GREATER 2.3.9 AND NONFREE_INCLUDE)
 
 # Create an executable file from sources:
 ADD_LIBRARY(CvStarDetector SHARED ${files})
@@ -19,6 +20,6 @@ INSTALL_COMPONENT(CvStarDetector)
 
 ELSE ()
 
-MESSAGE ( STATUS "Skipping STAR - required OpenCV 2.4. Detected OpenCV ${OpenCV_VERSION}." )
+MESSAGE ( STATUS "Skipping STAR - required OpenCV 2.4 with nonfree module. Detected OpenCV ${OpenCV_VERSION}." )
 
 ENDIF ()
