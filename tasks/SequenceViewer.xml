@@ -24,7 +24,7 @@
 			</Executor>
 
 			<Executor name="Visualization" period="0.2">
-				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="5">
+				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
 					<param name="count">1</param>
 					<param name="title">Window</param>
 				</Component>
