@@ -61,20 +61,18 @@ void CvSURF::onNewImage()
 	try {
 		// Input: a grayscale image.
 		cv::Mat input = in_img.read();
-		cv::Mat gray;
-		cvtColor(input, gray, COLOR_BGR2GRAY);
 
 
 		//-- Step 1: Detect the keypoints using SURF Detector.
 		SurfFeatureDetector detector( minHessian );
 		std::vector<KeyPoint> keypoints;
-		detector.detect( gray, keypoints );
+		detector.detect( input, keypoints );
 
 
 		//-- Step 2: Calculate descriptors (feature vectors).
         SurfDescriptorExtractor extractor;
 		Mat descriptors;
-		extractor.compute( gray, keypoints, descriptors);
+		extractor.compute( input, keypoints, descriptors);
 
 		// Write features to the output.
 	    Types::Features features(keypoints);
