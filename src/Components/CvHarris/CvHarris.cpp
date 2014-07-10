@@ -70,9 +70,6 @@ void CvHarris::onNewImage()
 	LOG(LTRACE) << "CvHarris::onNewImage\n";
 	try {
 		// Input: a grayscale image.
-			//cv::Mat grayImage;
-			//cv::cvtColor(in_img.read(), grayImage, cv::COLOR_BGR2GRAY);
-			//cv::Mat in = grayImage;
 		cv::Mat in = in_img.read();
 
 
@@ -87,10 +84,6 @@ void CvHarris::onNewImage()
 		//convertScaleAbs( dst_norm, dst_norm_scaled );
 
 	    std::vector<cv::KeyPoint> keypoints;
-
-		// Clone the grayscale image
-		cv::Mat out;
-		cvtColor(in, out, CV_GRAY2BGR);
 		/// Drawing a circle around corners
 		for( int j = 0; j < dst_norm.rows ; j++ )
 		   { for( int i = 0; i < dst_norm.cols; i++ )
@@ -98,7 +91,6 @@ void CvHarris::onNewImage()
 		          if( (int) dst_norm.at<float>(j,i) > thresh )
 		            {
 		        	  keypoints.push_back(cv::KeyPoint(i,j,5));
-		             //circle( out, Point( i, j ), 5,  Scalar(240, 240, 0), 2, 8, 0 );
 		            }
 		        }
 		   }
