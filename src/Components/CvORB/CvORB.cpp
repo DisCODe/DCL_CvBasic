@@ -61,20 +61,15 @@ void CvORB::onNewImage()
 	LOG(LTRACE) << "CvORB::onNewImage\n";
 	try {
 		// Input: a grayscale image.
-		cv::Mat input = in_img.read();
-		cv::Mat gray;
-		cvtColor(input, gray, COLOR_BGR2GRAY);
+		cv::Mat input = in_img.read().clone();
+		if (input.type() != CV_8UC1)
+			cvtColor(input, input, COLOR_BGR2GRAY);
 
 		//-- Step 1: Detect the keypoints using ORB Detector.
-        cv::OrbFeatureDetector detector( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
+        cv::ORB orb( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
 		std::vector<KeyPoint> keypoints;
-		detector.detect( gray, keypoints );
-
-
-		//-- Step 2: Calculate descriptors (feature vectors).
-        cv::OrbDescriptorExtractor extractor;
 		Mat descriptors;
-		extractor.compute( gray, keypoints, descriptors);
+		orb(input, cv::Mat(), keypoints, descriptors);
 
 		// Write features to the output.
 	    Types::Features features(keypoints);

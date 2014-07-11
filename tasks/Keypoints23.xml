@@ -22,14 +22,26 @@
 					<param name="mode.loop">1</param>
 				</Component>
 				
+				<Component name="Color" type="CvBasic:CvColorConv" priority="2">
+					<type>BGR2GRAY</type>
+				</Component>
+				
 				<Component name="FAST" type="CvBasic:CvFAST" priority="2">
 				</Component>
+				
+				<Component name="ORB" type="CvBasic:CvORB" priority="2">
+				</Component>
+				
+				<Component name="BRISK" type="CvBasic:CvBRISK" priority="2">
+				</Component>
+				
+				
 			</Executor>
 
 			<Executor name="Visualization" period="0.2">
 				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
-					<param name="count">1</param>
-					<param name="title">FAST</param>
+					<param name="count">3</param>
+					<param name="title">FAST,ORB,BRISK</param>
 				</Component>
 			</Executor>
 		</Subtask>	
@@ -40,11 +52,27 @@
 	<DataStreams>
 		<Source name="Sequence.out_img">
 			<sink>Window.in_img0</sink>
-			<sink>FAST.in_img</sink>		
+			<sink>Window.in_img1</sink>
+			<sink>Window.in_img2</sink>
+			<sink>Color.in_img</sink>
+		</Source>
+		
+		<Source name="Color.out_img">
+			<sink>FAST.in_img</sink>
+			<sink>ORB.in_img</sink>
+			<sink>BRISK.in_img</sink>
 		</Source>
 		
 		<Source name="FAST.out_features">
 			<sink>Window.in_draw0</sink>
+		</Source>
+		
+		<Source name="ORB.out_features">
+			<sink>Window.in_draw1</sink>
+		</Source>
+		
+		<Source name="BRISK.out_features">
+			<sink>Window.in_draw2</sink>
 		</Source>
 	</DataStreams>
 </Task>
