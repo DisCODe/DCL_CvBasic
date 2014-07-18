@@ -28,46 +28,6 @@ using namespace cv;
 #define ELEMS BOOST_PP_TUPLE_TO_LIST(5, (NEAREST, LINEAR, AREA, CUBIC, LANCZOS4))
 GENERATE_ENUM_TRANSLATOR(InterpolationTranslator, int, ELEMS, INTER_);
 
-/*
-
-class InterpolationTranslator {
-public:
-	static int fromStr(const std::string & s)
-	{
-		if (s == "NEAREST")
-			return INTER_NEAREST;
-		else if (s == "LINEAR")
-			return INTER_LINEAR;
-		else if (s == "AREA")
-			return INTER_AREA;
-		else if (s == "CUBIC")
-			return INTER_CUBIC;
-		else if (s == "LANCZOS4")
-			return INTER_LANCZOS4;
-		else
-			return INTER_NEAREST;
-	}
-
-	static std::string toStr(int t)
-	{
-		switch (t)
-		{
-			case INTER_NEAREST:
-				return "NEAREST";
-			case INTER_LINEAR:
-				return "LINEAR";
-			case INTER_AREA:
-				return "AREA";
-			case INTER_CUBIC:
-				return "CUBIC";
-			case INTER_LANCZOS4:
-				return "LANCZOS4";
-			default:
-				return "NEAREST";
-		}
-	}
-};*/
-
 class CvFindCirclesGrid_Processor: public Base::Component
 {
 public:
@@ -138,26 +98,17 @@ private:
 
 	cv::Mat sub_img;
 
-	Base::Property<bool> prop_subpix;
-	Base::Property<int> prop_subpix_window;
-	Base::Property<bool> prop_scale;
-	Base::Property<int> prop_scale_factor;
 	Base::Property<int> prop_width;
 	Base::Property<int> prop_height;
-	Base::Property<float> prop_square_width;
-	Base::Property<float> prop_square_height;
+	Base::Property<float> prop_square_size;
 
-	Base::Property<bool> prop_fastCheck;
-	Base::Property<bool> prop_filterQuads;
-	Base::Property<bool> prop_adaptiveThreshold;
-	Base::Property<bool> prop_normalizeImage;
+	Base::Property<bool> prop_inverse;
 
 	Base::Property<int, InterpolationTranslator> prop_interpolation_type;
 
 	// TODO: add unit types: found and not found
 
 	void sizeCallback(int old_value, int new_value);
-	void flagsCallback(bool old_value, bool new_value);
 };
 
 } // namespace CvFindCirclesGrid {
