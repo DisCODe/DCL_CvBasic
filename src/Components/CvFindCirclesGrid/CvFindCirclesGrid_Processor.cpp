@@ -43,6 +43,7 @@ CvFindCirclesGrid_Processor::CvFindCirclesGrid_Processor(const std::string & nam
 	prop_height.setCallback(boost::bind(&CvFindCirclesGrid_Processor::sizeCallback, this, _1, _2));
 
 
+#include "Property.hpp"
 	prop_interpolation_type.setToolTip("Interpolation type");
 	PROP_ADD_COMBO_ITEMS(prop_interpolation_type, ELEMS);
 	registerProperty(prop_interpolation_type);
@@ -147,8 +148,7 @@ void CvFindCirclesGrid_Processor::onNewImage()
 
 		// check if found, if not-invert colors and try again
 		if(found){
-			LOG(LWARNING)<<"Dots found!!!\n\n\n";
-			//out_img.write(image);
+			//LOG(LWARNING)<<"Dots found!!!\n\n\n";
 			chessboard->setImagePoints(corners);
 			out_chessboard.write(*chessboard);
 
