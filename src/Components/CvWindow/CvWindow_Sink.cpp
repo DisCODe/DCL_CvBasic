@@ -93,6 +93,9 @@ void CvWindow_Sink::prepareInterface() {
 
 	img.resize(count);
 	to_draw.resize(count);
+	for (int i =0; i < count; ++i) {
+		to_draw_timeout.push_back(0);
+	}
 
 	// Split window titles.
 	std::string t = title;
@@ -150,16 +153,24 @@ void CvWindow_Sink::onNewImageN(int n) {
 			img[n] = in_img[n]->read().clone();
 		}
 
+		if (to_draw_timeout[n])
+			--to_draw_timeout[n];
+
 		Types::DrawableContainer ctr;
 		while (!in_draw[n]->empty()) {
 			ctr.add(in_draw[n]->read()->clone());
 			to_draw[n] = boost::shared_ptr<Types::Drawable>(ctr.clone());
+			to_draw_timeout[n] = 10;
 		}
 
 		if (to_draw[n]) {
-			to_draw[n]->draw(img[n], CV_RGB(255,0,255));
-			// TODO: dodać wygaszanie starszych drawable, np. przez 10 odświeżeń
-			//to_draw[n] = boost::shared_ptr<Types::Drawable>();
+			float opacity = 0.1 * to_draw_timeout[n];
+			if (opacity > 0.01) {
+				cv::Mat overlay;
+				img[n].copyTo(overlay);
+				to_draw[n]->draw(overlay, CV_RGB(255,0,255));
+				cv::addWeighted(overlay, opacity, img[n], 1-opacity, 0, img[n]);
+			}
 		}
 
 		// Display image.
