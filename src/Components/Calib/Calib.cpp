@@ -71,6 +71,7 @@ bool Calib::onStart() {
 }
 
 void Calib::process_chessboard() {
+    std::cout << "Calib::process_chessboard";
     // Check component working mode.
     if (addChessboard || continuous) {
     	// Reset flag.

@@ -74,7 +74,7 @@ bool CvSolvePnP_Processor::onStep()
 
 void CvSolvePnP_Processor::onNewObject3D()
 {
-	LOG(LTRACE) << "CvSolvePnP_Processor::onNewObject3D()\n";
+	CLOG(LTRACE) << "CvSolvePnP_Processor::onNewObject3D()\n";
 	boost::shared_ptr <Types::Objects3D::Object3D> object3D = in_object3d.read();
 
 	Types::CameraInfo camera_info = in_camerainfo.read();
@@ -101,7 +101,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 		hm.elements[i][3] = tvec(i, 0);
 		ss << hm.elements[i][3] << "\n";
 	}
-	LOG(LDEBUG) << "HomogMatrix:\n" << ss.str() << endl;
+	CLOG(LDEBUG) << "HomogMatrix:\n" << ss.str() << endl;
 
 	out_homogMatrix.write(hm);
 }

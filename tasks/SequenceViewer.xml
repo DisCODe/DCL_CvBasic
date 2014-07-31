@@ -22,7 +22,12 @@
 					<param name="mode.loop">1</param>
 				</Component>
 			</Executor>
-
+			<Executor name="DetectCircles" period="0.2">
+				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="5">
+					<param name="count">1</param>
+					<param name="title">Window</param>
+				</Component>
+			</Executor>
 			<Executor name="Visualization" period="0.2">
 				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
 					<param name="count">1</param>
@@ -36,6 +41,9 @@
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
 		<Source name="Sequence.out_img">
+			<sink>DetectCircles.in_img</sink>		
+		</Source>
+		<Source name="DetectCircles.out_img">
 			<sink>Window.in_img</sink>		
 		</Source>
 	</DataStreams>
