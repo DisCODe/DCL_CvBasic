@@ -9,6 +9,8 @@
 #include "Logger.hpp"
 
 #include <sstream>
+#include "Property.hpp"
+#include <boost/foreach.hpp>
 
 namespace Processors {
 
@@ -21,8 +23,12 @@ using Types::HomogMatrix;
 using namespace Types::Objects3D;
 
 CvSolvePnP_Processor::CvSolvePnP_Processor(const std::string & n) :
-	Component(n)
-{
+	Component(n),
+	prop_X("offset.X", 0),
+	prop_Y("offset.Y", 0){
+		registerProperty(prop_X);
+		registerProperty(prop_Y);
+
 }
 
 CvSolvePnP_Processor::~CvSolvePnP_Processor()
@@ -38,6 +44,8 @@ void CvSolvePnP_Processor::prepareInterface() {
 	registerStream("in_object3d", &in_object3d);
 	registerStream("in_camerainfo", &in_camerainfo);
 	registerStream("out_homogMatrix", &out_homogMatrix);
+	registerStream("out_rvec", &out_rvec);
+	registerStream("out_tvec", &out_tvec);
 }
 
 bool CvSolvePnP_Processor::onStart()
@@ -74,21 +82,30 @@ bool CvSolvePnP_Processor::onStep()
 
 void CvSolvePnP_Processor::onNewObject3D()
 {
-	LOG(LTRACE) << "CvSolvePnP_Processor::onNewObject3D()\n";
+	CLOG(LTRACE) << "CvSolvePnP_Processor::onNewObject3D()\n";
 	boost::shared_ptr <Types::Objects3D::Object3D> object3D = in_object3d.read();
 
 	Types::CameraInfo camera_info = in_camerainfo.read();
 
-	Mat modelPoints(object3D->getModelPoints());
-	Mat imagePoints(object3D->getImagePoints());
-
 	Mat_<double> rvec;
 	Mat_<double> tvec;
+
+	vector<cv::Point3f> model=object3D->getModelPoints();
+
+	for(int i=0; i< model.size(); i++){
+		model[i].x += prop_X;
+		model[i].y += prop_Y;
+	}
+	object3D->setModelPoints(model);
+
+	Mat modelPoints(object3D->getModelPoints());
+	Mat imagePoints(object3D->getImagePoints());
 
 	solvePnP(modelPoints, imagePoints, camera_info.cameraMatrix(), camera_info.distCoeffs(), rvec, tvec, false);
 
 	Mat_<double> rotationMatrix;
 	Rodrigues(rvec, rotationMatrix);
+
 
 	HomogMatrix hm;
 
@@ -101,8 +118,10 @@ void CvSolvePnP_Processor::onNewObject3D()
 		hm.elements[i][3] = tvec(i, 0);
 		ss << hm.elements[i][3] << "\n";
 	}
-	LOG(LDEBUG) << "HomogMatrix:\n" << ss.str() << endl;
+	CLOG(LDEBUG) << "HomogMatrix:\n" << ss.str() << endl;
 
+	out_rvec.write(rvec);
+	out_tvec.write(tvec);
 	out_homogMatrix.write(hm);
 }
 
