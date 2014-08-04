@@ -11,7 +11,14 @@
 #include "Common/Logger.hpp"
 #include <stdlib.h>
 #include <boost/bind.hpp>
+#include "Types/Objects3D/Object3D.hpp"
+#include "Types/HomogMatrix.hpp"
+#include "Types/CameraInfo.hpp"
+#include <Common/Timer.hpp>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
+#include <sstream>
 namespace Processors {
 namespace CalcObjectLocation {
 
@@ -25,6 +32,8 @@ CalcObjectLocation::~CalcObjectLocation() {
 
 void CalcObjectLocation::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
+	//registerStream("in_homogMatrix0", &in_homogMatrix0);
+	//registerStream("in_homogMatrix1", &in_homogMatrix1);
 	registerStream("in_homogMatrix", &in_homogMatrix);
 	registerStream("out_homogMatrix", &out_homogMatrix);
 
@@ -33,11 +42,12 @@ void CalcObjectLocation::prepareInterface() {
 	h_calculate.setup(this, &CalcObjectLocation::calculate);
 	registerHandler("calculate", &h_calculate);
 	addDependency("calculate", &in_homogMatrix);
+	//addDependency("calculate", &in_homogMatrix0);
+	//addDependency("calculate", &in_homogMatrix1);
 
 }
 
 bool CalcObjectLocation::onInit() {
-	//meanHomogMatrix = new Types::HomogMatrix();
 	return true;
 }
 
@@ -54,46 +64,91 @@ bool CalcObjectLocation::onStart() {
 }
 
 void CalcObjectLocation::calculate(){
+	Common::Timer tm;
+	tm.restart();
 
-	vector<Types::HomogMatrix> readedHomogMatrix;
-	Types::HomogMatrix meanHomogMatrix;
-	vector<cv::Mat_<double> > rvec;
-	vector<cv::Mat_<double> > tvec;
-	cv::Mat_<double> rvectemp;
+	CLOG(LDEBUG)<<"in calculate()";
+
+	Types::HomogMatrix homogMatrix;
+	vector<cv::Mat_<double> > rvec(0);
+	vector<cv::Mat_<double> > tvec(0);
+	vector<cv::Mat_<double> > axis(0);
+	vector<double> fi(0);
 	cv::Mat_<double> tvectemp;
 	cv::Mat_<double> rotMatrix;
+	rotMatrix.create(3,3);
+	tvectemp.create(3,1);
 
-	stringstream ss;
 	while (!in_homogMatrix.empty()){
-		readedHomogMatrix.push_back(in_homogMatrix.read());
+		cv::Mat_<double> rvectemp;
+
+		homogMatrix=in_homogMatrix.read();
+
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
-				rotMatrix(i,j)=(readedHomogMatrix.back().elements[i][j]);
-				ss << rotMatrix(i,j) << "  ";
+				rotMatrix(i,j)=homogMatrix.elements[i][j];
 			}
-			tvectemp(i, 0) = readedHomogMatrix.back().elements[i][3];
-			ss << tvectemp(i, 0) << "\n";
+			tvectemp(i, 0) = homogMatrix.elements[i][3];
 		}
+
 		Rodrigues(rotMatrix, rvectemp);
+		CLOG(LINFO) << rvectemp << "\n";
 		rvec.push_back(rvectemp);
 		tvec.push_back(tvectemp);
 	}
+	CLOG(LNOTICE) << tm.elapsed();
 
-	float fi_1, fi_2, fi_avg;
-
-	//przerobic na tablice i liczyc srednia z vektora ;D
-	for(int i = 0; i < rvec.size(); i++){
-		//do potegi drugiej
-		fi_1 = abs(sqrt(rvec.at(i)(0,0) + rvec.at(i)(1,0)+rvec.at(i)(2,0)));
-		if(rvec.size()>1)
-			fi_2 = abs(sqrt(rvec.at(i+1)(0,0) + rvec.at(i+1)(1,0)+rvec.at(i+1)(2,0)));
-		else
-			fi_2 = 0;
-
-		fi_avg = (fi_1+fi_2)/2.00;
-
-
+	if (rvec.size() == 1) {
+		out_homogMatrix.write(homogMatrix);
+		return;
 	}
+
+	float fi_sum=0, fi_avg;
+	cv::Mat_<double> axis_sum, axis_avg;
+	cv::Mat_<double> rvec_avg;
+	cv::Mat_<double> tvec_avg, tvec_sum;
+
+	axis_sum.create(3,3);
+	tvec_sum.create(3,1);
+
+	CLOG(LNOTICE) << "Usredniam " << rvec.size() << " macierzy";
+
+	for(int i = 0; i < rvec.size(); i++){
+		fi.push_back(sqrt((pow(rvec.at(i)(0,0), 2) + pow(rvec.at(i)(1,0), 2)+pow(rvec.at(i)(2,0),2))));
+
+		fi_sum+=fi.back();
+		cv::Mat_<double> axistemp;
+		axistemp.create(3,3);
+		for(int k=0;k<3;k++){
+			for(int j=0;j<3;j++){
+				axistemp(k,j)=rvec.at(i)(k,j)/fi.back();
+			}
+		}
+		axis.push_back(axistemp);
+		axis_sum+=axis.back();
+		tvec_sum+=tvec.back();
+	}
+	CLOG(LNOTICE) << tm.elapsed();
+
+	fi_avg = fi_sum/fi.size();
+	axis_avg = axis_sum/axis.size();
+	rvec_avg = axis_avg * fi_avg ;
+	tvec_avg = tvec_sum/tvec.size();
+
+	Types::HomogMatrix hm;
+	cv::Mat_<double> rottMatrix;
+	Rodrigues(rvec_avg, rottMatrix);
+
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			hm.elements[i][j] = rotMatrix(i, j);
+			CLOG(LINFO) << hm.elements[i][j] << "  ";
+		}
+		hm.elements[i][3] = tvec_avg(i, 0);
+		CLOG(LINFO) << hm.elements[i][3] << "\n";
+	}
+	CLOG(LNOTICE) << tm.elapsed();
+	out_homogMatrix.write(hm);
 }
 
 } //: namespace CalcObjectLocation
