@@ -83,6 +83,8 @@ public:
 		return modelPoints;
 	}
 
+
+
 //	void setPosition(const HomogMatrix& position)
 //	{
 //		this->position = position;

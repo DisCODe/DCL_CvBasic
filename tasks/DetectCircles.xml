@@ -16,11 +16,14 @@
 	<Subtasks>
 		<Subtask name="Main">
 			<Executor name="Processing"  period="1">
-				<Component name="Sequence" type="CvBasic:Sequence" priority="1" bump="0">
+				<Component name="Sequence" type="CvBasic:CameraOpenCV" priority="1" bump="3">
+					<param name="device">0</param>
+				</Component>
+				<!--<Component name="Sequence" type="CvBasic:Sequence" priority="1" bump="0">
 					<param name="sequence.directory">/home/mlepicka/012/deska/</param>
 					<param name="sequence.pattern">.*\_rgb.png</param>
 					<param name="mode.loop">1</param>
-				</Component>
+				</Component>-->
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="2" bump="1">
 					<param name="camera_matrix">525 0 319.5; 0 525 239.5; 0 0 1</param>
 				</Component>

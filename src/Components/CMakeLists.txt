@@ -84,3 +84,7 @@ ADD_COMPONENT(CvHoughCircles)
 #ADD_COMPONENT(CvBruteForce)
 
 ADD_COMPONENT(Trigger)
+
+ADD_COMPONENT(CalcStatistics)
+
+ADD_COMPONENT(CalcObjectLocation)
