@@ -1,0 +1,8 @@
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/download.cmake.in ${CMAKE_BINARY_DIR}/download.cmake IMMEDIATE @ONLY)
+
+add_custom_target(
+	dataset
+	COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/download.cmake
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
