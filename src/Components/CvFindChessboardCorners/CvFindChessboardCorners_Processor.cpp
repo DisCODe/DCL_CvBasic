@@ -140,27 +140,27 @@ void CvFindChessboardCorners_Processor::flagsCallback(bool old_value,
 		bool new_value) {
 	// Set flags.
 	if (prop_fastCheck) {
-		findChessboardCornersFlags |= CV_CALIB_CB_FAST_CHECK;
+		findChessboardCornersFlags |= CALIB_CB_FAST_CHECK;
 	} else {
-		findChessboardCornersFlags &= ~CV_CALIB_CB_FAST_CHECK;
+		findChessboardCornersFlags &= ~CALIB_CB_FAST_CHECK;
 	}
 
 	if (prop_filterQuads) {
-		findChessboardCornersFlags |= CV_CALIB_CB_FILTER_QUADS;
+		findChessboardCornersFlags |= CALIB_CB_FILTER_QUADS;
 	} else {
-		findChessboardCornersFlags &= ~CV_CALIB_CB_FILTER_QUADS;
+		findChessboardCornersFlags &= ~CALIB_CB_FILTER_QUADS;
 	}
 
 	if (prop_adaptiveThreshold) {
-		findChessboardCornersFlags |= CV_CALIB_CB_ADAPTIVE_THRESH;
+		findChessboardCornersFlags |= CALIB_CB_ADAPTIVE_THRESH;
 	} else {
-		findChessboardCornersFlags &= ~CV_CALIB_CB_ADAPTIVE_THRESH;
+		findChessboardCornersFlags &= ~CALIB_CB_ADAPTIVE_THRESH;
 	}
 
 	if (prop_normalizeImage) {
-		findChessboardCornersFlags |= CV_CALIB_CB_NORMALIZE_IMAGE;
+		findChessboardCornersFlags |= CALIB_CB_NORMALIZE_IMAGE;
 	} else {
-		findChessboardCornersFlags &= ~CV_CALIB_CB_NORMALIZE_IMAGE;
+		findChessboardCornersFlags &= ~CALIB_CB_NORMALIZE_IMAGE;
 	}
 }
 
@@ -216,8 +216,7 @@ void CvFindChessboardCorners_Processor::onNewImage() {
 				cornerSubPix(image, corners,
 						Size(prop_subpix_window, prop_subpix_window),
 						Size(1, 1),
-						TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 50,
-								1e-3));
+						TermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 50, 1e-3));
 			}
 
 			// Set image points and write the result to ourput stream.
