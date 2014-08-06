@@ -23,7 +23,7 @@ namespace Processors {
 namespace CalcObjectLocation {
 
 CalcObjectLocation::CalcObjectLocation(const std::string & name) :
-		Base::Component(name)  {
+		Base::Component(name) {
 
 }
 
@@ -32,19 +32,13 @@ CalcObjectLocation::~CalcObjectLocation() {
 
 void CalcObjectLocation::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
-	//registerStream("in_homogMatrix0", &in_homogMatrix0);
-	//registerStream("in_homogMatrix1", &in_homogMatrix1);
 	registerStream("in_homogMatrix", &in_homogMatrix);
 	registerStream("out_homogMatrix", &out_homogMatrix);
-
 
 	// Register handlers
 	h_calculate.setup(this, &CalcObjectLocation::calculate);
 	registerHandler("calculate", &h_calculate);
 	addDependency("calculate", &in_homogMatrix);
-	//addDependency("calculate", &in_homogMatrix0);
-	//addDependency("calculate", &in_homogMatrix1);
-
 }
 
 bool CalcObjectLocation::onInit() {
@@ -63,10 +57,7 @@ bool CalcObjectLocation::onStart() {
 	return true;
 }
 
-void CalcObjectLocation::calculate(){
-	Common::Timer tm;
-	tm.restart();
-
+void CalcObjectLocation::calculate() {
 	CLOG(LDEBUG)<<"in calculate()";
 
 	Types::HomogMatrix homogMatrix;
@@ -79,7 +70,7 @@ void CalcObjectLocation::calculate(){
 	rotMatrix.create(3,3);
 	tvectemp.create(3,1);
 
-	while (!in_homogMatrix.empty()){
+	while (!in_homogMatrix.empty()) {
 		cv::Mat_<double> rvectemp;
 
 		homogMatrix=in_homogMatrix.read();
@@ -96,7 +87,6 @@ void CalcObjectLocation::calculate(){
 		rvec.push_back(rvectemp);
 		tvec.push_back(tvectemp);
 	}
-	CLOG(LNOTICE) << tm.elapsed();
 
 	if (rvec.size() == 1) {
 		out_homogMatrix.write(homogMatrix);
@@ -111,16 +101,14 @@ void CalcObjectLocation::calculate(){
 	axis_sum.create(3,3);
 	tvec_sum.create(3,1);
 
-	CLOG(LNOTICE) << "Usredniam " << rvec.size() << " macierzy";
-
-	for(int i = 0; i < rvec.size(); i++){
+	for(int i = 0; i < rvec.size(); i++) {
 		fi.push_back(sqrt((pow(rvec.at(i)(0,0), 2) + pow(rvec.at(i)(1,0), 2)+pow(rvec.at(i)(2,0),2))));
 
 		fi_sum+=fi.back();
 		cv::Mat_<double> axistemp;
 		axistemp.create(3,3);
-		for(int k=0;k<3;k++){
-			for(int j=0;j<3;j++){
+		for(int k=0;k<3;k++) {
+			for(int j=0;j<3;j++) {
 				axistemp(k,j)=rvec.at(i)(k,j)/fi.back();
 			}
 		}
@@ -128,11 +116,10 @@ void CalcObjectLocation::calculate(){
 		axis_sum+=axis.back();
 		tvec_sum+=tvec.back();
 	}
-	CLOG(LNOTICE) << tm.elapsed();
 
 	fi_avg = fi_sum/fi.size();
 	axis_avg = axis_sum/axis.size();
-	rvec_avg = axis_avg * fi_avg ;
+	rvec_avg = axis_avg * fi_avg;
 	tvec_avg = tvec_sum/tvec.size();
 
 	Types::HomogMatrix hm;
@@ -141,13 +128,12 @@ void CalcObjectLocation::calculate(){
 
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
-			hm.elements[i][j] = rotMatrix(i, j);
+			hm.elements[i][j] = rottMatrix(i, j);
 			CLOG(LINFO) << hm.elements[i][j] << "  ";
 		}
 		hm.elements[i][3] = tvec_avg(i, 0);
 		CLOG(LINFO) << hm.elements[i][3] << "\n";
 	}
-	CLOG(LNOTICE) << tm.elapsed();
 	out_homogMatrix.write(hm);
 }
 

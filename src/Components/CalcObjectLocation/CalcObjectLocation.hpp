@@ -22,7 +22,6 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 
-
 namespace Processors {
 namespace CalcObjectLocation {
 
@@ -74,20 +73,17 @@ protected:
 	bool onStop();
 
 	// Input data streams
-	//Base::DataStreamIn <Types::HomogMatrix> in_homogMatrix0;
-	//Base::DataStreamIn <Types::HomogMatrix> in_homogMatrix1;
+	Base::DataStreamIn<Types::HomogMatrix> in_homogMatrix;
 
-	Base::DataStreamIn <Types::HomogMatrix> in_homogMatrix;
-	Base::DataStreamOut <Types::HomogMatrix> out_homogMatrix;
 	// Output data streams
+	Base::DataStreamOut<Types::HomogMatrix> out_homogMatrix;
 
 	// Handlers
 
 	// Properties
 
-	
 	// Handlers
-	Base::EventHandler <CalcObjectLocation> h_calculate;
+	Base::EventHandler<CalcObjectLocation> h_calculate;
 
 	void calculate();
 };
@@ -98,6 +94,7 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CalcObjectLocation", Processors::CalcObjectLocation::CalcObjectLocation)
+REGISTER_COMPONENT("CalcObjectLocation",
+		Processors::CalcObjectLocation::CalcObjectLocation)
 
 #endif /* CALCOBJECTLOCATION_HPP_ */
