@@ -125,7 +125,7 @@ protected:
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 
-discode -    /*!
+    /*!
      * Event handler function - moves image index to the next frame of the sequence.
      */
     void onLoadNextImage();
