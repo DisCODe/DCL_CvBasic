@@ -55,28 +55,23 @@ void Sequence::prepareInterface() {
     registerStream("in_load_next_image_trigger", &in_load_next_image_trigger);
 
     // Register handlers - loads image, NULL dependency.
-	h_onLoadImage.setup(this, &Sequence::onLoadImage);
-	registerHandler("onLoadImage", &h_onLoadImage);
+	registerHandler("onLoadImage", boost::bind(&Sequence::onLoadImage, this));
     addDependency("onLoadImage", NULL);
 
     // Register handlers - next image, can be triggered manually (from GUI) or by new data present in_load_next_image_trigger dataport.
     // 1st version - manually.
-    h_onLoadNextImage.setup(this, &Sequence::onLoadNextImage);
-    registerHandler("Next image", &h_onLoadNextImage);
+    registerHandler("Next image", boost::bind(&Sequence::onLoadNextImage, this));
 
     // 2nd version - external tritter.
-    h_onTriggeredLoadNextImage.setup(this, &Sequence::onTriggeredLoadNextImage);
-    registerHandler("onTriggeredLoadNextImage", &h_onTriggeredLoadNextImage);
+    registerHandler("onTriggeredLoadNextImage", boost::bind(&Sequence::onTriggeredLoadNextImage, this));
     addDependency("onTriggeredLoadNextImage", &in_load_next_image_trigger);
 
 
     // Register handlers - reloads sequence, triggered manually.
-    h_onSequenceReload.setup(this, &Sequence::onSequenceReload);
-    registerHandler("Reload sequence", &h_onSequenceReload);
+    registerHandler("Reload sequence", boost::bind(&Sequence::onSequenceReload, this));
 
     // Register handlers - trigger (load frame), triggered manually.
-    h_onRefreshImage.setup(this, &Sequence::onRefreshImage);
-    registerHandler("Refresh image", &h_onRefreshImage);
+    registerHandler("Refresh image", boost::bind(&Sequence::onRefreshImage, this));
 
 }
 

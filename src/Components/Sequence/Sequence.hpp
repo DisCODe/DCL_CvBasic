@@ -125,17 +125,10 @@ protected:
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 
-
-	/// Event handler.
-//    Base::EventHandler<Sequence> h_on_load_next_image_trigger;
-
-    /*!
+discode -    /*!
      * Event handler function - moves image index to the next frame of the sequence.
      */
     void onLoadNextImage();
-
-    /// Event handler - moves image index to the next frame of the sequence.
-    Base::EventHandler<Sequence> h_onLoadNextImage;
 
 
     /*!
@@ -143,33 +136,21 @@ protected:
      */
     void onTriggeredLoadNextImage();
 
-    /// Event handler - moves image index to the next frame of the sequence, externally triggered version.
-    Base::EventHandler<Sequence> h_onTriggeredLoadNextImage;
-
 
     /*!
 	 * Event handler function - loads image from the sequence.
 	 */
 	void onLoadImage();
 
-	/// Event handler - loads image from the sequence.
-	Base::EventHandler<Sequence> h_onLoadImage;
-
 	/*!
 	 * Event handler function - reload the sequence.
 	 */
 	void onSequenceReload();
 
-	/// Event handler - reload the sequence.
-	Base::EventHandler<Sequence> h_onSequenceReload;
-
     /*!
      * Event handler function - triggers image refresh.
      */
     void onRefreshImage();
-
-    /// Event handler - refreshes the image (old or new, depending on the rest of settings.
-    Base::EventHandler<Sequence> h_onRefreshImage;
 
 private:
 	/**
