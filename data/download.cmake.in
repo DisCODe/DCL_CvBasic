@@ -1,29 +1,17 @@
 MESSAGE("Downloading datasets...")
 
-MACRO(GET_DATASET DATASET)
-	IF(NOT EXISTS @PROJECT_SOURCE_DIR@/data/${DATASET})
-		FILE(MAKE_DIRECTORY @PROJECT_SOURCE_DIR@/data/${DATASET})
-	
-		FILE(DOWNLOAD
-			http://robotyka.ia.pw.edu.pl/discode/datasets/${DATASET}.rar
-			@PROJECT_BINARY_DIR@/data/${DATASET}.rar
-			SHOW_PROGRESS
-		)
+# Find DisCODe installation
+FIND_PACKAGE(DisCODe REQUIRED COMPONENTS Macros)
 
-		EXECUTE_PROCESS(
-			COMMAND unrar e @PROJECT_BINARY_DIR@/data/${DATASET}.rar
-			WORKING_DIRECTORY @PROJECT_SOURCE_DIR@/data/${DATASET}
-		) 
-
-		EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E remove @PROJECT_BINARY_DIR@/data/${DATASET}.rar)
-	ENDIF()
-ENDMACRO(GET_DATASET DATASET)
+# Use CMake macros provided with DisCODe
+set(CMAKE_MODULE_PATH ${DisCODe_DIR} ${CMAKE_MODULE_PATH})
+include(DisCODeMacros)
 
 
-GET_DATASET(opencv_classics)
-GET_DATASET(calibration_opencv)
-GET_DATASET(calibration_robotics_lab)
-GET_DATASET(opencv_other)
+GET_DATASET(@PROJECT_SOURCE_DIR@/data opencv_classics)
+GET_DATASET(@PROJECT_SOURCE_DIR@/data calibration_opencv)
+GET_DATASET(@PROJECT_SOURCE_DIR@/data calibration_robotics_lab)
+GET_DATASET(@PROJECT_SOURCE_DIR@/data opencv_other)
 
 
 
