@@ -43,9 +43,9 @@ void CalcStatistics::prepareInterface() {
 
 bool CalcStatistics::onInit() {
 	//cumulatedHomogMatrix;
-	cumulatedRvec.create(3, 1);
-	cumulatedTvec.create(3, 1);
-	cumulatedAxis.create(3, 3);
+	cumulatedRvec = cv::Mat_<double>::zeros(3,1);
+	cumulatedTvec = cv::Mat_<double>::zeros(3,1);
+	cumulatedAxis = cv::Mat_<double>::zeros(3,1);
 	cumulatedFi = 0;
 	counter = 0;
 	return true;
@@ -67,25 +67,24 @@ void CalcStatistics::calculate() {
 	CLOG(LDEBUG)<<"in calculate()";
 
 	Types::HomogMatrix homogMatrix;
-	cv::Mat_<float> rvec;
-	cv::Mat_<float> tvec;
-	cv::Mat_<float> axis;
-	cv::Mat_<float> rotMatrix;
+	cv::Mat_<double> rvec;
+	cv::Mat_<double> tvec;
+	cv::Mat_<double> axis;
+	cv::Mat_<double> rotMatrix;
 	float fi;
 
-	rotMatrix.create(3,3);
-	tvec.create(3,1);
-	axis.create(3,1);
+	rotMatrix= cv::Mat_<double>::zeros(3,3);
+	tvec = cv::Mat_<double>::zeros(3,1);
+	axis = cv::Mat_<double>::zeros(3,1);
 
 	//first homogMatrix on InputStream
-	if(cumulatedFi == 0) {
+	if(counter == 0) {
 		homogMatrix = in_homogMatrix.read();
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
 				rotMatrix(i,j)=homogMatrix.elements[i][j];
 			}
 			tvec(i, 0) = homogMatrix.elements[i][3];
-
 		}
 
 		Rodrigues(rotMatrix, rvec);
@@ -119,9 +118,7 @@ void CalcStatistics::calculate() {
 	fi = sqrt((pow(rvec(0,0), 2) + pow(rvec(1,0), 2)+pow(rvec(2,0),2)));
 
 	for(int k=0;k<3;k++) {
-		for(int j=0;j<3;j++) {
-			axis(k,j)=rvec(k,j)/fi;
-		}
+			axis(k,0)=rvec(k,0)/fi;
 	}
 	cumulatedFi += fi;
 	cumulatedTvec += tvec;
@@ -135,7 +132,7 @@ void CalcStatistics::calculate() {
 	avgTvec = cumulatedTvec/counter;
 
 	Types::HomogMatrix hm;
-	cv::Mat_<float> rottMatrix;
+	cv::Mat_<double> rottMatrix;
 	Rodrigues(avgRvec, rottMatrix);
 
 	CLOG(LINFO)<<"Uśredniona macierz z "<<counter<<" macierzy \n";
