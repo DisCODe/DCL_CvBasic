@@ -86,15 +86,15 @@ protected:
 	Base::EventHandler<CalcStatistics> h_calculate;
 
 	Types::HomogMatrix cumulatedHomogMatrix;
-	cv::Mat_<float> cumulatedRvec;
-	cv::Mat_<float> cumulatedTvec;
-	cv::Mat_<float> cumulatedAxis;
-	float cumulatedFi;
+	cv::Mat_<double> cumulatedRvec;
+	cv::Mat_<double> cumulatedTvec;
+	cv::Mat_<double> cumulatedAxis;
+	double cumulatedFi;
 
-	cv::Mat_<float> avgRvec;
-	cv::Mat_<float> avgTvec;
-	cv::Mat_<float> avgAxis;
-	float avgFi;
+	cv::Mat_<double> avgRvec;
+	cv::Mat_<double> avgTvec;
+	cv::Mat_<double> avgAxis;
+	double avgFi;
 	int counter;
 
 	void calculate();
