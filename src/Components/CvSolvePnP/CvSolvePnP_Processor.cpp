@@ -24,11 +24,19 @@ using namespace Types::Objects3D;
 
 CvSolvePnP_Processor::CvSolvePnP_Processor(const std::string & n) :
 	Component(n),
-	prop_X("offset.X", 0),
-	prop_Y("offset.Y", 0){
-		registerProperty(prop_X);
-		registerProperty(prop_Y);
-
+	prop_x("offset.x", 0),
+	prop_y("offset.y", 0),
+	prop_z("offset.z", 0),
+	prop_roll("offset.roll", 0),
+	prop_pitch("offset.pitch", 0),
+	prop_yaw("offset.yaw", 0)
+	{
+		registerProperty(prop_x);
+		registerProperty(prop_y);
+		registerProperty(prop_z);
+		registerProperty(prop_roll);
+		registerProperty(prop_pitch);
+		registerProperty(prop_yaw);
 }
 
 CvSolvePnP_Processor::~CvSolvePnP_Processor()
@@ -90,38 +98,76 @@ void CvSolvePnP_Processor::onNewObject3D()
 	Mat_<double> rvec;
 	Mat_<double> tvec;
 
-	vector<cv::Point3f> model=object3D->getModelPoints();
+//	vector<cv::Point3f> model=object3D->getModelPoints();
+//
+//	for(int i=0; i< model.size(); i++){
+//		model[i].x += prop_X;
+//		model[i].y += prop_Y;
+//	}
+//	object3D->setModelPoints(model);
 
-	for(int i=0; i< model.size(); i++){
-		model[i].x += prop_X;
-		model[i].y += prop_Y;
-	}
-	object3D->setModelPoints(model);
-
+	// Create matrices with model and image points.
 	Mat modelPoints(object3D->getModelPoints());
 	Mat imagePoints(object3D->getImagePoints());
 
+	// Solve PnP for 3d-2d pairs of points.
 	solvePnP(modelPoints, imagePoints, camera_info.cameraMatrix(), camera_info.distCoeffs(), rvec, tvec, false);
 
+	// Create homogenous matrix.
 	Mat_<double> rotationMatrix;
 	Rodrigues(rvec, rotationMatrix);
 
+	cv::Mat pattern_pose = (cv::Mat_<double>(4, 4) <<
+			rotationMatrix(0,0), rotationMatrix(0,1), rotationMatrix(0,2), tvec(0),
+			rotationMatrix(1,0), rotationMatrix(1,1), rotationMatrix(1,2), tvec(1),
+			rotationMatrix(2,0), rotationMatrix(2,1), rotationMatrix(2,2), tvec(2),
+			0, 0, 0, 1);
+
+	// Roll - rotation around the X (blue) axis.
+	cv::Mat roll = (cv::Mat_<double>(4, 4) <<
+	              1,          0,           0, 0,
+	              0, cos(prop_roll), -sin(prop_roll), 0,
+	              0, sin(prop_roll),  cos(prop_roll), 0,
+	              0, 0, 0, 1 );
+
+	// Pitch - rotation around the Y (green) axis.
+	cv::Mat pitch = (cv::Mat_<double>(4, 4) <<
+            cos(prop_pitch), 0, sin(prop_pitch), 0,
+            0, 1, 0, 0,
+	        -sin(prop_pitch),  0,	cos(prop_pitch), 0,
+	        0, 0, 0, 1 );
+
+	// Yaw - rotation around the Z (red) axis.
+	cv::Mat yaw = (cv::Mat_<double>(4, 4) <<
+            cos(prop_yaw), -sin(prop_yaw), 0, 0,
+	        sin(prop_yaw),  cos(prop_yaw), 0, 0,
+            0, 0, 1, 0,
+	        0, 0, 0, 1 );
+
+	// translation
+	cv::Mat t = (cv::Mat_<double>(4, 4) <<
+			            0, 0, 0, prop_x,
+				        0, 0, 0, prop_y,
+			            0, 0, 0, prop_z,
+				        0, 0, 0, 0 );
+
+	//rottMatrix = rottMatrix * RX;
+	// transform
+	pattern_pose = pattern_pose * (yaw * pitch * roll + t);
 
 	HomogMatrix hm;
 
 	stringstream ss;
 	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
-			hm.elements[i][j] = rotationMatrix(i, j);
+		for (int j = 0; j < 4; ++j) {
+			hm.elements[i][j] = pattern_pose.at<double>(i,j);
 			ss << hm.elements[i][j] << "  ";
 		}
-		hm.elements[i][3] = tvec(i, 0);
-		ss << hm.elements[i][3] << "\n";
 	}
 	CLOG(LDEBUG) << "HomogMatrix:\n" << ss.str() << endl;
 
-	out_rvec.write(rvec);
-	out_tvec.write(tvec);
+	out_rvec.write(rvec.clone());
+	out_tvec.write(tvec.clone());
 	out_homogMatrix.write(hm);
 }
 

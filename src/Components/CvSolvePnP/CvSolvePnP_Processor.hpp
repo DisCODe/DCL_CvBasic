@@ -119,8 +119,12 @@ private:
 
 	void onNewObject3D();
 
-	Base::Property<float> prop_X;
-	Base::Property<float> prop_Y;
+	Base::Property<double> prop_x;
+	Base::Property<double> prop_y;
+	Base::Property<double> prop_z;
+	Base::Property<double> prop_roll;
+	Base::Property<double> prop_pitch;
+	Base::Property<double> prop_yaw;
 
 
 	Base::DataStreamInPtr <Types::Objects3D::Object3D> in_object3d;

@@ -60,16 +60,19 @@ bool CalcObjectLocation::onStart() {
 void CalcObjectLocation::calculate() {
 	CLOG(LDEBUG)<<"in calculate()";
 
+	CLOG(LERROR)<<"dupa1";
+
 	Types::HomogMatrix homogMatrix;
-	vector<cv::Mat_<double> > rvec(0);
-	vector<cv::Mat_<double> > tvec(0);
-	vector<cv::Mat_<double> > axis(0);
-	vector<double> fi(0);
+	vector<cv::Mat_<double> > rvec;
+	vector<cv::Mat_<double> > tvec;
+	vector<cv::Mat_<double> > axis;
+	vector<double> fi;
 	cv::Mat_<double> tvectemp;
 	cv::Mat_<double> rotMatrix;
 	rotMatrix.create(3,3);
 	tvectemp.create(3,1);
 
+	CLOG(LERROR)<<"dupa2";
 	while (!in_homogMatrix.empty()) {
 		cv::Mat_<double> rvectemp;
 
@@ -88,6 +91,8 @@ void CalcObjectLocation::calculate() {
 		tvec.push_back(tvectemp);
 	}
 
+	CLOG(LERROR)<<"dupa3";
+
 	if (rvec.size() == 1) {
 		out_homogMatrix.write(homogMatrix);
 		return;
@@ -100,6 +105,8 @@ void CalcObjectLocation::calculate() {
 
 	axis_sum.create(3,3);
 	tvec_sum.create(3,1);
+
+	CLOG(LERROR)<<"dupa4";
 
 	for(int i = 0; i < rvec.size(); i++) {
 		fi.push_back(sqrt((pow(rvec.at(i)(0,0), 2) + pow(rvec.at(i)(1,0), 2)+pow(rvec.at(i)(2,0),2))));
@@ -117,6 +124,7 @@ void CalcObjectLocation::calculate() {
 		tvec_sum+=tvec.back();
 	}
 
+	CLOG(LERROR)<<"dupa5";
 	fi_avg = fi_sum/fi.size();
 	axis_avg = axis_sum/axis.size();
 	rvec_avg = axis_avg * fi_avg;
@@ -125,6 +133,8 @@ void CalcObjectLocation::calculate() {
 	Types::HomogMatrix hm;
 	cv::Mat_<double> rottMatrix;
 	Rodrigues(rvec_avg, rottMatrix);
+
+	CLOG(LERROR)<<"dupa6";
 
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
