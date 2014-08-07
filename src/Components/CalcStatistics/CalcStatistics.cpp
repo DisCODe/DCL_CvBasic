@@ -43,9 +43,9 @@ void CalcStatistics::prepareInterface() {
 
 bool CalcStatistics::onInit() {
 	//cumulatedHomogMatrix;
-	cumulatedRvec.create(3, 1);
-	cumulatedTvec.create(3, 1);
-	cumulatedAxis.create(3, 3);
+	cumulatedRvec = cv::Mat_<double>::zeros(3,1);
+	cumulatedTvec = cv::Mat_<double>::zeros(3,1);
+	cumulatedAxis = cv::Mat_<double>::zeros(3,1);
 	cumulatedFi = 0;
 	counter = 0;
 	return true;
@@ -73,9 +73,9 @@ void CalcStatistics::calculate() {
 	cv::Mat_<float> rotMatrix;
 	float fi;
 
-	rotMatrix.create(3,3);
-	tvec.create(3,1);
-	axis.create(3,1);
+	rotMatrix= cv::Mat_<double>::zeros(3,3);
+	tvec = cv::Mat_<double>::zeros(3,1);
+	axis = cv::Mat_<double>::zeros(3,1);
 
 	//first homogMatrix on InputStream
 	if(cumulatedFi == 0) {
@@ -119,9 +119,7 @@ void CalcStatistics::calculate() {
 	fi = sqrt((pow(rvec(0,0), 2) + pow(rvec(1,0), 2)+pow(rvec(2,0),2)));
 
 	for(int k=0;k<3;k++) {
-		for(int j=0;j<3;j++) {
-			axis(k,j)=rvec(k,j)/fi;
-		}
+			axis(k,0)=rvec(k,0)/fi;
 	}
 	cumulatedFi += fi;
 	cumulatedTvec += tvec;

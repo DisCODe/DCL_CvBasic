@@ -24,7 +24,6 @@ namespace CalcObjectLocation {
 
 CalcObjectLocation::CalcObjectLocation(const std::string & name) :
 		Base::Component(name) {
-
 }
 
 CalcObjectLocation::~CalcObjectLocation() {
@@ -67,12 +66,11 @@ void CalcObjectLocation::calculate() {
 	vector<double> fi(0);
 	cv::Mat_<double> tvectemp;
 	cv::Mat_<double> rotMatrix;
-	rotMatrix.create(3,3);
-	tvectemp.create(3,1);
+	rotMatrix = cv::Mat_<double>::zeros(3,3);
+	tvectemp = cv::Mat_<double>::zeros(3,1);
 
 	while (!in_homogMatrix.empty()) {
 		cv::Mat_<double> rvectemp;
-
 		homogMatrix=in_homogMatrix.read();
 
 		for (int i = 0; i < 3; ++i) {
@@ -98,23 +96,22 @@ void CalcObjectLocation::calculate() {
 	cv::Mat_<double> rvec_avg;
 	cv::Mat_<double> tvec_avg, tvec_sum;
 
-	axis_sum.create(3,3);
-	tvec_sum.create(3,1);
+	axis_sum = cv::Mat_<double>::zeros(3,1);
+	tvec_sum = cv::Mat_<double>::zeros(3,1);
 
 	for(int i = 0; i < rvec.size(); i++) {
-		fi.push_back(sqrt((pow(rvec.at(i)(0,0), 2) + pow(rvec.at(i)(1,0), 2)+pow(rvec.at(i)(2,0),2))));
+		float fitmp = sqrt((pow(rvec.at(i)(0,0), 2) + pow(rvec.at(i)(1,0), 2)+pow(rvec.at(i)(2,0),2)));
+		fi.push_back(fitmp);
 
-		fi_sum+=fi.back();
+		fi_sum+=fitmp;
 		cv::Mat_<double> axistemp;
-		axistemp.create(3,3);
+		axistemp.create(3,1);
 		for(int k=0;k<3;k++) {
-			for(int j=0;j<3;j++) {
-				axistemp(k,j)=rvec.at(i)(k,j)/fi.back();
-			}
+				axistemp(k,0)=rvec.at(i)(k,0)/fitmp;
 		}
 		axis.push_back(axistemp);
-		axis_sum+=axis.back();
-		tvec_sum+=tvec.back();
+		axis_sum+=axistemp;
+		tvec_sum+=tvec.at(i);
 	}
 
 	fi_avg = fi_sum/fi.size();
