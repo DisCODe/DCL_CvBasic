@@ -15,6 +15,12 @@
 
 #include <opencv2/opencv.hpp>
 #include "Types/HomogMatrix.hpp"
+#include "Types/Objects3D/Object3D.hpp"
+#include "Types/HomogMatrix.hpp"
+#include "Types/CameraInfo.hpp"
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 
 namespace Processors {
 namespace CalcObjectLocation {
@@ -67,21 +73,19 @@ protected:
 	bool onStop();
 
 	// Input data streams
-	Base::DataStreamIn <Types::HomogMatrix> in_homogMatrix;
-	Base::DataStreamOut <Types::HomogMatrix> out_homogMatrix;
+	Base::DataStreamIn<Types::HomogMatrix> in_homogMatrix;
+
 	// Output data streams
+	Base::DataStreamOut<Types::HomogMatrix> out_homogMatrix;
 
 	// Handlers
 
 	// Properties
 
-	
 	// Handlers
-	Base::EventHandler <CalcObjectLocation> h_calculate;
+	Base::EventHandler<CalcObjectLocation> h_calculate;
 
 	void calculate();
-
-	Types::HomogMatrix meanHomogMatrix;
 };
 
 } //: namespace CalcObjectLocation
@@ -90,6 +94,7 @@ protected:
 /*
  * Register processor component.
  */
-REGISTER_COMPONENT("CalcObjectLocation", Processors::CalcObjectLocation::CalcObjectLocation)
+REGISTER_COMPONENT("CalcObjectLocation",
+		Processors::CalcObjectLocation::CalcObjectLocation)
 
 #endif /* CALCOBJECTLOCATION_HPP_ */
