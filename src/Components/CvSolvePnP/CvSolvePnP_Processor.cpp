@@ -153,7 +153,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 
 	//rottMatrix = rottMatrix * RX;
 	// transform
-	pattern_pose = pattern_pose * (yaw * pitch * roll + t);
+	pattern_pose = pattern_pose * (t + yaw * pitch * roll);
 
 	HomogMatrix hm;
 
