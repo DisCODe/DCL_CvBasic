@@ -14,6 +14,13 @@
 #include "EventHandler2.hpp"
 
 #include <opencv2/opencv.hpp>
+#include "Types/HomogMatrix.hpp"
+#include "Types/Objects3D/Object3D.hpp"
+#include "Types/HomogMatrix.hpp"
+#include "Types/CameraInfo.hpp"
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 
 namespace Processors {
 namespace CalcStatistics {
@@ -65,33 +72,32 @@ protected:
 	 */
 	bool onStop();
 
-
 	// Input data streams
-	Base::DataStreamIn <cv::Mat> in_rvec;
-	Base::DataStreamIn <cv::Mat> in_tvec;
-	Base::DataStreamIn <cv::Mat> in_rvec_d;
-	Base::DataStreamIn <cv::Mat> in_tvec_d;
+	Base::DataStreamIn<Types::HomogMatrix> in_homogMatrix;
 
 	// Output data streams
+	Base::DataStreamOut<Types::HomogMatrix> out_homogMatrix;
 
 	// Handlers
 
 	// Properties
 
-	
 	// Handlers
-	Base::EventHandler <CalcStatistics> h_calculate;
-	Base::EventHandler <CalcStatistics> h_calculateDiff;
+	Base::EventHandler<CalcStatistics> h_calculate;
+
+	Types::HomogMatrix cumulatedHomogMatrix;
+	cv::Mat_<float> cumulatedRvec;
+	cv::Mat_<float> cumulatedTvec;
+	cv::Mat_<float> cumulatedAxis;
+	float cumulatedFi;
+
+	cv::Mat_<float> avgRvec;
+	cv::Mat_<float> avgTvec;
+	cv::Mat_<float> avgAxis;
+	float avgFi;
+	int counter;
 
 	void calculate();
-	void calculateDiff();
-
-	cv::Mat tvec;
-	cv::Mat rvec;
-
-	cv::Mat tvec_d;
-	cv::Mat rvec_d;
-
 
 };
 
