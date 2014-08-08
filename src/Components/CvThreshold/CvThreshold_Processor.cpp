@@ -15,7 +15,7 @@ namespace Processors {
 namespace CvThreshold {
 
 CvThreshold_Processor::CvThreshold_Processor(const std::string & name) : Base::Component(name),
-		m_type("type", CV_THRESH_BINARY, "combo"),
+		m_type("type", THRESH_BINARY, "combo"),
 		m_thresh("thresh", 128, "range"),
 		m_maxval("maxval", 255, "range")
 {

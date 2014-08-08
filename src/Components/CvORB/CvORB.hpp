@@ -15,7 +15,6 @@
 #include "Types/Features.hpp"
 
 #include <opencv2/opencv.hpp>
-#include "opencv2/nonfree/features2d.hpp"
 #include "opencv2/features2d/features2d.hpp"
 
 
@@ -88,8 +87,8 @@ protected:
 	/// Output data stream containing feature descriptors
 	Base::DataStreamOut <cv::Mat> out_descriptors;
 
-	 // The maximum number of features to retain
-        Base::Property<int> nfeatures;
+	/// The maximum number of features to retain
+	Base::Property<int> nfeatures;
     /*
         //Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor will mean that to cover certain scale range you will need more pyramid levels and so the speed will suffer.
 		Base::Property<float> scaleFactor;

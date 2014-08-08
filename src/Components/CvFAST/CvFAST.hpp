@@ -15,7 +15,6 @@
 #include "Types/Features.hpp"
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
 #include <opencv2/core/core.hpp>
@@ -88,27 +87,7 @@ protected:
 	/// Output data stream containing extracted features
 	Base::DataStreamOut <Types::Features> out_features;
 
-	/// Output data stream containing feature descriptors
-	Base::DataStreamOut <cv::Mat> out_descriptors;
-
-	 // The maximum number of features to retain
-        Base::Property<int> nfeatures;
-    /*
-        //Pyramid decimation ratio, greater than 1. scaleFactor==2 means the classical pyramid, where each next level has 4x less pixels than the previous, but such a big scale factor will degrade feature matching scores dramatically. On the other hand, too close to 1 scale factor will mean that to cover certain scale range you will need more pyramid levels and so the speed will suffer.
-		Base::Property<float> scaleFactor;
-		//This is size of the border where the features are not detected. It should roughly match the patchSize parameter.
-		Base::Property<int> nlevels;
-		//This is size of the border where the features are not detected. It should roughly match the patchSize parameter.
-		Base::Property<int> edgeThreshold;
-		//
-		Base::Property<int> firstLevel;
-		//The number of points that produce each element of the oriented BRIEF descriptor
-		Base::Property<int> WTA_K;
-		//The default HARRIS_SCORE means that Harris algorithm is used to rank features (the score is written to KeyPoint::score and is used to retain best nfeatures features); FAST_SCORE is alternative value of the parameter that produces slightly less stable keypoints, but it is a little faster to compute.
-		Base::Property<int> scoreType;
-		//size of the patch used by the oriented BRIEF descriptor. Of course, on smaller pyramid layers the perceived image area covered by a feature will be larger.
-        Base::Property<int> patchSize;
-    */
+	Base::Property<int> m_threshold;
 };
 
 } //: namespace CvFAST

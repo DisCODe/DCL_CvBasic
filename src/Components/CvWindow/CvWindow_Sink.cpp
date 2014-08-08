@@ -42,11 +42,11 @@ CvWindow_Sink::CvWindow_Sink(const std::string & name) :
 }
 
 CvWindow_Sink::~CvWindow_Sink() {
-	CLOG(LTRACE) << "Good bye CvWindow_Sink\n";
+	CLOG(LTRACE) << "Good bye CvWindow_Sink";
 }
 
 void CvWindow_Sink::prepareInterface() {
-	CLOG(LTRACE) << "CvWindow_Sink::configure\n";
+	CLOG(LTRACE) << "CvWindow_Sink::configure";
 
 	h_onRefresh.setup(this, &CvWindow_Sink::onRefresh);
 	registerHandler("onRefresh", &h_onRefresh);
@@ -93,6 +93,9 @@ void CvWindow_Sink::prepareInterface() {
 
 	img.resize(count);
 	to_draw.resize(count);
+	for (int i =0; i < count; ++i) {
+		to_draw_timeout.push_back(0);
+	}
 
 	// Split window titles.
 	std::string t = title;
@@ -111,13 +114,14 @@ bool CvWindow_Sink::onInit() {
 	for (int i = 0; i < count; ++i) {
 		cv::namedWindow(titles[i]);
 	}
+	CLOG(LTRACE) << "CvWindow_Sink::initialize done\n";
 	return true;
 }
 
 bool CvWindow_Sink::onFinish() {
 	CLOG(LTRACE) << "CvWindow_Sink::finish\n";
 
-#if OpenCV_MAJOR<2 || OpenCV_MINOR<2
+#if CV_MAJOR_VERSION<2 || CV_MINOR_VERSION<2
 	for (int i = 0; i < count; ++i) {
 		char id = '0' + i;
 		cv::destroyWindow(titles[i]);
@@ -149,27 +153,35 @@ void CvWindow_Sink::onNewImageN(int n) {
 			img[n] = in_img[n]->read().clone();
 		}
 
+		if (to_draw_timeout[n])
+			--to_draw_timeout[n];
+
 		Types::DrawableContainer ctr;
 		while (!in_draw[n]->empty()) {
 			ctr.add(in_draw[n]->read()->clone());
 			to_draw[n] = boost::shared_ptr<Types::Drawable>(ctr.clone());
+			to_draw_timeout[n] = 10;
 		}
 
 		if (to_draw[n]) {
-			to_draw[n]->draw(img[n], CV_RGB(255,0,255));
-			// TODO: dodać wygaszanie starszych drawable, np. przez 10 odświeżeń
-			//to_draw[n] = boost::shared_ptr<Types::Drawable>();
+			float opacity = 0.1 * to_draw_timeout[n];
+			if (opacity > 0.01) {
+				cv::Mat overlay;
+				img[n].copyTo(overlay);
+				to_draw[n]->draw(overlay, CV_RGB(255,0,255));
+				cv::addWeighted(overlay, opacity, img[n], 1-opacity, 0, img[n]);
+			}
 		}
 
 		// Display image.
 		//onStep();
 	} catch (std::exception &ex) {
-		CLOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "\n";
+		CLOG(LERROR) << "CvWindow::onNewImage failed: " << ex.what() << "";
 	}
 }
 
 void CvWindow_Sink::onRefresh() {
-	CLOG(LTRACE) << "CvWindow_Sink::step\n";
+	CLOG(LTRACE) << "CvWindow_Sink::step";
 
 	try {
 		for (int i = 0; i < count; ++i) {
@@ -193,8 +205,8 @@ void CvWindow_Sink::onTitleChanged(const std::string & old_title,
 		const std::string & new_title) {
 	std::cout << "onTitleChanged: " << new_title << std::endl;
 
-#if OpenCV_MAJOR<2 || OpenCV_MINOR<2
-	std::cout << "Changing window title not supported\n";
+#if CV_MAJOR_VERSION<2 || CV_MINOR_VERSION<2
+	CLOG(LDEBUG) << "Changing window title not supported";
 #else
 	for (int i = 0; i < count; ++i) {
 		char id = '0' + i;

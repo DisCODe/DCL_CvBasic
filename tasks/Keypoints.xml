@@ -21,11 +21,25 @@
 					<param name="sequence.pattern">.*\.jpg</param>
 					<param name="mode.loop">1</param>
 				</Component>
+				
+				<Component name="Color" type="CvBasic:CvColorConv" priority="2">
+					<type>BGR2GRAY</type>
+				</Component>
+				
+				<Component name="SIFT" type="CvBasic:CvSIFT" priority="30">
+				</Component>
+				
+				<Component name="SURF" type="CvBasic:CvSURF" priority="40">
+				</Component>
+				
+				<Component name="Harris" type="CvBasic:CvHarris" priority="50">
+				</Component>
 			</Executor>
+
 			<Executor name="Visualization" period="0.2">
 				<Component name="Window" type="CvBasic:CvWindow" priority="1" bump="0">
-					<param name="count">1</param>
-					<param name="title">Window</param>
+					<param name="count">3</param>
+					<param name="title">SIFT,SURF,Harris</param>
 				</Component>
 			</Executor>
 		</Subtask>	
@@ -35,7 +49,28 @@
 	<!-- pipes connecting datastreams -->
 	<DataStreams>
 		<Source name="Sequence.out_img">
-			<sink>Window.in_img</sink>			
+			<sink>Window.in_img0</sink>
+			<sink>Window.in_img1</sink>
+			<sink>Window.in_img2</sink>
+			<sink>Color.in_img</sink>
+		</Source>
+		
+		<Source name="Color.out_img">
+			<sink>SIFT.in_img</sink>
+			<sink>SURF.in_img</sink>
+			<sink>Harris.in_img</sink>
+		</Source>
+		
+		<Source name="SIFT.out_features">
+			<sink>Window.in_draw0</sink>
+		</Source>
+		
+		<Source name="SURF.out_features">
+			<sink>Window.in_draw1</sink>
+		</Source>
+		
+		<Source name="Harris.out_features">
+			<sink>Window.in_draw2</sink>
 		</Source>
 	</DataStreams>
 </Task>

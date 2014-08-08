@@ -1,0 +1,18 @@
+MESSAGE("Downloading datasets...")
+
+# Find DisCODe installation
+FIND_PACKAGE(DisCODe REQUIRED COMPONENTS Macros)
+
+# Use CMake macros provided with DisCODe
+set(CMAKE_MODULE_PATH ${DisCODe_DIR} ${CMAKE_MODULE_PATH})
+include(DisCODeMacros)
+
+
+GET_DATASET(@PROJECT_SOURCE_DIR@/data opencv_classics)
+GET_DATASET(@PROJECT_SOURCE_DIR@/data calibration_opencv)
+GET_DATASET(@PROJECT_SOURCE_DIR@/data calibration_robotics_lab)
+GET_DATASET(@PROJECT_SOURCE_DIR@/data opencv_other)
+
+
+
+

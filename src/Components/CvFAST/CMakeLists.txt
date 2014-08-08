@@ -19,6 +19,6 @@ INSTALL_COMPONENT(CvFAST)
 
 ELSE ()
 
-MESSAGE ( STATUS "Skipping FAST - required OpenCV 2.4. Detected OpenCV ${OpenCV_VERSION}." )
+MESSAGE ( STATUS "Skipping FAST - required OpenCV 2.4. Detected OpenCV ${OpenCV_VERSION}.")
 
 ENDIF ()

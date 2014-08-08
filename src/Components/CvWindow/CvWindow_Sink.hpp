@@ -191,6 +191,7 @@ protected:
 	std::vector<cv::Mat> img;
 
 	std::vector<boost::shared_ptr<Types::Drawable> > to_draw;
+	std::vector<int> to_draw_timeout;
 
 	std::vector<std::string> titles;
 	Base::Property<std::string> title;
