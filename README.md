@@ -14,7 +14,7 @@ According to the current changes in the partial commercialization of the OpenCV,
 
 Dataset
 ------------
-Call make dataset in order to download and unrar the files required by exemplary tasks, e.g. SequenceViewer displays images from the data/opencv_classics folder.
+Call __make dataset__ from the build directory in order to download and unrar the files required by exemplary tasks, e.g. SequenceViewer displays images from the data/opencv_classics folder.
 
 
 Maintainer
