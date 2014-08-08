@@ -120,7 +120,7 @@ protected:
 	bool onStop();
 
     /// Trigger - used for loading next image in case of several sequences present.
-    Base::DataStreamIn<Base::UnitType> in_load_next_image_trigger;
+    Base::DataStreamIn<Base::UnitType> in_trigger;
 
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
@@ -147,11 +147,6 @@ protected:
 	 */
 	void onSequenceReload();
 
-    /*!
-     * Event handler function - triggers image refresh.
-     */
-    void onRefreshImage();
-
 private:
 	/**
 	 * Fill list of files according to pattern
@@ -171,8 +166,12 @@ private:
 	/// Index of current frame.
 	int frame;
 
-    /// Flag indicating whether the image was already loaded or not.
-	bool trig;
+    /// Flag indicating whether the next image should loaded or not.
+	bool next_image_flag;
+
+    /// Flag indicating whether the sequence should be reloaded or not.
+	bool reload_flag;
+
 
 	/// Directory containing the images sequence.
 	Base::Property<std::string> prop_directory;
@@ -180,8 +179,8 @@ private:
 	/// Files pattern (regular expression).
 	Base::Property<std::string> prop_pattern;
 
-	/// Loading mode: triggered vs continous.
-	Base::Property<bool> prop_triggered;
+	/// Next image loading mode: iterative vs triggered.
+	Base::Property<bool> prop_auto_trigger;
 
 	/// Loading mode: images loaded in the loop.
 	Base::Property<bool> prop_loop;
@@ -189,8 +188,6 @@ private:
 	/// Sort image sequence by their names.
 	Base::Property<bool> prop_sort;
 
-	/// Working mode: iterative vs constant.
-	Base::Property<bool> prop_iterate;
 
 	/// ???
 	//Base::Property<bool> prop_prefetch;

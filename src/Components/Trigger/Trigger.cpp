@@ -49,6 +49,7 @@ bool Trigger::onStart() {
 }
 
 void Trigger::trigger() {
+    CLOG(LDEBUG) << "Trigger::trigger";
     Base::UnitType t;
     out_trigger.write(t);
 }

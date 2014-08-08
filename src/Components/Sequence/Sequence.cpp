@@ -21,25 +21,25 @@ Sequence::Sequence(const std::string & n) :
 	prop_pattern("sequence.pattern", std::string(".*\\.(jpg|png|bmp)")),
 	prop_sort("mode.sort", true),
 	//prop_prefetch("mode.prefetch", false),
-	prop_triggered("mode.triggered", false),
-	prop_iterate("mode.iterate", true),
-	prop_loop("mode.loop", false)
+	prop_loop("mode.loop", false),
+	prop_auto_trigger("mode.auto_trigger", true)
 {
 	registerProperty(prop_directory);
 	registerProperty(prop_pattern);
 	registerProperty(prop_sort);
-	//registerProperty(prop_prefetch);
-	registerProperty(prop_triggered);
-	registerProperty(prop_iterate);
 	registerProperty(prop_loop);
+	registerProperty(prop_auto_trigger);
+	//registerProperty(prop_prefetch);
 
 	// Set first frame index number.
-	if (prop_iterate)
+	if (prop_auto_trigger)
 		frame = -1;
 	else
 		frame = 0;
 
-	trig = true;
+	// Initialize flags
+	next_image_flag = false;
+	reload_flag = false;
 
 	CLOG(LTRACE) << name() << ": constructed";
 }
@@ -52,7 +52,7 @@ Sequence::~Sequence() {
 void Sequence::prepareInterface() {
     // Register streams.
     registerStream("out_img", &out_img);
-    registerStream("in_load_next_image_trigger", &in_load_next_image_trigger);
+    registerStream("in_trigger", &in_trigger);
 
     // Register handlers - loads image, NULL dependency.
 	registerHandler("onLoadImage", boost::bind(&Sequence::onLoadImage, this));
@@ -62,16 +62,13 @@ void Sequence::prepareInterface() {
     // 1st version - manually.
     registerHandler("Next image", boost::bind(&Sequence::onLoadNextImage, this));
 
-    // 2nd version - external tritter.
+    // 2nd version - external trigger.
     registerHandler("onTriggeredLoadNextImage", boost::bind(&Sequence::onTriggeredLoadNextImage, this));
-    addDependency("onTriggeredLoadNextImage", &in_load_next_image_trigger);
+    addDependency("onTriggeredLoadNextImage", &in_trigger);
 
 
     // Register handlers - reloads sequence, triggered manually.
     registerHandler("Reload sequence", boost::bind(&Sequence::onSequenceReload, this));
-
-    // Register handlers - trigger (load frame), triggered manually.
-    registerHandler("Refresh image", boost::bind(&Sequence::onRefreshImage, this));
 
 }
 
@@ -79,7 +76,7 @@ bool Sequence::onInit() {
 	CLOG(LTRACE) << "Sequence::initialize\n";
 
 	if (!findFiles()) {
-		CLOG(LERROR) << name() << ": There are no files matching regex "
+		CLOG(LERROR) << name() << ": There are no files matching the regular expression "
 				<< prop_pattern << " in " << prop_directory;
 		return false;
 	}
@@ -95,18 +92,26 @@ bool Sequence::onFinish() {
 
 void Sequence::onLoadImage() {
 	CLOG(LDEBUG) << "Sequence::onLoadImage";
+	if(reload_flag) {
+		// Try to reload sequence.
+		if (!findFiles()) {
+			CLOG(LERROR) << name() << ": There are no files matching the regular expression "
+					<< prop_pattern << " in " << prop_directory;
+		}
+		frame = -1;
+		reload_flag = false;
+	}
+
 
 	// Check triggering mode.
-	if (prop_triggered && !trig)
-		return;
-	trig = false;
-	// Check iterate mode.
-	if (prop_iterate)
+	if ((prop_auto_trigger) || (!prop_auto_trigger && next_image_flag))
 		frame++;
+	// Anyway, reset flag.
+	next_image_flag = false;
 
+	// Check frane number.
 	if (frame <0)
 		frame = 0;
-
 	// Check the size of the dataset.
 	if (frame >= files.size()) {
 		if (prop_loop) {
@@ -134,37 +139,21 @@ void Sequence::onLoadImage() {
 }
 
 
-void Sequence::onRefreshImage(){
-    CLOG(LDEBUG) << "Sequence::onRefreshImage - trigger";
-    trig = true;
-}
-
-
 void Sequence::onTriggeredLoadNextImage(){
     CLOG(LDEBUG) << "Sequence::onTriggeredLoadNextImage - next image from the sequence will be loaded";
-    in_load_next_image_trigger.read();
-    frame++;
+    in_trigger.read();
+	next_image_flag = true;
 }
 
 
 void Sequence::onLoadNextImage(){
 	CLOG(LDEBUG) << "Sequence::onLoadNextImage - next image from the sequence will be loaded";
-	frame++;
+	next_image_flag = true;
 }
 
 
 void Sequence::onSequenceReload() {
-	// Set first frame index number.
-	if (prop_iterate)
-		frame = -1;
-	else
-		frame = 0;
-	// Try to load new sequence.
-	if (!findFiles()) {
-		CLOG(LERROR) << name() << ": There are no files matching regex "
-				<< prop_pattern << " in " << prop_directory;
-		frame = -1;
-	}
+	reload_flag = true;
 }
 
 
