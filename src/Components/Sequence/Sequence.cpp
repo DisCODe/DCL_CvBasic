@@ -18,7 +18,7 @@ namespace Sequence {
 Sequence::Sequence(const std::string & n) :
 	Base::Component(n),
 	prop_directory("sequence.directory", std::string(".")),
-	prop_pattern("sequence.pattern", std::string(".*\\.(jpg|png|bmp)")),
+	prop_pattern("sequence.pattern", std::string(".*\\.(jpg|png|bmp|yaml|yml)")),
 	prop_sort("mode.sort", true),
 	//prop_prefetch("mode.prefetch", false),
 	prop_loop("mode.loop", false),
@@ -66,7 +66,6 @@ void Sequence::prepareInterface() {
     registerHandler("onTriggeredLoadNextImage", boost::bind(&Sequence::onTriggeredLoadNextImage, this));
     addDependency("onTriggeredLoadNextImage", &in_trigger);
 
-
     // Register handlers - reloads sequence, triggered manually.
     registerHandler("Reload sequence", boost::bind(&Sequence::onSequenceReload, this));
 
@@ -75,11 +74,8 @@ void Sequence::prepareInterface() {
 bool Sequence::onInit() {
 	CLOG(LTRACE) << "Sequence::initialize\n";
 
-	if (!findFiles()) {
-		CLOG(LERROR) << name() << ": There are no files matching the regular expression "
-				<< prop_pattern << " in " << prop_directory;
-		return false;
-	}
+	// Load files on first
+	reload_flag = true;
 
 	return true;
 }
@@ -92,6 +88,7 @@ bool Sequence::onFinish() {
 
 void Sequence::onLoadImage() {
 	CLOG(LDEBUG) << "Sequence::onLoadImage";
+
 	if(reload_flag) {
 		// Try to reload sequence.
 		if (!findFiles()) {
@@ -103,13 +100,17 @@ void Sequence::onLoadImage() {
 	}
 
 
+	// Check whether there are any images loaded.
+	if(files.empty())
+		return;
+
 	// Check triggering mode.
 	if ((prop_auto_trigger) || (!prop_auto_trigger && next_image_flag))
 		frame++;
 	// Anyway, reset flag.
 	next_image_flag = false;
 
-	// Check frane number.
+	// Check frame number.
 	if (frame <0)
 		frame = 0;
 	// Check the size of the dataset.
@@ -128,7 +129,16 @@ void Sequence::onLoadImage() {
 
 	CLOG(LTRACE) << "Sequence: reading image " << files[frame];
 	try {
-		img = cv::imread(files[frame], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+		// Get file extension.
+		std::string ext = files[frame].substr(files[frame].rfind(".")+1);
+		CLOG(LDEBUG) << "Extracted file Extension " << ext;
+		// Read depth from yaml.
+		if ((ext == "yaml") || (ext == "yml")){
+			cv::FileStorage file(files[frame], cv::FileStorage::READ);
+			file["img"] >> img;
+		}
+		else
+			img = cv::imread(files[frame], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
 	} catch (...) {
 		CLOG(LWARNING) << name() << ": image reading failed! ["
 				<< files[frame] << "]";
@@ -153,13 +163,10 @@ void Sequence::onLoadNextImage(){
 
 
 void Sequence::onSequenceReload() {
+	CLOG(LDEBUG) << "Sequence::onSequenceReload";
 	reload_flag = true;
 }
 
-
-bool Sequence::onStep() {
-
-}
 
 bool Sequence::onStart() {
 	return true;
@@ -179,7 +186,7 @@ bool Sequence::findFiles() {
 
 	CLOG(LINFO) << "Sequence loaded.";
 	BOOST_FOREACH(std::string fname, files)
-	CLOG(LINFO) << fname;
+		CLOG(LINFO) << fname;
 
 	return !files.empty();
 }

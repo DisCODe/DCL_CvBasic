@@ -26,21 +26,22 @@ ImageWriter::ImageWriter(const std::string & name) :
 		base_name("base_name", std::string("img")),
 		format("format", std::string("png")),
 		digits("digits", 2),
-		count("count", 1){
-
+		count("count", 1),
+		prop_auto_trigger("mode.auto_trigger", false)
+{
 	registerProperty(directory);
 	registerProperty(base_name);
 	registerProperty(format);
 	registerProperty(digits);
 	registerProperty(count);
+	registerProperty(prop_auto_trigger);
 }
 
 ImageWriter::~ImageWriter() {
 }
 
 void ImageWriter::prepareInterface() {
-	// Register data streams, events and event handlers HERE!
-	// Register data streams
+	CLOG(LTRACE) << name() << "::prepareInterface()";
 
 	// Register handlers
 	Base::EventHandler2 * hand;
@@ -53,8 +54,12 @@ void ImageWriter::prepareInterface() {
 
 		Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest> * stream = new Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest>;
 		in_img.push_back(stream);
-		registerStream( std::string("in_img_")+id, (Base::DataStreamInterface*)(in_img[i]));
+		registerStream( std::string("in_img")+id, (Base::DataStreamInterface*)(in_img[i]));
 		addDependency(std::string("write_image_")+id, stream);
+
+		// Add n flags for manual trigger.
+		bool tmp_flag = false;
+		save_flags.push_back(tmp_flag);
 	}
 
 
@@ -79,6 +84,14 @@ void ImageWriter::prepareInterface() {
 		formats.push_back(format);
 	}
 
+    // Register handlers - next image, can be triggered manually (from GUI) or by new data present in_load_next_image_trigger dataport.
+    // 1st version - manually.
+    registerHandler("SaveImage", boost::bind(&ImageWriter::onSaveButtonPressed, this));
+
+    // 2nd version - external trigger.
+    registerHandler("onSaveTriggered", boost::bind(&ImageWriter::onSaveTriggered, this));
+    addDependency("onSaveTriggered", &in_trigger);
+
 }
 
 bool ImageWriter::onInit() {
@@ -97,10 +110,32 @@ bool ImageWriter::onStart() {
 	return true;
 }
 
+
+void ImageWriter::onSaveButtonPressed() {
+	CLOG(LTRACE) << name() << "::onSaveButtonPressed()";
+	for (int i = 0; i < count; ++i)
+		save_flags[i] = true;
+}
+
+void ImageWriter::onSaveTriggered(){
+	CLOG(LTRACE) << name() << "::onSaveTriggered()";
+    in_trigger.read();
+	for (int i = 0; i < count; ++i)
+		save_flags[i] = true;
+}
+
+
+
 void ImageWriter::write_image_N(int n) {
-	CLOG(LTRACE) << name() << "::onNewImage(" << n << ")";
+	CLOG(LTRACE) << name() << "::write_image_N(" << n << ")";
 
 	boost::posix_time::ptime tm = boost::posix_time::microsec_clock::local_time();
+
+	// Check working mode.
+	if ((!prop_auto_trigger && !save_flags[n])){
+		return;
+	}
+	save_flags[n] = false;
 
 	try {
 		if(!in_img[n]->empty()){
@@ -109,9 +144,24 @@ void ImageWriter::write_image_N(int n) {
 			ss << std::setw(digits) << std::setfill('0') << counts[n];
 			//std::string fname = std::string(directory) + "/" + base_names[n] + boost::lexical_cast<std::string>(counts[n]) + "." + formats[n];
 			std::string fname = std::string(directory) + "/" + boost::posix_time::to_iso_extended_string(tm) + "_" + base_names[n] + "." + formats[n];
-			cv::imwrite(fname, in_img[n]->read());
-			CLOG(LNOTICE) << "Written: " << fname;
+
+			// Write to file depending on the extension.
+			// Write to yaml.
+			if ((formats[n] == "yaml") || (formats[n] == "yml")){
+				CLOG(LNOTICE) << "Writing "<< n <<"-th image to YAML file" << fname;
+			    cv::FileStorage fs(fname, cv::FileStorage::WRITE);
+				fs << "img" << in_img[n]->read();
+			    fs.release();
+			}
+			else
+			{
+				CLOG(LNOTICE) << "Writing "<< n <<"-th image to file" << fname;
+				cv::imwrite(fname, in_img[n]->read());
+
+			}
 		}
+		else
+			CLOG(LWARNING) <<"Image N(" << n << ") empty!";
 	}
 	catch(std::exception &ex) {
 		CLOG(LERROR) << "ImageWriter::write_image_N failed: " << ex.what() << "\n";

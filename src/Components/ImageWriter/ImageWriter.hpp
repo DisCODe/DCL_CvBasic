@@ -66,7 +66,20 @@ protected:
 	 */
 	bool onStop();
 
-	/// Image to be drawn
+    /*!
+     * Event handler function - saves image when button is pressed.
+     */
+    void onSaveButtonPressed();
+
+    /*!
+     * Event handler function - saves images.
+     */
+    void onSaveTriggered();
+
+    /// Trigger - used for loading next image in case of several sequences present.
+    Base::DataStreamIn<Base::UnitType> in_trigger;
+
+    /// Image to be saved.
 	std::vector< Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest> *> in_img;
 
 	/// Event handlers
@@ -77,14 +90,25 @@ protected:
 	Base::Property<string> format;
 	Base::Property<int> digits;
 	Base::Property<int> count;
-	
+
+	/// Vector of image names.
 	std::vector<std::string> base_names;
+
+	/// Vector of image extensions.
 	std::vector<std::string> formats;
 
-	// Handlers
+	/// Handlers
 	void write_image_N(int n);
 
+	/// Number of image streams.
 	std::vector<int> counts;
+
+	/// Saving mode: continous vs triggered.
+	Base::Property<bool> prop_auto_trigger;
+
+    /// Flag indicating whether the set of images images should saved or not (trigger).
+	std::vector<bool> save_flags;
+
 
 };
 

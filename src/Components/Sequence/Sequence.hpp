@@ -105,11 +105,6 @@ protected:
 	bool onFinish();
 
 	/*!
-	 * Retrieves data from device.
-	 */
-	bool onStep();
-
-	/*!
 	 * Start component
 	 */
 	bool onStart();

@@ -7,7 +7,9 @@ FILE(GLOB files *.cpp)
 # Create an executable file from sources:
 ADD_LIBRARY(ImageWriter SHARED ${files})
 
+FIND_PACKAGE(Boost REQUIRED COMPONENTS date_time)
+ 
 # Add aother libraries if necessary, for example:
-TARGET_LINK_LIBRARIES(ImageWriter ${DisCODe_LIBRARIES} ${OpenCV_LIBS} )
+TARGET_LINK_LIBRARIES(ImageWriter ${Boost_DATE_TIME_LIBRARY} ${OpenCV_LIBS} ${DisCODe_LIBRARIES} )
 
 INSTALL_COMPONENT(ImageWriter)
