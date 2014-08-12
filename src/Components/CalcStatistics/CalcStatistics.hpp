@@ -83,7 +83,7 @@ protected:
 	// Properties
 
 	// Handlers
-	Base::EventHandler<CalcStatistics> h_calculate;
+	void calculate();
 
 	Types::HomogMatrix cumulatedHomogMatrix;
 	cv::Mat_<double> cumulatedRvec;
@@ -97,7 +97,6 @@ protected:
 	double avgFi;
 	int counter;
 
-	void calculate();
 
 };
 

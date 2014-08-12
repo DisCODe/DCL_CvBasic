@@ -44,37 +44,29 @@ CvBayesClassifier::~CvBayesClassifier() {
 
 void CvBayesClassifier::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewData.setup(this, &CvBayesClassifier::onNewData);
-	registerHandler("onNewData", &h_onNewData);
+	registerHandler("onNewData", boost::bind(&CvBayesClassifier::onNewData, this));
 	addDependency("onNewData", &in_moments);
 
 	// Add to dataset.
-	h_onAddToDataset.setup(this, &CvBayesClassifier::onAddToDataset);
-	registerHandler("Training dataset add sample", &h_onAddToDataset);
+	registerHandler("Training dataset add sample", boost::bind(&CvBayesClassifier::onAddToDataset, this));
 
 	// Clear dataset.
-	h_onClearDataset.setup(this, &CvBayesClassifier::onClearDataset);
-	registerHandler("Training dataset clear", &h_onClearDataset);
+	registerHandler("Training dataset clear", boost::bind(&CvBayesClassifier::onClearDataset, this));
 
 	// Display dataset.
-	h_onDisplayDataset.setup(this, &CvBayesClassifier::onDisplayDataset);
-	registerHandler("Training dataset display", &h_onDisplayDataset);
+	registerHandler("Training dataset display", boost::bind(&CvBayesClassifier::onDisplayDataset, this));
 
 	// Bayes: clear.
-	h_onBayesClear.setup(this, &CvBayesClassifier::onBayesClear);
-	registerHandler("Bayes reset", &h_onBayesClear);
+	registerHandler("Bayes reset", boost::bind(&CvBayesClassifier::onBayesClear, this));
 
 	// Bayes: Training.
-	h_onBayesTraining.setup(this, &CvBayesClassifier::onBayesTraining);
-	registerHandler("Bayes train classifier with dataset", &h_onBayesTraining);
+	registerHandler("Bayes train classifier with dataset", boost::bind(&CvBayesClassifier::onBayesTraining, this));
 
 	// Bayes: Save.
-	h_onBayesSave.setup(this, &CvBayesClassifier::onBayesSave);
-	registerHandler("Bayes save parameters to file", &h_onBayesSave);
+	registerHandler("Bayes save parameters to file", boost::bind(&CvBayesClassifier::onBayesSave, this));
 
 	// Bayes: Load.
-	h_onBayesLoad.setup(this, &CvBayesClassifier::onBayesLoad);
-	registerHandler("Bayes load parameters from file", &h_onBayesLoad);
+	registerHandler("Bayes load parameters from file", boost::bind(&CvBayesClassifier::onBayesLoad, this));
 
 	// Input data stream.
 	registerStream("in_moments", &in_moments);

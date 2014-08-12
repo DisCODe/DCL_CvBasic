@@ -25,8 +25,7 @@ CvContour::~CvContour() {
 
 void CvContour::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvContour::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvContour::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// Input and output data streams.

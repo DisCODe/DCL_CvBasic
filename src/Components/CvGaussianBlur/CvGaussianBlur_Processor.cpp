@@ -46,8 +46,7 @@ CvGaussianBlur_Processor::~CvGaussianBlur_Processor()
 void CvGaussianBlur_Processor::prepareInterface() {
 	CLOG(LTRACE) << "CvGaussianBlur_Processor::prepareInterface\n";
 
-	h_onNewImage.setup(this, &CvGaussianBlur_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvGaussianBlur_Processor::onNewImage, this));
 
 	registerStream("in_img", &in_img);
 

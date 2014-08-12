@@ -147,11 +147,6 @@ protected:
 	bool onFinish();
 
 	/*!
-	 * Retrieves data from device.
-	 */
-	bool onStep();
-
-	/*!
 	 * Start component
 	 */
 	bool onStart();
@@ -166,9 +161,6 @@ protected:
 	 * Event handler function.
 	 */
 	void onNewImage();
-
-	/// Event handler.
-	Base::EventHandler <CvThreshold_Processor> h_onNewImage;
 
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat> in_img;

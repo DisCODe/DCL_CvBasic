@@ -99,25 +99,15 @@ protected:
 	 */
 	bool onStop();
 
-
-
 	/*!
 	 * Event handler function.
 	 */
 	void onTrigger();
 
-	/// Event handler.
-	Base::EventHandler<Movie_Source> h_onTrigger;
-
-
 	/*!
 	 * Event handler function.
 	 */
 	void onStep();
-
-	/// Event handler.
-	Base::EventHandler<Movie_Source> h_onStep;
-
 
 	/// Output data stream
 	Base::DataStreamOut<Mat> out_img;

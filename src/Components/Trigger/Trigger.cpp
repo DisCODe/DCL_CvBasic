@@ -26,8 +26,7 @@ void Trigger::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
 	registerStream("out_trigger", &out_trigger);
 	// Register handlers
-	h_trigger.setup(boost::bind(&Trigger::trigger, this));
-	registerHandler("trigger", &h_trigger);
+	registerHandler("trigger", boost::bind(&Trigger::trigger, this));
 
 }
 

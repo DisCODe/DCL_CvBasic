@@ -31,8 +31,7 @@ CvBRISK::~CvBRISK() {
 
 void CvBRISK::prepareInterface() {
 	// Register handlers with their dependencies.
-    h_onNewImage.setup(this, &CvBRISK::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvBRISK::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// objectImg and output data streams.

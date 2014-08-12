@@ -117,20 +117,11 @@ protected:
 	 */
 	virtual bool onFinish();
 
-	/*!
-	 * Method called when step is called
-	 * \return true on success
-	 */
-	virtual bool onStep();
-
 private:
 	/*!
 	 * Event handler function.
 	 */
 	void onNewImage();
-
-	/// Event handler.
-	Base::EventHandler <CvUndistort_Processor> h_onNewImage;
 
 	Base::DataStreamIn <cv::Mat> in_img;
 	Base::DataStreamIn <Types::CameraInfo> in_camerainfo;

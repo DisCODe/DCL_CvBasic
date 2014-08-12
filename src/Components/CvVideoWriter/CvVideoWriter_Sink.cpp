@@ -43,8 +43,7 @@ CvVideoWriter_Sink::~CvVideoWriter_Sink() {
 }
 
 void CvVideoWriter_Sink::prepareInterface() {
-	h_onNewImage.setup(this, &CvVideoWriter_Sink::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvVideoWriter_Sink::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);
@@ -66,12 +65,6 @@ bool CvVideoWriter_Sink::onInit() {
 bool CvVideoWriter_Sink::onFinish() {
 	LOG(LTRACE) << "CvVideoWriter_Sink::finish\n";
 
-	return true;
-}
-
-bool CvVideoWriter_Sink::onStep()
-{
-	LOG(LTRACE)<<"CvVideoWriter_Sink::step\n";
 	return true;
 }
 

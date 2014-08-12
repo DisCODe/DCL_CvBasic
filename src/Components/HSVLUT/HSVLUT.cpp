@@ -55,8 +55,7 @@ HSVLUT::~HSVLUT() {
 
 void HSVLUT::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
-	h_onNewImage.setup(this, &HSVLUT::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&HSVLUT::onNewImage, this));
 
 	registerStream("in_img", &in_img);
 	registerStream("out_img", &out_img);

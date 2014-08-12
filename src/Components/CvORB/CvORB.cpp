@@ -19,18 +19,17 @@ namespace CvORB {
 CvORB::CvORB(const std::string & name) :
         Base::Component(name),
         nfeatures("nfeatures", 500, "nfeatures")
-		{
-			// Register properties.
-            registerProperty(nfeatures);
-		}
+{
+	// Register properties.
+	registerProperty(nfeatures);
+}
 
 CvORB::~CvORB() {
 }
 
 void CvORB::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvORB::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvORB::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// Input and output data streams.

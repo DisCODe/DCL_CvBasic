@@ -31,8 +31,7 @@ CvFlann::~CvFlann() {
 
 void CvFlann::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvFlann::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvFlann::onNewImage, this));
 	addDependency("onNewImage", &in_features0);
 	addDependency("onNewImage", &in_features1);
 	addDependency("onNewImage", &in_descriptors0);

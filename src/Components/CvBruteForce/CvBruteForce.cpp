@@ -32,8 +32,7 @@ CvBruteForce::~CvBruteForce() {
 
 void CvBruteForce::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvBruteForce::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvBruteForce::onNewImage, this));
 	addDependency("onNewImage", &in_features0);
 	addDependency("onNewImage", &in_features1);
 	addDependency("onNewImage", &in_descriptors0);

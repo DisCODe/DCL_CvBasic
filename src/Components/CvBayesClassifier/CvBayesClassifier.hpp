@@ -78,26 +78,21 @@ protected:
 	void prepareResponseVector(cv::Mat& resp_mat_);
 
 
-	/// Event handler.
-	Base::EventHandler<CvBayesClassifier> h_onBayesTraining;
 	/// Train the classifier with the possessed dataset.
 	void onBayesTraining();
 
 
 	// Handler activated when user will trigger "add to dataset"
-	Base::EventHandler<CvBayesClassifier> h_onAddToDataset;
 	// Sets the add_set flag.
 	void onAddToDataset();
 
 
 	// Handler activated when user will trigger "clear whole dataset"
-	Base::EventHandler<CvBayesClassifier> h_onClearDataset;
 	// Adds received observation to dataset.
 	void onClearDataset();
 
 
 	// Handler activated when user will trigger "display dataset"
-	Base::EventHandler<CvBayesClassifier> h_onDisplayDataset;
 	// Displays the dataset.
 	void onDisplayDataset();
 
@@ -105,22 +100,18 @@ protected:
 	void onFilenameChanged(const std::string & old_filename, const std::string & new_filename);
 
 	// Handler activated when user will trigger "save bayes"
-	Base::EventHandler<CvBayesClassifier> h_onBayesSave;
 	// Saves the bayes internal state to an xml file.
 	void onBayesSave();
 
 	// Handler activated when user will trigger "load bayes"
-	Base::EventHandler<CvBayesClassifier> h_onBayesLoad;
 	// Loads the model state from an xml file.
 	void onBayesLoad();
 
 	// Handler activated when user will trigger "Clear bayes"
-	Base::EventHandler<CvBayesClassifier> h_onBayesClear;
 	// Loads clears the bayes settings.
 	void onBayesClear();
 
 	/// Event handler.
-	Base::EventHandler<CvBayesClassifier> h_onNewData;
 	/// Event handler function.
 	void onNewData();
 

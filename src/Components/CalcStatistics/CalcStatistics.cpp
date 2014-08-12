@@ -36,8 +36,7 @@ void CalcStatistics::prepareInterface() {
 	registerStream("out_homogMatrix", &out_homogMatrix);
 
 	// Register handlers
-	h_calculate.setup(this, &CalcStatistics::calculate);
-	registerHandler("calculate", &h_calculate);
+	registerHandler("calculate", boost::bind(&CalcStatistics::calculate,this));
 	addDependency("calculate", &in_homogMatrix);
 }
 

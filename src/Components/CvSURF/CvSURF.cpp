@@ -28,8 +28,7 @@ CvSURF::~CvSURF() {
 
 void CvSURF::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvSURF::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvSURF::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// Input and output data streams.

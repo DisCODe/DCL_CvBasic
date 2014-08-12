@@ -51,8 +51,7 @@ CvThreshold_Processor::~CvThreshold_Processor()
 void CvThreshold_Processor::prepareInterface() {
 	CLOG(LTRACE) << "CvThreshold_Processor::prepareInterface\n";
 
-	h_onNewImage.setup(this, &CvThreshold_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvThreshold_Processor::onNewImage, this));
 
 	registerStream("in_img", &in_img);
 
@@ -72,12 +71,6 @@ bool CvThreshold_Processor::onFinish()
 {
 	LOG(LTRACE) << "CvThreshold_Processor::finish\n";
 
-	return true;
-}
-
-bool CvThreshold_Processor::onStep()
-{
-	LOG(LTRACE) << "CvThreshold_Processor::step\n";
 	return true;
 }
 

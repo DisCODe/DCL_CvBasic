@@ -65,7 +65,6 @@ private:
 	Base::Property <int> blockSize;
 	Base::Property <double> C;
 
-	Base::EventHandler <CvAdaptiveThreshold_Processor> h_onNewImage;
 	Base::DataStreamIn <Mat> in_img;
 	Base::DataStreamOut <Mat> out_img;
 

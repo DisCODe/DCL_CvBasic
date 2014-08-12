@@ -65,17 +65,9 @@ protected:
 	 */
 	bool onStop();
 
+	// Output data streams
+    Base::DataStreamOut<Base::UnitType> out_trigger;
 
-// Input data streams
-
-
-// Output data streams
-
-        Base::DataStreamOut<Base::UnitType> out_trigger;
-	// Handlers
-	Base::EventHandler2 h_trigger;
-
-	
 	// Handlers
 	void trigger();
 

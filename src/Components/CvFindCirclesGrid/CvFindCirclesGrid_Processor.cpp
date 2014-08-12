@@ -56,8 +56,7 @@ CvFindCirclesGrid_Processor::~CvFindCirclesGrid_Processor()
 void CvFindCirclesGrid_Processor::prepareInterface() {
 	CLOG(LTRACE) << "CvFindCirclesGrid_Processor::prepareInterface\n";
 
-	h_onNewImage.setup(this, &CvFindCirclesGrid_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvFindCirclesGrid_Processor::onNewImage, this));
 
 	registerStream("in_img", &in_img);
 	registerStream("out_chessboard", &out_chessboard);

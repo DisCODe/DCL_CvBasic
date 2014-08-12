@@ -79,9 +79,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <CvBruteForce> h_onNewImage;
-
 	/// Input data stream containing extracted features.
 	Base::DataStreamIn <Types::Features> in_features0;
 	Base::DataStreamIn <Types::Features> in_features1;

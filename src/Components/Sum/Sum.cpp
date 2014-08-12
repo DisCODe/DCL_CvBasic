@@ -29,8 +29,7 @@ Sum::~Sum() {
 
 void Sum::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &Sum::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&Sum::onNewImage, this));
 	addDependency("onNewImage", &in_img1);
 	addDependency("onNewImage", &in_img2);
 

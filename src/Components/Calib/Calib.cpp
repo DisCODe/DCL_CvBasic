@@ -34,23 +34,18 @@ void Calib::prepareInterface() {
 	registerStream("in_camerainfo", &in_camerainfo);
 	registerStream("out_camerainfo", &out_camerainfo);
 
-	// Register handler processing the chessboard.
-	h_process_chessboard.setup(boost::bind(&Calib::process_chessboard, this));
-	registerHandler("process_chessboard", &h_process_chessboard);
+	registerHandler("process_chessboard", boost::bind(&Calib::process_chessboard, this));
 	addDependency("process_chessboard", &in_chessboard);
 	addDependency("process_chessboard", &in_camerainfo);
 
 	// Register handler performing the calibration.
-	h_perform_calibration.setup(boost::bind(&Calib::perform_calibration, this));
-	registerHandler("perform_calibration", &h_perform_calibration);
+	registerHandler("perform_calibration", boost::bind(&Calib::perform_calibration, this));
 
 	// Register handler setting the flag for acquisition of a single chessboard.
-	h_add_chessboard.setup(boost::bind(&Calib::add_chessboard, this));
-	registerHandler("add_chessboard", &h_add_chessboard);
+	registerHandler("add_chessboard", boost::bind(&Calib::add_chessboard, this));
 
 	// Register handler realizing the clearance of the whole dataset.
-	h_clear_dataset.setup(boost::bind(&Calib::clear_dataset, this));
-	registerHandler("clear_dataset", &h_clear_dataset);
+	registerHandler("clear_dataset", boost::bind(&Calib::clear_dataset, this));
 }
 
 bool Calib::onInit() {

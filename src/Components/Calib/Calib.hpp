@@ -74,18 +74,6 @@ protected:
 
 	// Handlers
 
-	// Handler activated when datastream chessboard is present.
-	Base::EventHandler2 h_process_chessboard;
-
-	// Handler activated a calibration computations should be performed.
-	Base::EventHandler2 h_perform_calibration;
-
-	// Handler activated when user will trigger "add chessboard"
-	Base::EventHandler2 h_add_chessboard;
-
-	// Handler activated when user will trigger "clear whole dataset"
-	Base::EventHandler2 h_clear_dataset;
-
 	// Adds received chessboard observation to calibration set.
 	void process_chessboard();
 

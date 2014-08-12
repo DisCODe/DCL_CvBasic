@@ -84,8 +84,7 @@ CvFindChessboardCorners_Processor::~CvFindChessboardCorners_Processor() {
 void CvFindChessboardCorners_Processor::prepareInterface() {
 	CLOG(LTRACE) << "CvFindChessboardCorners_Processor::prepareInterface\n";
 
-	h_onNewImage.setup(this, &CvFindChessboardCorners_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvFindChessboardCorners_Processor::onNewImage, this));
 
 	registerStream("in_img", &in_img);
 	registerStream("out_chessboard", &out_chessboard);

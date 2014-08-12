@@ -40,8 +40,7 @@ CvHoughCircles_Processor::~CvHoughCircles_Processor()
 void CvHoughCircles_Processor::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
 
-	h_onNewImage.setup(this, &CvHoughCircles_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvHoughCircles_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);

@@ -39,8 +39,7 @@ CvHarris::~CvHarris() {
 
 void CvHarris::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvHarris::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvHarris::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// Input and output data streams.

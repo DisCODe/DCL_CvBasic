@@ -38,8 +38,7 @@ CvMorphology_Processor::~CvMorphology_Processor()
 }
 
 void CvMorphology_Processor::prepareInterface() {
-	h_onNewImage.setup(this, &CvMorphology_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvMorphology_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);

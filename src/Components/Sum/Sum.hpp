@@ -74,9 +74,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <Sum> h_onNewImage;
-
 	/// Input data streams
 	Base::DataStreamIn <Mat> in_img1;
 	Base::DataStreamIn <Mat> in_img2;

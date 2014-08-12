@@ -71,9 +71,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <Skeletonization> h_onNewImage;
-
 	/// Input image
 	Base::DataStreamIn <cv::Mat> in_img;
 

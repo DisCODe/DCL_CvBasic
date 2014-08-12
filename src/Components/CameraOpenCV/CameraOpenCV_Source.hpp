@@ -72,16 +72,10 @@ protected:
 	 */
 	void onTrigger();
 
-	/// Event handler.
-	Base::EventHandler<CameraOpenCV_Source> h_onTrigger;
-
 	/*!
 	 * Event handler function.
 	 */
 	void onGrabFrame();
-
-	/// Event handler.
-	Base::EventHandler<CameraOpenCV_Source> h_onGrabFrame;
 
 	/// Output data stream
 	Base::DataStreamOut<Mat> out_img;

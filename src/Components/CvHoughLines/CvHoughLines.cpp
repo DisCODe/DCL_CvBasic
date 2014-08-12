@@ -47,8 +47,7 @@ CvHoughLines_Processor::~CvHoughLines_Processor()
 void CvHoughLines_Processor::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
 
-	h_onNewImage.setup(this, &CvHoughLines_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvHoughLines_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);

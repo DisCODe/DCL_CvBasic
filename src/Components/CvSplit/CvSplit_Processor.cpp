@@ -37,8 +37,7 @@ CvSplit_Processor::~CvSplit_Processor()
 }
 
 void CvSplit_Processor::prepareInterface() {
-	h_onNewImage.setup(this, &CvSplit_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvSplit_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);
@@ -69,12 +68,6 @@ bool CvSplit_Processor::onFinish()
 {
 	LOG(LTRACE) << "CvSplit_Processor::finish\n";
 
-	return true;
-}
-
-bool CvSplit_Processor::onStep()
-{
-	LOG(LTRACE) << "CvSplit_Processor::step\n";
 	return true;
 }
 

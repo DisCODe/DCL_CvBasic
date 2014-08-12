@@ -25,8 +25,7 @@ CvMoments::~CvMoments() {
 
 void CvMoments::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewContours.setup(this, &CvMoments::onNewContours);
-	registerHandler("onNewContours", &h_onNewContours);
+	registerHandler("onNewContours", boost::bind(&CvMoments::onNewContours, this));
 	addDependency("onNewContours", &in_contours);
 
 	// Input and output data streams.

@@ -18,21 +18,8 @@ namespace Processors {
 namespace CvMSER {
 
 CvMSER::CvMSER(const std::string & name) :
-        Base::Component(name)/*,
-        Base::Component(delta),
-		Base::Component(minArea),
-		Base::Component(maxArea),
-		Base::Component(maxVariation),
-		Base::Component(minDiversity)*/
+        Base::Component(name)
 {
-	/*// Register properties.
-		registerProperty(delta);
-		registerProperty(minArea);
-		registerProperty(maxArea);
-		registerProperty(maxVariation);
-		registerProperty(minDiversity);*/
-
-
 }
 
 CvMSER::~CvMSER() {
@@ -40,8 +27,7 @@ CvMSER::~CvMSER() {
 
 void CvMSER::prepareInterface() {
 	// Register handlers with their dependencies.
-    h_onNewImage.setup(this, &CvMSER::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvMSER::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// img and output data streams.
