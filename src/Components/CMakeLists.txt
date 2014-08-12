@@ -57,7 +57,6 @@ ADD_COMPONENT(Skeletonization)
 
 ADD_COMPONENT(CvBayesClassifier)
 
-
 ADD_COMPONENT(CvSIFT)
 
 ADD_COMPONENT(CvFlann)
@@ -86,3 +85,4 @@ ADD_COMPONENT(CalcObjectLocation)
 
 ADD_COMPONENT(Trigger)
 
+ADD_COMPONENT(DrawCoordinateSystem)
