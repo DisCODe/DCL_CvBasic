@@ -6,9 +6,14 @@ include_directories(.)
 FIND_PACKAGE(Boost 1.41.0 REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
+FIND_PACKAGE(Boost REQUIRED COMPONENTS system date_time thread filesystem)
 FIND_PACKAGE( OpenCV REQUIRED )
 
 DISCODE_FIND_DCL(CvCoreTypes)
+
+SET(DisCODe_LIBRARIES ${DisCODe_LIBRARIES} ${Boost_LIBRARIES})
+
+SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,defs") 
 
 # CvBasic components
 ADD_SUBDIRECTORY(Components)
