@@ -3,10 +3,9 @@ SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(.)
 
 # Find Boost, at least ver. 1.41
-FIND_PACKAGE(Boost 1.41.0 REQUIRED)
+FIND_PACKAGE(Boost 1.41.0 REQUIRED COMPONENTS system thread filesystem date_time)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
-FIND_PACKAGE(Boost REQUIRED COMPONENTS system date_time thread filesystem)
 FIND_PACKAGE( OpenCV REQUIRED )
 
 DISCODE_FIND_DCL(CvCoreTypes)
