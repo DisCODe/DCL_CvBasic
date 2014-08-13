@@ -14,10 +14,10 @@
 #include "EventHandler2.hpp"
 
 #include <opencv2/opencv.hpp>
-#include "Types/HomogMatrix.hpp"
 #include "Types/Objects3D/Object3D.hpp"
-#include "Types/HomogMatrix.hpp"
-#include "Types/CameraInfo.hpp"
+
+#include <Types/HomogMatrix.hpp>
+#include <Types/CameraInfo.hpp>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
