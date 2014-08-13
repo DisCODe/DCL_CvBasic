@@ -111,7 +111,9 @@ void CvSolvePnP_Processor::onNewObject3D()
 	Mat imagePoints(object3D->getImagePoints());
 
 	// Solve PnP for 3d-2d pairs of points.
+	CLOG(LINFO) << "1";
 	solvePnP(modelPoints, imagePoints, camera_info.cameraMatrix(), camera_info.distCoeffs(), rvec, tvec, false);
+	CLOG(LINFO) << "2";
 
 	// Create homogenous matrix.
 	Mat_<double> rotationMatrix;
