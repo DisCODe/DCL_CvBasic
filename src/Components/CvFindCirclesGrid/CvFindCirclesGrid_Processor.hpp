@@ -10,7 +10,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Component_Aux.hpp"
-#include "Types/Objects3D/Chessboard.hpp"
+#include "Types/Objects3D/GridPattern.hpp"
 #include "Types/ImagePosition.hpp"
 #include "Types/Drawable.hpp"
 #include "Timer.hpp"
@@ -75,36 +75,34 @@ protected:
 private:
 	void onNewImage();
 
-	void initChessboard();
+	void initGridPattern();
 
-	/** Image stream. */
+
+	/// Input image stream.
 	Base::DataStreamIn <cv::Mat> in_img;
-	/** Chessboard stream. */
-	Base::DataStreamOut <Types::Objects3D::Chessboard> out_chessboard;
+
+	/// Output grid pattern.
+	Base::DataStreamOut <Types::Objects3D::GridPattern> out_gridPattern;
+
+	/// Output image position.
 	Base::DataStreamOut <Types::ImagePosition> out_imagePosition;
 
 	Base::DataStreamOut <cv::Mat> out_img;
 
-	/** Located corners.*/
-	std::vector<cv::Point2f> corners;
-
-	int findChessboardCornersFlags;
+	/// Located points.
+	std::vector<cv::Point2f> gridPoints;
 
 	Common::Timer timer;
 
-	boost::shared_ptr<Types::Objects3D::Chessboard> chessboard;
+	boost::shared_ptr<Types::Objects3D::GridPattern> gridPattern;
 
 	cv::Mat sub_img;
 
 	Base::Property<int> prop_width;
 	Base::Property<int> prop_height;
-	Base::Property<float> prop_square_size;
-
+	Base::Property<float> prop_size;
 	Base::Property<bool> prop_inverse;
-
 	Base::Property<int, InterpolationTranslator> prop_interpolation_type;
-
-	// TODO: add unit types: found and not found
 
 	void sizeCallback(int old_value, int new_value);
 };
