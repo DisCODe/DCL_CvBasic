@@ -86,3 +86,5 @@ ADD_COMPONENT(CalcObjectLocation)
 ADD_COMPONENT(Trigger)
 
 ADD_COMPONENT(DrawCoordinateSystem)
+
+ADD_COMPONENT(HomogenousMatrixProvider)
