@@ -30,11 +30,11 @@ void CvUndistort_Processor::prepareInterface() {
 	h_onNewImage.setup(this, &CvUndistort_Processor::onNewImage);
 	registerHandler("onNewImage", &h_onNewImage);
 	addDependency("onNewImage", &in_img);
-	addDependency("onNewImage", &in_camerainfo);
+	addDependency("onNewImage", &in_camera_info);
 
 	registerStream("in_img", &in_img);
 	registerStream("out_img", &out_img);
-	registerStream("in_camerainfo", &in_camerainfo);
+	registerStream("in_camera_info", &in_camera_info);
 }
 
 bool CvUndistort_Processor::onStart()
@@ -66,7 +66,7 @@ void CvUndistort_Processor::onNewImage()
 	cv::Mat originalImage;
 
 	originalImage = in_img.read();
-	camera_info = in_camerainfo.read();
+	camera_info = in_camera_info.read();
 
 	//cv::Mat undistortedImage = originalImage.clone();
 	cv::Mat undistortedImage;

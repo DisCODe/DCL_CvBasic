@@ -66,7 +66,7 @@ protected:
 	bool onStop();
 
 	// Data streams
-	Base::DataStreamIn< Types::Objects3D::Chessboard > in_chessboard;
+	Base::DataStreamIn<Types::Objects3D::Object3D> in_object3D;
 
 	Base::DataStreamIn< Types::CameraInfo > in_camerainfo;
 
@@ -75,25 +75,25 @@ protected:
 	// Handlers
 
 	// Handler activated when datastream chessboard is present.
-	Base::EventHandler2 h_process_chessboard;
+	Base::EventHandler2 h_process_object3D;
 
 	// Handler activated a calibration computations should be performed.
 	Base::EventHandler2 h_perform_calibration;
 
-	// Handler activated when user will trigger "add chessboard"
-	Base::EventHandler2 h_add_chessboard;
+	// Handler activated when user will trigger "add object3D"
+	Base::EventHandler2 h_add_object3D;
 
 	// Handler activated when user will trigger "clear whole dataset"
 	Base::EventHandler2 h_clear_dataset;
 
 	// Adds received chessboard observation to calibration set.
-	void process_chessboard();
+	void process_object3D();
 
 	// Performs the calibration.
 	void perform_calibration();
 
 	// Sets the add_set flag.
-	void add_chessboard();
+	void add_object3D();
 
 	// Adds received chessboard observation to calibration set.
 	void clear_dataset();
@@ -112,7 +112,7 @@ private:
 	cv::Size imageSize;
 
 	// Flag used for memorizing that used demanded to process and store the incomming frame.
-	bool addChessboard;
+	bool addObject3D;
 };
 
 } //: namespace Calib

@@ -83,6 +83,15 @@ public:
 		return modelPoints;
 	}
 
+	virtual Object3D* clone()
+	{
+		return new Object3D(*this);
+	}
+
+	virtual void draw(cv::Mat& image, cv::Scalar color, int offsetX = 0, int offsetY = 0)
+	{
+		// TODO?
+	}
 
 
 //	void setPosition(const HomogMatrix& position)
@@ -99,7 +108,7 @@ public:
 //		return position;
 //	}
 
-	virtual Object3D* clone() = 0;
+//	virtual Object3D* clone() = 0;
 
 protected:
 	bool imagePointsSet;
