@@ -121,9 +121,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <CvFilter2D_Processor> h_onNewImage;
-
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 

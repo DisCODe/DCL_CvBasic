@@ -55,8 +55,7 @@ RGBLUT::~RGBLUT() {
 
 void RGBLUT::prepareInterface() {
 	// Register data streams, events and event handlers HERE!
-	h_onNewImage.setup(this, &RGBLUT::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&RGBLUT::onNewImage, this));
 
 	registerStream("in_img", &in_img);
 	registerStream("out_img", &out_img);

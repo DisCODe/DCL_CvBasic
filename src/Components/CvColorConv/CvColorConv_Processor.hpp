@@ -332,9 +332,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <CvColorConv_Processor> h_onNewImage;
-
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 

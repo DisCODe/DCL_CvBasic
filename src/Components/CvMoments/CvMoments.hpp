@@ -73,9 +73,6 @@ protected:
 	 */
 	void onNewContours();
 
-	/// Event handler.
-	Base::EventHandler <CvMoments> h_onNewContours;
-
 	/// Input data stream
 	Base::DataStreamIn <vector<vector<Point> > > in_contours;
 

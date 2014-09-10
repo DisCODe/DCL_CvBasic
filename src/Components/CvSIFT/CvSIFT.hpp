@@ -80,9 +80,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <CvSIFT> h_onNewImage;
-
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 

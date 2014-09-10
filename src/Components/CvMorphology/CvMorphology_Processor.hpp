@@ -148,9 +148,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <CvMorphology_Processor> h_onNewImage;
-
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
 

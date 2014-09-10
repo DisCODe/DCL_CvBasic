@@ -65,8 +65,6 @@ private:
 	Base::Property<double> minLineLength;
 	Base::Property<double> maxLineGap;
 
-	/** New image event handler. */
-	Base::EventHandler <CvHoughLines_Processor> h_onNewImage;
 	/** Image stream. */
 	Base::DataStreamIn <cv::Mat> in_img;
 

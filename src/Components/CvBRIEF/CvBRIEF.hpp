@@ -75,9 +75,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <CvBRIEF> h_onNewImage;
-
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat> in_img;
 

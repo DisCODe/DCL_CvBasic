@@ -67,8 +67,6 @@ private:
 	Base::Property<int> minCircleRadius;
 	Base::Property<int> maxCircleRadius;
 
-	/** New image event handler. */
-	Base::EventHandler <CvHoughCircles_Processor> h_onNewImage;
 	/** Image stream. */
 	Base::DataStreamIn <cv::Mat> in_img;
 

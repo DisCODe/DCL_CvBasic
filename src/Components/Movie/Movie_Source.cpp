@@ -35,11 +35,9 @@ Movie_Source::~Movie_Source() {
 void Movie_Source::prepareInterface() {
 	registerStream("out_img", &out_img);
 
-	h_onTrigger.setup(this, &Movie_Source::onTrigger);
-	registerHandler("onTrigger", &h_onTrigger);
+	registerHandler("onTrigger", boost::bind(&Movie_Source::onTrigger, this));
 
-	h_onStep.setup(this, &Movie_Source::onStep);
-	registerHandler("onStep", &h_onStep);
+	registerHandler("onStep", boost::bind(&Movie_Source::onStep, this));
 	addDependency("onStep", NULL);
 }
 

@@ -25,6 +25,7 @@ CvFindCirclesGrid_Processor::CvFindCirclesGrid_Processor(const std::string & nam
 	prop_height("grid.height", 6),
 	prop_size("grid.size", 1),
 	prop_inverse("image.inverse",false),
+
 	prop_interpolation_type("scale.interpolation_type", INTER_NEAREST, "combo")
 {
 	registerProperty(prop_width);
@@ -54,8 +55,7 @@ void CvFindCirclesGrid_Processor::prepareInterface() {
 	registerStream("out_img", &out_img);
 
 	// Register handler responsible for finding grid pattern.
-	h_onNewImage.setup(this, &CvFindCirclesGrid_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvFindCirclesGrid_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 }
 

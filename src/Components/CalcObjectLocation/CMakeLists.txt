@@ -11,6 +11,6 @@ FIND_PACKAGE( OpenCV REQUIRED )
 ADD_LIBRARY(CalcObjectLocation SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(CalcObjectLocation ${OpenCV_LIBS} ${DisCODe_LIBRARIES} )
+TARGET_LINK_LIBRARIES(CalcObjectLocation ${DisCODe_LIBRARIES} ${OpenCV_LIBS})
 
 INSTALL_COMPONENT(CalcObjectLocation)

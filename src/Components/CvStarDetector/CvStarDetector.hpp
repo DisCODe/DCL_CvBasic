@@ -80,9 +80,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-    Base::EventHandler <CvStarDetector> h_onNewImage;
-
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat> in_img;
 
@@ -92,8 +89,8 @@ protected:
 	/// Output data stream containing feature descriptors
 	Base::DataStreamOut <cv::Mat> out_descriptors;
 
-	 // The maximum number of features to retain
-        Base::Property<int> nfeatures;
+	// The maximum number of features to retain
+	Base::Property<int> nfeatures;
 
 };
 

@@ -33,8 +33,7 @@ CvSIFT::~CvSIFT() {
 
 void CvSIFT::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvSIFT::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvSIFT::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// Input and output data streams.

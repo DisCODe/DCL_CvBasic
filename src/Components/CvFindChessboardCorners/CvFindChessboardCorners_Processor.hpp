@@ -119,8 +119,6 @@ private:
 
 	void initChessboard();
 
-	/** New image event handler. */
-	Base::EventHandler<CvFindChessboardCorners_Processor> h_onNewImage;
 	/** Image stream. */
 	Base::DataStreamIn<cv::Mat> in_img;
 	/** Chessboard stream. */

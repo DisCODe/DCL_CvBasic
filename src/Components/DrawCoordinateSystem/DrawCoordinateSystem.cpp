@@ -35,8 +35,7 @@ void DrawCoordinateSystem::prepareInterface() {
 	registerStream("out_impoints", &out_impoints);
 
 	// Register handlers
-	h_projectPoints.setup(this, &DrawCoordinateSystem::projectPoints);
-	registerHandler("projectPoints", &h_projectPoints);
+	registerHandler("projectPoints", boost::bind(&DrawCoordinateSystem::projectPoints, this));
 	addDependency("projectPoints", &in_camera_matrix);
 }
 

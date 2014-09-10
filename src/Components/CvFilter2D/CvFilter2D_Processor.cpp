@@ -32,8 +32,7 @@ CvFilter2D_Processor::~CvFilter2D_Processor()
 }
 
 void CvFilter2D_Processor::prepareInterface() {
-	h_onNewImage.setup(this, &CvFilter2D_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvFilter2D_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);

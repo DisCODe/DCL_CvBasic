@@ -83,8 +83,6 @@ protected:
 	// Properties
 
 	// Handlers
-	Base::EventHandler<CalcObjectLocation> h_calculate;
-
 	void calculate();
 };
 

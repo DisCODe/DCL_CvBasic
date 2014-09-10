@@ -82,23 +82,12 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <CvMSER> h_onNewImage;
-
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat> in_img;
 
 	/// Output data stream containing extracted contours
 	Base::DataStreamOut <vector<vector<Point> > > out_contours;
 	Base::DataStreamOut <cv::Mat> out_img;
-
-	//parameters
-    /*Base::Property<int> delta;
-    Base::Property<int> minArea;
-    Base::Property<int> maxArea;
-    Base::Property<int> maxVariation;
-    Base::Property<int> minDiversity;
-*/
 };
 
 } //: namespace CvMSER

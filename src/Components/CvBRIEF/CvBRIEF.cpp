@@ -29,8 +29,7 @@ CvBRIEF::~CvBRIEF() {
 
 void CvBRIEF::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvBRIEF::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvBRIEF::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// Input and output data streams.

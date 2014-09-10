@@ -51,8 +51,7 @@ CvAdaptiveThreshold_Processor::~CvAdaptiveThreshold_Processor()
 void CvAdaptiveThreshold_Processor::prepareInterface() {
 	
 	// Register data streams, events and event handlers HERE!
-	h_onNewImage.setup(this, &CvAdaptiveThreshold_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvAdaptiveThreshold_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	registerStream("in_img", &in_img);

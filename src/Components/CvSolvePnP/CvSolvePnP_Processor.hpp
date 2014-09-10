@@ -109,12 +109,6 @@ protected:
 	 */
 	virtual bool onFinish();
 
-	/*!
-	 * Method called when step is called
-	 * \return true on success
-	 */
-	virtual bool onStep();
-
 private:
 
 	void onNewObject3D();
@@ -132,8 +126,6 @@ private:
 	Base::DataStreamOut <Types::HomogMatrix> out_homogMatrix;
 	Base::DataStreamOut <cv::Mat> out_rvec;
 	Base::DataStreamOut <cv::Mat> out_tvec;
-
-	Base::EventHandler <CvSolvePnP_Processor> h_onNewObject3D;
 };
 
 } // namespace CvSolvePnP

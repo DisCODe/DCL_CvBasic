@@ -84,7 +84,6 @@ protected:
 	Base::DataStreamOut <std::vector<cv::Point2f> > out_impoints;
 
 	void projectPoints();
-	Base::EventHandler <DrawCoordinateSystem> h_projectPoints;
 
 };
 

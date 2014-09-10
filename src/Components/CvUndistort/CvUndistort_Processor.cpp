@@ -27,8 +27,7 @@ CvUndistort_Processor::~CvUndistort_Processor()
 }
 
 void CvUndistort_Processor::prepareInterface() {
-	h_onNewImage.setup(this, &CvUndistort_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvUndistort_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 	addDependency("onNewImage", &in_camera_info);
 
@@ -46,17 +45,15 @@ bool CvUndistort_Processor::onStop()
 {
 	return true;
 }
+
 bool CvUndistort_Processor::onInit()
 {
 	interpolation = INTER_LINEAR;
 
 	return true;
 }
+
 bool CvUndistort_Processor::onFinish()
-{
-	return true;
-}
-bool CvUndistort_Processor::onStep()
 {
 	return true;
 }

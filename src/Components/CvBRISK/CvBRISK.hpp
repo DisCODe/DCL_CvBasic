@@ -78,9 +78,6 @@ protected:
 	 */
 	void onNewImage();
 
-	/// Event handler.
-	Base::EventHandler <CvBRISK> h_onNewImage;
-
 	/// Input data stream
 	Base::DataStreamIn <cv::Mat> in_img;
 

@@ -38,8 +38,7 @@ CvCanny::~CvCanny() {
 
 void CvCanny::prepareInterface() {
 	// Register handlers with their dependencies.
-	h_onNewImage.setup(this, &CvCanny::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvCanny::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 
 	// Input and output data streams.

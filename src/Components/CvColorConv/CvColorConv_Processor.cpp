@@ -32,8 +32,7 @@ CvColorConv_Processor::~CvColorConv_Processor()
 void CvColorConv_Processor::prepareInterface() {
 	CLOG(LTRACE) << "CvColorConv_Processor::prepareInterface\n";
 
-	h_onNewImage.setup(this, &CvColorConv_Processor::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
+	registerHandler("onNewImage", boost::bind(&CvColorConv_Processor::onNewImage, this));
 
 	registerStream("in_img", &in_img);
 

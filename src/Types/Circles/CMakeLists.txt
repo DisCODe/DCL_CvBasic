@@ -14,7 +14,7 @@ SET(circles Circles.cpp)
 #FILE(GLOB circles *.cpp)
 ADD_LIBRARY(TypesCircles SHARED ${circles})
 SET_TARGET_PROPERTIES (TypesCircles PROPERTIES DEFINE_SYMBOL  "COMPILING_DLL" )
-TARGET_LINK_LIBRARIES(TypesCircles ${OpenCV_LIBRARIES})
+TARGET_LINK_LIBRARIES(TypesCircles ${OpenCV_LIBS})
 
 INSTALL(
   TARGETS TypesCircles

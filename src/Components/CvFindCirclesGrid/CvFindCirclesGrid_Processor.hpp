@@ -12,9 +12,10 @@
 #include "Component_Aux.hpp"
 #include "Types/Objects3D/GridPattern.hpp"
 #include "Types/ImagePosition.hpp"
+#include "Types/Drawable.hpp"
 #include "Timer.hpp"
 #include "Property.hpp"
-//#include "Types/Drawable.hpp"
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -76,8 +77,6 @@ private:
 
 	void initGridPattern();
 
-	/// New image event handler.
-	Base::EventHandler <CvFindCirclesGrid_Processor> h_onNewImage;
 
 	/// Input image stream.
 	Base::DataStreamIn <cv::Mat> in_img;

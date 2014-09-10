@@ -44,8 +44,7 @@ CvSolvePnP_Processor::~CvSolvePnP_Processor()
 }
 
 void CvSolvePnP_Processor::prepareInterface() {
-	h_onNewObject3D.setup(this, &CvSolvePnP_Processor::onNewObject3D);
-	registerHandler("onNewObject3D", &h_onNewObject3D);
+	registerHandler("onNewObject3D", boost::bind(&CvSolvePnP_Processor::onNewObject3D, this));
 	addDependency("onNewObject3D", &in_object3d);
 	addDependency("onNewObject3D", &in_camerainfo);
 
@@ -79,12 +78,6 @@ bool CvSolvePnP_Processor::onInit()
 bool CvSolvePnP_Processor::onFinish()
 {
 	LOG(LTRACE) << "CvSolvePnP_Processor::onFinish()\n";
-	return true;
-}
-
-bool CvSolvePnP_Processor::onStep()
-{
-	LOG(LTRACE) << "CvSolvePnP_Processor::onStep()\n";
 	return true;
 }
 

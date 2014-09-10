@@ -141,11 +141,6 @@ protected:
 	bool onFinish();
 
 	/*!
-	 * Retrieves data from device.
-	 */
-	bool onStep();
-
-	/*!
 	 * Start component
 	 */
 	bool onStart();
@@ -161,9 +156,6 @@ protected:
 	 * Event handler function.
 	 */
 	void onNewImage();
-
-	/// Event handler.
-	Base::EventHandler<CvVideoWriter_Sink> h_onNewImage;
 
 
 	/// Image to be drawn

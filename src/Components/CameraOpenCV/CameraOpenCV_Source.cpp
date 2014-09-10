@@ -44,11 +44,9 @@ CameraOpenCV_Source::~CameraOpenCV_Source() {
 }
 
 void CameraOpenCV_Source::prepareInterface() {
-	h_onTrigger.setup(this, &CameraOpenCV_Source::onTrigger);
-	registerHandler("onTrigger", &h_onTrigger);
+	registerHandler("onTrigger", boost::bind(&CameraOpenCV_Source::onTrigger, this));
 
-	h_onGrabFrame.setup(this, &CameraOpenCV_Source::onGrabFrame);
-	registerHandler("onGrabFrame", &h_onGrabFrame);
+	registerHandler("onGrabFrame", boost::bind(&CameraOpenCV_Source::onGrabFrame, this));
 	addDependency("onGrabFrame", NULL);
 
 	registerStream("out_img", &out_img);
