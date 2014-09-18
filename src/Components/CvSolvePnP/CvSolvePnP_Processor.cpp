@@ -153,8 +153,8 @@ void CvSolvePnP_Processor::onNewObject3D()
 	stringstream ss;
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 4; ++j) {
-			hm.elements[i][j] = pattern_pose.at<double>(i,j);
-			ss << hm.elements[i][j] << "  ";
+            hm.setElement(i,j, pattern_pose.at<double>(i,j));
+            ss << hm.getElement(i, j) << "  ";
 		}
 	}
 	CLOG(LDEBUG) << "HomogMatrix:\n" << ss.str() << endl;

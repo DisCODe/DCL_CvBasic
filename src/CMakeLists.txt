@@ -8,6 +8,10 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 FIND_PACKAGE( OpenCV REQUIRED )
 
+# Find EIGEN
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
 DISCODE_FIND_DCL(CvCoreTypes)
 
 SET(DisCODe_LIBRARIES ${DisCODe_LIBRARIES} ${Boost_LIBRARIES})

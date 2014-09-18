@@ -4,6 +4,8 @@ PROJECT(CvBasic)
 # CMake required version must be >= 2.6
 cmake_minimum_required(VERSION 2.6)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 # Find DisCODe installation
 FIND_PACKAGE(DisCODe REQUIRED)
 

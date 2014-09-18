@@ -74,9 +74,9 @@ void CalcObjectLocation::calculate() {
 
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
-				rotMatrix(i,j)=homogMatrix.elements[i][j];
+                rotMatrix(i,j)=homogMatrix.getElement(i, j);
 			}
-			tvectemp(i, 0) = homogMatrix.elements[i][3];
+            tvectemp(i, 0) = homogMatrix.getElement(i, 3);
 		}
 
 		Rodrigues(rotMatrix, rvectemp);
@@ -124,11 +124,11 @@ void CalcObjectLocation::calculate() {
 
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
-			hm.elements[i][j] = rottMatrix(i, j);
-			CLOG(LINFO) << hm.elements[i][j] << "  ";
+            hm.setElement(i, j, rottMatrix(i, j));
+            CLOG(LINFO) << hm.getElement(i, j) << "  ";
 		}
-		hm.elements[i][3] = tvec_avg(i, 0);
-		CLOG(LINFO) << hm.elements[i][3] << "\n";
+        hm.setElement(i, 3, tvec_avg(i, 0));
+        CLOG(LINFO) << hm.getElement(i, 3) << "\n";
 	}
 	out_homogMatrix.write(hm);
 }
