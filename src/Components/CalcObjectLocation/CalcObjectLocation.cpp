@@ -72,6 +72,10 @@ void CalcObjectLocation::calculate() {
 		cv::Mat_<double> rvectemp;
 		homogMatrix=in_homogMatrix.read();
 
+		if (homogMatrix.getElements() == Eigen::Matrix4f::Identity()) {
+			continue;
+		}
+
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
                 rotMatrix(i,j)=homogMatrix.getElement(i, j);
