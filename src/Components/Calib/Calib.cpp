@@ -20,7 +20,7 @@ Calib::Calib(const std::string & name) :
 		Base::Component(name),
 		continuous("continuous", false)
 {
-	addChessboard = false;
+	addObject3D = false;
 	// Register properties.
 	registerProperty(continuous);
 }
@@ -30,22 +30,27 @@ Calib::~Calib() {
 
 void Calib::prepareInterface() {
 	// Register data streams
-	registerStream("in_chessboard", &in_chessboard);
-	registerStream("in_camerainfo", &in_camerainfo);
-	registerStream("out_camerainfo", &out_camerainfo);
+	registerStream("in_object3d", &in_object3D);
+	registerStream("in_camera_info", &in_camerainfo);
+	registerStream("out_camera_info", &out_camerainfo);
 
-	registerHandler("process_chessboard", boost::bind(&Calib::process_chessboard, this));
-	addDependency("process_chessboard", &in_chessboard);
-	addDependency("process_chessboard", &in_camerainfo);
+	// Register handler processing the object3D.
+	h_process_object3D.setup(boost::bind(&Calib::process_object3D, this));
+	registerHandler("process_object3D", &h_process_object3D);
+	addDependency("process_object3D", &in_object3D);
+	addDependency("process_object3D", &in_camerainfo);
 
 	// Register handler performing the calibration.
-	registerHandler("perform_calibration", boost::bind(&Calib::perform_calibration, this));
+	h_perform_calibration.setup(boost::bind(&Calib::perform_calibration, this));
+	registerHandler("perform_calibration", &h_perform_calibration);
 
-	// Register handler setting the flag for acquisition of a single chessboard.
-	registerHandler("add_chessboard", boost::bind(&Calib::add_chessboard, this));
+	// Register handler setting the flag for acquisition of a single object3D.
+	h_add_object3D.setup(boost::bind(&Calib::add_object3D, this));
+	registerHandler("add_object3D", &h_add_object3D);
 
 	// Register handler realizing the clearance of the whole dataset.
-	registerHandler("clear_dataset", boost::bind(&Calib::clear_dataset, this));
+	h_clear_dataset.setup(boost::bind(&Calib::clear_dataset, this));
+	registerHandler("clear_dataset", &h_clear_dataset);
 }
 
 bool Calib::onInit() {
@@ -65,33 +70,33 @@ bool Calib::onStart() {
 	return true;
 }
 
-void Calib::process_chessboard() {
-    std::cout << "Calib::process_chessboard";
+void Calib::process_object3D() {
+	CLOG(LTRACE) << "Calib::process_chessboard";
     // Check component working mode.
-    if (addChessboard || continuous) {
+    if (addObject3D || continuous) {
     	// Reset flag.
-    	addChessboard = false;
+    	addObject3D = false;
 
 		// Retrieve chessboard from the inputstream.
-		Types::Objects3D::Chessboard chessboard = in_chessboard.read();
+		Types::Objects3D::Object3D object = in_object3D.read();
 		Types::CameraInfo camera_info = in_camerainfo.read();
 
 		imageSize = camera_info.size();
 
 		// Add image points.
-		imagePoints.push_back(chessboard.getImagePoints());
+		imagePoints.push_back(object.getImagePoints());
 
 		// Add object points.
-		objectPoints.push_back(chessboard.getModelPoints());
+		objectPoints.push_back(object.getModelPoints());
 
 		CLOG(LINFO) << "Registered new set of points";
     }
 
 }
 
-void Calib::add_chessboard()
+void Calib::add_object3D()
 {
-	addChessboard = true;
+	addObject3D = true;
 	CLOG(LINFO) << "Next set of points will be registered";
 }
 
@@ -104,7 +109,7 @@ void Calib::clear_dataset()
 
 void Calib::perform_calibration()
 {
-    LOG(LINFO) << "Calib::perform_calibration()";
+    CLOG(LINFO) << "Calib::perform_calibration()";
 
     if(imagePoints.size() > 0) {
 		// The 3x3 camera matrix containing focal lengths fx,fy and displacement of the center of coordinates cx,cy.
@@ -133,6 +138,8 @@ void Calib::perform_calibration()
 		camera_info.setSize(imageSize);
 		camera_info.setCameraMatrix(cameraMatrix);
 		camera_info.setDistCoeffs(distCoeffs);
+		camera_info.setRotationMatrix(cv::Mat::eye(3, 3, CV_64F));
+		camera_info.setTranlationMatrix(cv::Mat::zeros(3, 1, CV_64F));
 
 		// Write parameters to the camerainfo
 		out_camerainfo.write(camera_info);
