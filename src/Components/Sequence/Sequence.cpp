@@ -22,17 +22,19 @@ Sequence::Sequence(const std::string & n) :
 	prop_sort("mode.sort", true),
 	//prop_prefetch("mode.prefetch", false),
 	prop_loop("mode.loop", false),
-	prop_auto_trigger("mode.auto_trigger", true)
+    prop_auto_streaming("mode.auto_streaming", true),
+    prop_auto_next_image("mode.auto_next_image", true)
 {
 	registerProperty(prop_directory);
 	registerProperty(prop_pattern);
 	registerProperty(prop_sort);
 	registerProperty(prop_loop);
-	registerProperty(prop_auto_trigger);
+    registerProperty(prop_auto_streaming);
+    registerProperty(prop_auto_next_image);
 	//registerProperty(prop_prefetch);
 
 	// Set first frame index number.
-	if (prop_auto_trigger)
+    if (prop_auto_next_image)
 		frame = -1;
 	else
 		frame = 0;
@@ -52,7 +54,8 @@ Sequence::~Sequence() {
 void Sequence::prepareInterface() {
     // Register streams.
     registerStream("out_img", &out_img);
-    registerStream("in_trigger", &in_trigger);
+    registerStream("in_stream_trigger", &in_stream_trigger);
+    registerStream("in_next_image_trigger", &in_next_image_trigger);
 
     // Register handlers - loads image, NULL dependency.
 	registerHandler("onLoadImage", boost::bind(&Sequence::onLoadImage, this));
@@ -64,10 +67,15 @@ void Sequence::prepareInterface() {
 
     // 2nd version - external trigger.
     registerHandler("onTriggeredLoadNextImage", boost::bind(&Sequence::onTriggeredLoadNextImage, this));
-    addDependency("onTriggeredLoadNextImage", &in_trigger);
+    addDependency("onTriggeredLoadNextImage", &in_next_image_trigger);
 
     // Register handlers - reloads sequence, triggered manually.
     registerHandler("Reload sequence", boost::bind(&Sequence::onSequenceReload, this));
+
+    registerHandler("Stream Image", boost::bind(&Sequence::onStreamImage, this));
+
+    registerHandler("onTriggeredStreamImage", boost::bind(&Sequence::onTriggeredStreamImage, this));
+    addDependency("onTriggeredStreamImage", &in_stream_trigger);
 
 }
 
@@ -84,6 +92,20 @@ bool Sequence::onFinish() {
 	CLOG(LTRACE) << "Sequence::finish\n";
 
 	return true;
+}
+
+void Sequence::onStreamImage() {
+    CLOG(LTRACE) << "Sequence::onStreamImage";
+
+    streaming_flag = true;
+}
+
+void Sequence::onTriggeredStreamImage() {
+    CLOG(LTRACE) << "Sequence::onTriggeredStreamImage";
+
+    in_stream_trigger.read();
+
+    streaming_flag = true;
 }
 
 void Sequence::onLoadImage() {
@@ -104,8 +126,14 @@ void Sequence::onLoadImage() {
 	if(files.empty())
 		return;
 
+    // Check streaming
+    if(!prop_auto_streaming && !streaming_flag)
+        return;
+
+    streaming_flag = false;
+
 	// Check triggering mode.
-	if ((prop_auto_trigger) || (!prop_auto_trigger && next_image_flag))
+    if ((prop_auto_next_image) || (!prop_auto_next_image && next_image_flag))
 		frame++;
 	// Anyway, reset flag.
 	next_image_flag = false;
@@ -151,7 +179,7 @@ void Sequence::onLoadImage() {
 
 void Sequence::onTriggeredLoadNextImage(){
     CLOG(LDEBUG) << "Sequence::onTriggeredLoadNextImage - next image from the sequence will be loaded";
-    in_trigger.read();
+    in_next_image_trigger.read();
 	next_image_flag = true;
 }
 

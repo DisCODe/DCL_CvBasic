@@ -114,8 +114,11 @@ protected:
 	 */
 	bool onStop();
 
+    /// Trigger - used for stream image in case of several sequences present.
+    Base::DataStreamIn<Base::UnitType> in_stream_trigger;
+
     /// Trigger - used for loading next image in case of several sequences present.
-    Base::DataStreamIn<Base::UnitType> in_trigger;
+    Base::DataStreamIn<Base::UnitType> in_next_image_trigger;
 
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
@@ -125,12 +128,10 @@ protected:
      */
     void onLoadNextImage();
 
-
     /*!
      * Event handler function - moves image index to the next frame of the sequence, externally triggered version.
      */
     void onTriggeredLoadNextImage();
-
 
     /*!
 	 * Event handler function - loads image from the sequence.
@@ -141,6 +142,16 @@ protected:
 	 * Event handler function - reload the sequence.
 	 */
 	void onSequenceReload();
+
+    /*!
+     * Event handler function - stream image.
+     */
+    void onStreamImage();
+
+    /*!
+     * Event handler function - stream image, externally triggered version.
+     */
+    void onTriggeredStreamImage();
 
 private:
 	/**
@@ -161,6 +172,9 @@ private:
 	/// Index of current frame.
 	int frame;
 
+    /// Flag indicating whether the image should be streamed
+    bool streaming_flag;
+
     /// Flag indicating whether the next image should loaded or not.
 	bool next_image_flag;
 
@@ -174,8 +188,11 @@ private:
 	/// Files pattern (regular expression).
 	Base::Property<std::string> prop_pattern;
 
+    ///
+    Base::Property<bool> prop_auto_streaming;
+
 	/// Next image loading mode: iterative vs triggered.
-	Base::Property<bool> prop_auto_trigger;
+    Base::Property<bool> prop_auto_next_image;
 
 	/// Loading mode: images loaded in the loop.
 	Base::Property<bool> prop_loop;
