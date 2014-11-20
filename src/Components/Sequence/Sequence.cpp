@@ -16,20 +16,25 @@ namespace Sources {
 namespace Sequence {
 
 Sequence::Sequence(const std::string & n) :
-		Base::Component(n), prop_directory("sequence.directory", std::string(".")), prop_pattern("sequence.pattern",
-				std::string(".*\\.(jpg|png|bmp|yaml|yml)")), prop_sort("mode.sort", true),
-		//prop_prefetch("mode.prefetch", false),
-		prop_loop("mode.loop", false), prop_auto_trigger("mode.auto_trigger", true), read_on_init("read_on_init", true) {
+	Base::Component(n),
+	prop_directory("sequence.directory", std::string(".")),
+	prop_pattern("sequence.pattern", std::string(".*\\.(jpg|png|bmp|yaml|yml)")),
+	prop_sort("mode.sort", true),
+	prop_loop("mode.loop", false),
+	prop_auto_streaming("mode.auto_streaming", true),
+	prop_auto_next_image("mode.auto_next_image", true),
+	prop_read_on_init("read_on_init", true) 
+{
 	registerProperty(prop_directory);
 	registerProperty(prop_pattern);
 	registerProperty(prop_sort);
 	registerProperty(prop_loop);
-	registerProperty(prop_auto_trigger);
-	registerProperty(read_on_init);
-	//registerProperty(prop_prefetch);
+	registerProperty(prop_auto_streaming);
+	registerProperty(prop_auto_next_image);
+	registerProperty(prop_read_on_init);
 
 	// Set first frame index number.
-	if (prop_auto_trigger)
+	if (prop_auto_next_image)
 		frame = -1;
 	else
 		frame = 0;
@@ -45,25 +50,32 @@ Sequence::~Sequence() {
 	CLOG(LTRACE) << name() << ": destroyed";
 }
 
+
 void Sequence::prepareInterface() {
-	// Register streams.
-	registerStream("out_img", &out_img);
-	registerStream("in_trigger", &in_trigger);
+    // Register streams.
+    registerStream("out_img", &out_img);
+    registerStream("in_stream_trigger", &in_stream_trigger);
+    registerStream("in_next_image_trigger", &in_next_image_trigger);
 
-	// Register handlers - loads image, NULL dependency.
+    // Register handlers - loads image, NULL dependency.
 	registerHandler("onLoadImage", boost::bind(&Sequence::onLoadImage, this));
-	addDependency("onLoadImage", NULL);
+    addDependency("onLoadImage", NULL);
 
-	// Register handlers - next image, can be triggered manually (from GUI) or by new data present in_load_next_image_trigger dataport.
-	// 1st version - manually.
-	registerHandler("Next image", boost::bind(&Sequence::onLoadNextImage, this));
+    // Register handlers - next image, can be triggered manually (from GUI) or by new data present in_load_next_image_trigger dataport.
+    // 1st version - manually.
+    registerHandler("Next image", boost::bind(&Sequence::onLoadNextImage, this));
 
-	// 2nd version - external trigger.
-	registerHandler("onTriggeredLoadNextImage", boost::bind(&Sequence::onTriggeredLoadNextImage, this));
-	addDependency("onTriggeredLoadNextImage", &in_trigger);
+    // 2nd version - external trigger.
+    registerHandler("onTriggeredLoadNextImage", boost::bind(&Sequence::onTriggeredLoadNextImage, this));
+    addDependency("onTriggeredLoadNextImage", &in_next_image_trigger);
 
-	// Register handlers - reloads sequence, triggered manually.
-	registerHandler("Reload sequence", boost::bind(&Sequence::onSequenceReload, this));
+    // Register handlers - reloads sequence, triggered manually.
+    registerHandler("Reload sequence", boost::bind(&Sequence::onSequenceReload, this));
+
+    registerHandler("Stream Image", boost::bind(&Sequence::onStreamImage, this));
+
+    registerHandler("onTriggeredStreamImage", boost::bind(&Sequence::onTriggeredStreamImage, this));
+    addDependency("onTriggeredStreamImage", &in_stream_trigger);
 
 }
 
@@ -72,7 +84,7 @@ bool Sequence::onInit() {
 
 	// Load files on first
 	reload_flag = true;
-	if (read_on_init)
+	if (prop_read_on_init)
 		next_image_flag = true;
 	return true;
 }
@@ -83,81 +95,108 @@ bool Sequence::onFinish() {
 	return true;
 }
 
+void Sequence::onStreamImage() {
+    CLOG(LTRACE) << "Sequence::onStreamImage";
+
+    streaming_flag = true;
+}
+
+void Sequence::onTriggeredStreamImage() {
+    CLOG(LTRACE) << "Sequence::onTriggeredStreamImage";
+
+    in_stream_trigger.read();
+
+    streaming_flag = true;
+}
+
 void Sequence::onLoadImage() {
 	CLOG(LDEBUG) << "Sequence::onLoadImage";
 
-	if (reload_flag) {
+	if(reload_flag) {
 		// Try to reload sequence.
 		if (!findFiles()) {
-			CLOG(LERROR) << name() << ": There are no files matching the regular expression " << prop_pattern << " in "
-					<< prop_directory;
+			CLOG(LERROR) << name() << ": There are no files matching the regular expression "
+					<< prop_pattern << " in " << prop_directory;
 		}
 		frame = -1;
 		reload_flag = false;
 	}
 
+
 	// Check whether there are any images loaded.
-	if (files.empty())
+	if(files.empty())
 		return;
 
+	// Check streaming
+	if(!prop_auto_streaming && !streaming_flag)
+		return;
+
+	streaming_flag = false;
+
 	// Check triggering mode.
-	if ((prop_auto_trigger) || (!prop_auto_trigger && next_image_flag)) {
+	if ((prop_auto_next_image) || (!prop_auto_next_image && next_image_flag))
 		frame++;
-		// Anyway, reset flag.
-		next_image_flag = false;
+	
+	// Anyway, reset flag.
+	next_image_flag = false;
 
-		// Check frame number.
-		if (frame < 0)
+	// Check frame number.
+	if (frame <0)
+		frame = 0;
+	// Check the size of the dataset.
+	if (frame >= files.size()) {
+		if (prop_loop) {
 			frame = 0;
-		// Check the size of the dataset.
-		if (frame >= files.size()) {
-			if (prop_loop) {
-				frame = 0;
-				CLOG(LINFO) << name() << ": loop";
-				// TODO: endOfSequence->raise();
-			} else {
-				frame = files.size() - 1;
-				CLOG(LINFO) << name() << ": end of sequence";
-				// TODO: endOfSequence->raise();
-			}
-
+			CLOG(LINFO) << name() << ": loop";
+			// TODO: endOfSequence->raise();
+		} else {
+			frame = files.size() -1;
+			CLOG(LINFO) << name() << ": end of sequence";
+			// TODO: endOfSequence->raise();
 		}
 
-		CLOG(LWARNING) << "Sequence: reading image " << files[frame] << " " << frame + 1 << "/" << files.size();
-		try {
-			// Get file extension.
-			std::string ext = files[frame].substr(files[frame].rfind(".") + 1);
-			CLOG(LDEBUG) << "Extracted file Extension " << ext;
-			// Read depth from yaml.
-			if ((ext == "yaml") || (ext == "yml")) {
-				cv::FileStorage file(files[frame], cv::FileStorage::READ);
-				file["img"] >> img;
-			} else
-				img = cv::imread(files[frame], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
-		} catch (...) {
-			CLOG(LWARNING) << name() << ": image reading failed! [" << files[frame] << "]";
-		}
-
-		// Write image to the output port.
-		out_img.write(img);
 	}
+
+	CLOG(LTRACE) << "Sequence: reading image " << files[frame];
+	try {
+		// Get file extension.
+		std::string ext = files[frame].substr(files[frame].rfind(".")+1);
+		CLOG(LDEBUG) << "Extracted file Extension " << ext;
+		// Read depth from yaml.
+		if ((ext == "yaml") || (ext == "yml")){
+			cv::FileStorage file(files[frame], cv::FileStorage::READ);
+			file["img"] >> img;
+		}
+		else
+			img = cv::imread(files[frame], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+	} catch (...) {
+		CLOG(LWARNING) << name() << ": image reading failed! ["
+				<< files[frame] << "]";
+	}
+
+	// Write image to the output port.
+	out_img.write(img);
 }
 
-void Sequence::onTriggeredLoadNextImage() {
-	CLOG(LDEBUG) << "Sequence::onTriggeredLoadNextImage - next image from the sequence will be loaded";
-	in_trigger.read();
+
+void Sequence::onTriggeredLoadNextImage(){
+    CLOG(LDEBUG) << "Sequence::onTriggeredLoadNextImage - next image from the sequence will be loaded";
+    in_next_image_trigger.read();
 	next_image_flag = true;
 }
 
-void Sequence::onLoadNextImage() {
+
+void Sequence::onLoadNextImage(){
 	CLOG(LDEBUG) << "Sequence::onLoadNextImage - next image from the sequence will be loaded";
 	next_image_flag = true;
 }
+
 
 void Sequence::onSequenceReload() {
 	CLOG(LDEBUG) << "Sequence::onSequenceReload";
 	reload_flag = true;
 }
+
 
 bool Sequence::onStart() {
 	return true;
@@ -182,5 +221,5 @@ bool Sequence::findFiles() {
 	return !files.empty();
 }
 
-}    //: namespace Sequence
-}    //: namespace Sources
+}//: namespace Sequence
+}//: namespace Sources
