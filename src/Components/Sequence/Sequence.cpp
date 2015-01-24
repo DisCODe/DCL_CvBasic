@@ -157,7 +157,7 @@ void Sequence::onLoadImage() {
 
 	}
 
-	CLOG(LTRACE) << "Sequence: reading image " << files[frame];
+	CLOG(LINFO) << "Sequence: reading image " << files[frame];
 	try {
 		// Get file extension.
 		std::string ext = files[frame].substr(files[frame].rfind(".")+1);
