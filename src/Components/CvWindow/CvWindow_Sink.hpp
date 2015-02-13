@@ -87,6 +87,15 @@ namespace CvWindow {
 
 using namespace cv;
 
+class CvWindow_Sink;
+
+struct MouseCallbackInfo {
+	CvWindow_Sink * parent;
+	int window;
+	
+	MouseCallbackInfo(CvWindow_Sink * p = NULL, int w = 0) : parent(p), window(w) {}
+};
+
 /*!
  * \class CvWindow_Sink
  * \brief Creates a window and displays the image
@@ -185,8 +194,6 @@ protected:
 	std::vector<Base::DataStreamInPtr<Types::Drawable> *>
 			in_draw;
 
-	std::vector<Base::DataStreamOut<cv::Point> *> out_point;
-
 	/// Image to be drawn.
 	std::vector<cv::Mat> img;
 
@@ -202,6 +209,16 @@ protected:
 
 	Base::Property<std::string> filename;
 	Base::Property<std::string> dir;
+	
+	
+	std::vector<MouseCallbackInfo*> callback_info;
+	static void onMouseStatic(int event, int x, int y, int flags, void * userdata);
+	
+	void onMouse(int event, int x, int y, int flags, int window);
+	
+	Base::Property<bool> mouse_tracking;
+
+	std::vector<Base::DataStreamOut<cv::Point2f> *> out_point;
 };
 
 }//: namespace CvWindow

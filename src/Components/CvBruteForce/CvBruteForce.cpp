@@ -48,7 +48,7 @@ void CvBruteForce::prepareInterface() {
 	registerStream("in_img0", &in_img0);
 	registerStream("in_img1", &in_img1);
 	registerStream("out_img", &out_img);
-
+	registerStream("out_matches", &out_matches);
 }
 
 bool CvBruteForce::onInit() {
@@ -84,7 +84,7 @@ void CvBruteForce::onNewImage()
 		cv::Mat descriptors_2 = in_descriptors1.read();
 
 		// Matching descriptor vectors using BruteForce matcher.
-		BFMatcher matcher; //BruteForce
+		BFMatcher matcher(cv::NORM_HAMMING); //BruteForce
 		std::vector< DMatch > matches;
 		matcher.match( descriptors_1, descriptors_2, matches );
 
@@ -117,7 +117,7 @@ void CvBruteForce::onNewImage()
 		Mat img_matches;
 		drawMatches( img_1, features_1.features, img_2, features_2.features,
 				   good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-				   vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+				   vector<char>(), DrawMatchesFlags::DEFAULT );
 
 		// Print stats.
 		if (print_stats) {
@@ -131,6 +131,7 @@ void CvBruteForce::onNewImage()
 
 		// Write the result to the output.
 		out_img.write(img_matches);
+		out_matches.write(good_matches);
 	} catch (...) {
 		CLOG(LERROR) << "CvBruteForce::onNewImage failed\n";
 	}

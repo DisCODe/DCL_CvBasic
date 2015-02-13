@@ -174,6 +174,8 @@ public:
 		if (s=="HLS2BGR") return CV_HLS2BGR;
 		if (s=="HLS2RGB") return CV_HLS2RGB;
 
+		std::cout << "Default!\n";
+		
 		return CV_BGR2GRAY;
 	}
 

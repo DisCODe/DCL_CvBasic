@@ -75,8 +75,8 @@ protected:
 	void onNewImage();
 
 	/// Input data streams
-	Base::DataStreamIn <Mat> in_img1;
-	Base::DataStreamIn <Mat> in_img2;
+	Base::DataStreamIn <Mat, Base::DataStreamBuffer::Newest> in_img1;
+	Base::DataStreamIn <Mat, Base::DataStreamBuffer::Newest> in_img2;
 
 	/// Output data stream - a normalized sum of input images
 	Base::DataStreamOut <Mat> out_img;

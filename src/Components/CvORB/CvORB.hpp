@@ -76,7 +76,7 @@ protected:
 	void onNewImage();
 
 	/// Input data stream
-	Base::DataStreamIn <cv::Mat> in_img;
+	Base::DataStreamIn <cv::Mat, Base::DataStreamBuffer::Newest> in_img;
 
 	/// Output data stream containing extracted features
 	Base::DataStreamOut <Types::Features> out_features;

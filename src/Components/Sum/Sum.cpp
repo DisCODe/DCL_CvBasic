@@ -61,7 +61,7 @@ void Sum::onNewImage()
 	LOG(LTRACE) << "Sum::onNewImage\n";
 	try {
 		cv::Mat img1 = in_img1.read();
-		cv::Mat img2 = in_img2.read();
+		cv::Mat img2 = in_img2.read().clone();
 
 		// TODO: add comparison of size1 & size2.
 		//cv::Size size = img1.size();

@@ -63,6 +63,9 @@ public:
 			return atan(A);
 	}
 
+	double length() {
+		return cv::norm(p1 - p2);
+	}
 
 	cv::Point getP1(){
 		return p1;
