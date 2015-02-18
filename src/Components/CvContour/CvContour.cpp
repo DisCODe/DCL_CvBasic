@@ -35,6 +35,7 @@ void CvContour::prepareInterface() {
 	// Input and output data streams.
 	registerStream("in_img", &in_img);
 	registerStream("out_contours", &out_contours);
+	registerStream("out_moments", &out_moments);
 	registerStream("out_img", &out_img);
 }
 
