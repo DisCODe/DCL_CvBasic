@@ -77,6 +77,7 @@ protected:
 
 	/// Input data stream
 	Base::DataStreamIn <Mat> in_img;
+	Base::DataStreamIn <Mat> in_mask;
 
 	/// Output data stream - a normalized sum of input images
 	Base::DataStreamOut <Mat> out_img;
