@@ -66,10 +66,16 @@ protected:
 	bool onStop();
 
 	// Output data streams
-    Base::DataStreamOut<Base::UnitType> out_trigger;
+	Base::DataStreamOut<Base::UnitType> out_trigger;
 
-	// Handlers
-	void trigger();
+	/// Auto-trigger - sends a trigger in every step.
+	Base::Property<bool> prop_auto_trigger;
+
+	/// Activates trigger when button is pressed.
+	void onTriggerButtonPressed();
+
+	/// Sends trigger when component is activated if auto-trigger property is set to true.
+	void onAutoTrigger();
 
 };
 
