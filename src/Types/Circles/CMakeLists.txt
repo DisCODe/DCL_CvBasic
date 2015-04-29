@@ -9,16 +9,3 @@ install(
     DESTINATION include/Types/Circles
     COMPONENT sdk
 )
-
-SET(circles Circles.cpp)
-#FILE(GLOB circles *.cpp)
-ADD_LIBRARY(TypesCircles SHARED ${circles})
-SET_TARGET_PROPERTIES (TypesCircles PROPERTIES DEFINE_SYMBOL  "COMPILING_DLL" )
-TARGET_LINK_LIBRARIES(TypesCircles ${OpenCV_LIBS})
-
-INSTALL(
-  TARGETS TypesCircles
-  RUNTIME DESTINATION bin COMPONENT applications
-  LIBRARY DESTINATION lib COMPONENT applications
-  ARCHIVE DESTINATION lib COMPONENT sdk
-)
