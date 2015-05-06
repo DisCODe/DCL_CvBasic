@@ -114,26 +114,26 @@ protected:
 	 */
 	bool onStop();
 
-    /// Trigger - used for stream image in case of several sequences present.
-    Base::DataStreamIn<Base::UnitType> in_stream_trigger;
+	/// Trigger - used for stream image in case of several sequences present.
+	Base::DataStreamIn<Base::UnitType, Base::DataStreamBuffer::Newest> in_stream_trigger;
 
-    /// Trigger - used for loading next image in case of several sequences present.
-    Base::DataStreamIn<Base::UnitType> in_next_image_trigger;
+	/// Trigger - used for loading next image in case of several sequences present.
+	Base::DataStreamIn<Base::UnitType, Base::DataStreamBuffer::Newest> in_next_image_trigger;
 
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 
-    /*!
-     * Event handler function - moves image index to the next frame of the sequence.
-     */
-    void onLoadNextImage();
+	/*!
+	* Event handler function - moves image index to the next frame of the sequence.
+	*/
+	void onLoadNextImage();
 
-    /*!
-     * Event handler function - moves image index to the next frame of the sequence, externally triggered version.
-     */
-    void onTriggeredLoadNextImage();
+	/*!
+	* Event handler function - moves image index to the next frame of the sequence, externally triggered version.
+	*/
+	void onTriggeredLoadNextImage();
 
-    /*!
+	/*!
 	 * Event handler function - loads image from the sequence.
 	 */
 	void onLoadImage();
@@ -143,15 +143,15 @@ protected:
 	 */
 	void onSequenceReload();
 
-    /*!
-     * Event handler function - stream image.
-     */
-    void onStreamImage();
+	/*!
+	* Event handler function - stream image.
+	*/
+	void onStreamImage();
 
-    /*!
-     * Event handler function - stream image, externally triggered version.
-     */
-    void onTriggeredStreamImage();
+	/*!
+	* Event handler function - stream image, externally triggered version.
+	*/
+	void onTriggeredStreamImage();
 
 private:
 	/**
@@ -161,12 +161,12 @@ private:
 	 */
 	bool findFiles();
 
-	/// list of files in sequence
+	/// List of file names in sequence.
 	std::vector<std::string> files;
 
-	std::vector<cv::Mat> images;
+	//std::vector<cv::Mat> images;
 
-	/// current frame
+	/// Current image.
 	cv::Mat img;
 
 	/// Index of current frame.

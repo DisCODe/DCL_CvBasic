@@ -9,6 +9,6 @@ FILE(GLOB files *.cpp)
 
 # Create an executable file from sources:
 ADD_LIBRARY(CvHoughCircles SHARED ${files})
-TARGET_LINK_LIBRARIES(CvHoughCircles ${OpenCV_LIBS} ${DisCODe_LIBRARIES} TypesCircles)
+TARGET_LINK_LIBRARIES(CvHoughCircles ${OpenCV_LIBS} ${DisCODe_LIBRARIES})
 
 INSTALL_COMPONENT(CvHoughCircles)
