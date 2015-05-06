@@ -18,7 +18,7 @@
 			<Executor name="ProcessingThread"  period="1">
 				<Component name="Source" type="CvBasic:Sequence" priority="1" bump="0">
 					<param name="sequence.pattern">.*\.jpeg</param>
-					<param name="sequence.directory">%[TASK_LOCATION]%/../data/chessboard/</param>
+					<param name="sequence.directory">%[TASK_LOCATION]%/../data/calibration_robotics_lab/</param>
 				</Component>
 				
 				<Component name="CameraInfo" type="CvCoreTypes:CameraInfoProvider" priority="2">
@@ -26,7 +26,7 @@
 					<param name="dist_coeffs">-0.51084775, 0.23313555, 4.50637517e-03, -6.86281081e-03, 4.94365674e-03</param>
 				</Component>
 				
-				<Component name="Undistort" type="CvBasic:CvUndistort" priority="2" bump="0">
+				<Component name="Undistort" type="CvBasic:CvUndistort" priority="2" bump="1">
 				</Component>
 			</Executor>
 			
@@ -46,8 +46,8 @@
 			<sink>Undistort.in_img</sink>	
 			<sink>Window.in_img0</sink>			
 		</Source>
-		<Source name="CameraInfo.out_camerainfo">
-			<sink>Undistort.in_camerainfo</sink>
+		<Source name="CameraInfo.out_camera_info">
+			<sink>Undistort.in_camera_info</sink>
 		</Source>
 		<Source name="Undistort.out_img">
 			<sink>Window.in_img1</sink>		
