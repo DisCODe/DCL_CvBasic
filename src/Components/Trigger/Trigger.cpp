@@ -36,7 +36,8 @@ void Trigger::prepareInterface() {
 }
 
 bool Trigger::onInit() {
-
+	// Reset flag.
+	triggered_flag = false;
 	return true;
 }
 
@@ -55,14 +56,14 @@ bool Trigger::onStart() {
 
 void Trigger::onTriggerButtonPressed() {
 	CLOG(LDEBUG) << "Trigger::onTriggerButtonPressed";
-	Base::UnitType t;
-	out_trigger.write(t);
+	triggered_flag = true;
 }
 
 
 void Trigger::onAutoTrigger() {
 	CLOG(LDEBUG) << "Trigger::onAutoTrigger";
-	if (prop_auto_trigger){
+	if (prop_auto_trigger || triggered_flag){
+		triggered_flag = false;
 		Base::UnitType t;
 		out_trigger.write(t);
 	}//: if

@@ -71,6 +71,9 @@ protected:
 	/// Auto-trigger - sends a trigger in every step.
 	Base::Property<bool> prop_auto_trigger;
 
+	/// Flag indicating whether the trigger button was pressed.
+	bool triggered_flag;
+
 	/// Activates trigger when button is pressed.
 	void onTriggerButtonPressed();
 
