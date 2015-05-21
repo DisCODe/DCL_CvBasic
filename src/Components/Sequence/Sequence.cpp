@@ -151,8 +151,9 @@ void Sequence::onLoadImage() {
 			// TODO: endOfSequence->raise();
 		} else {
 			frame = files.size() -1;
-			CLOG(LINFO) << name() << ": end of sequence";
+			CLOG(LWARNING) << name() << ": end of sequence";
 			// TODO: endOfSequence->raise();
+			return;
 		}
 
 	}
