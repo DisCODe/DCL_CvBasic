@@ -87,8 +87,6 @@ private:
 	/// Output image position.
 	Base::DataStreamOut <Types::ImagePosition> out_imagePosition;
 
-	Base::DataStreamOut <cv::Mat> out_img;
-
 	/// Located points.
 	std::vector<cv::Point2f> gridPoints;
 
