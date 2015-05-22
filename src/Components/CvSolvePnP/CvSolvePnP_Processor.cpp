@@ -157,7 +157,7 @@ void CvSolvePnP_Processor::onNewObject3D()
             ss << hm.getElement(i, j) << "  ";
 		}
 	}
-	CLOG(LDEBUG) << "HomogMatrix:\n" << ss.str() << endl;
+	CLOG(LINFO) << "HomogMatrix:\n" << ss.str() << endl;
 
 	out_rvec.write(rvec.clone());
 	out_tvec.write(tvec.clone());
