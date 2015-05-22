@@ -8,9 +8,9 @@ FILE(GLOB files *.cpp)
 FIND_PACKAGE( OpenCV REQUIRED )
 
 # Create an executable file from sources:
-ADD_LIBRARY(procCvGaussianBlur SHARED ${files})
+ADD_LIBRARY(RotateImage SHARED ${files})
 
 # Link external libraries
-TARGET_LINK_LIBRARIES(procCvGaussianBlur ${OpenCV_LIBS} ${DisCODe_LIBRARIES})
+TARGET_LINK_LIBRARIES(RotateImage ${OpenCV_LIBS} ${DisCODe_LIBRARIES} )
 
-INSTALL_COMPONENT(procCvGaussianBlur)
+INSTALL_COMPONENT(RotateImage)
