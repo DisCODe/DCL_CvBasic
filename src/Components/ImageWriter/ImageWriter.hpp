@@ -76,8 +76,8 @@ protected:
      */
     void onSaveTriggered();
 
-    /// Trigger - used for loading next image in case of several sequences present.
-    Base::DataStreamIn<Base::UnitType> in_trigger;
+    /// Trigger - used for saving received images.
+    Base::DataStreamIn<Base::UnitType> in_save_trigger;
 
     /// Image to be saved.
 	std::vector< Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest> *> in_img;
