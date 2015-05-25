@@ -51,7 +51,7 @@ void CvSolvePnP_Processor::prepareInterface() {
 	addDependency("onNewObject3D", &in_camerainfo);
 
 	registerStream("in_object3d", &in_object3d);
-	registerStream("in_camerainfo", &in_camerainfo);
+	registerStream("in_camera_info", &in_camerainfo);
 	registerStream("out_homogMatrix", &out_homogMatrix);
 	registerStream("out_rvec", &out_rvec);
 	registerStream("out_tvec", &out_tvec);
@@ -59,19 +59,19 @@ void CvSolvePnP_Processor::prepareInterface() {
 
 bool CvSolvePnP_Processor::onStart()
 {
-	LOG(LTRACE) << "CvSolvePnP_Processor::onStart()\n";
+	CLOG(LTRACE) << "CvSolvePnP_Processor::onStart()\n";
 	return true;
 }
 
 bool CvSolvePnP_Processor::onStop()
 {
-	LOG(LTRACE) << "CvSolvePnP_Processor::onStop()\n";
+	CLOG(LTRACE) << "CvSolvePnP_Processor::onStop()\n";
 	return true;
 }
 
 bool CvSolvePnP_Processor::onInit()
 {
-	LOG(LTRACE) << "CvSolvePnP_Processor::onInit()\n";
+	CLOG(LTRACE) << "CvSolvePnP_Processor::onInit()\n";
 
 
 	return true;
@@ -79,7 +79,7 @@ bool CvSolvePnP_Processor::onInit()
 
 bool CvSolvePnP_Processor::onFinish()
 {
-	LOG(LTRACE) << "CvSolvePnP_Processor::onFinish()\n";
+	CLOG(LTRACE) << "CvSolvePnP_Processor::onFinish()\n";
 	return true;
 }
 
@@ -90,8 +90,12 @@ void CvSolvePnP_Processor::onNewObject3D()
 
 	Types::CameraInfo camera_info = in_camerainfo.read();
 
-	Mat_<double> rvec;
+	// Resulting translation vector.
 	Mat_<double> tvec;
+	// Resulting rotation matrix and vector.
+	Mat_<double> rotationMatrix;
+	Mat_<double> rvec;
+
 
 //	vector<cv::Point3f> model=object3D->getModelPoints();
 //
@@ -105,26 +109,48 @@ void CvSolvePnP_Processor::onNewObject3D()
 	Mat modelPoints(object3D->getModelPoints());
 	Mat imagePoints(object3D->getImagePoints());
 
-	Mat camera_matrix;
-	Mat rot, trans;
-	Mat dist_coeffs;
 	
 	// Check whether the image is rectified.
 	if (prop_rectified) {
+		Mat camera_matrix;
+		Mat rotMatrix1, rotVector2, trans1, trans2;
+		Mat dist_coeffs;
+
 		// If so, use data after rectification and decompose the projection matrix.
-		decomposeProjectionMatrix(camera_info.projectionMatrix(), camera_matrix, rot, trans);
+		decomposeProjectionMatrix(camera_info.projectionMatrix(), camera_matrix, rotMatrix1, trans1);
+
+		CLOG(LDEBUG) << " After decomposition of projection matrix";
+		CLOG(LDEBUG) << " Camera matrix = "<< camera_matrix;
+		CLOG(LDEBUG) << " Rotation matrix = "<< rotMatrix1 << "  translation vector = " << trans1;
+
+		// Empty distortion coefficients vector.
 		dist_coeffs = Mat ();
+
+		// Solve PnP for 3d-2d pairs of points.
+		solvePnP(modelPoints, imagePoints, camera_matrix, dist_coeffs, rotVector2, trans2, false);
+
+		CLOG(LINFO) << "SolvePnP: rot = "<< rotVector2 << "  trans=" << trans2;
+
+		Mat_<double> rotMatrix2;
+		// Use Rodriques transformation to get rotation matrix.
+		Rodrigues(rotVector2, rotMatrix2);
+
+		// Update rotation and translation.
+		rotationMatrix = rotMatrix1 * rotMatrix2;
+		tvec = rotMatrix1 * trans2 + trans1.rowRange(Range(0,3));
+		CLOG(LDEBUG) << "Tvec = rotMatrix1 * trans2 = "<< tvec ;
+		
+		// Update rotation vector.
+		Rodrigues(rotationMatrix, rvec);
+
 	} else {
-		camera_matrix = camera_info.cameraMatrix();
-		dist_coeffs = camera_info.distCoeffs();
+		// Solve PnP for 3d-2d pairs of points for camera matrix and distortion coefficients.
+		solvePnP(modelPoints, imagePoints, camera_info.cameraMatrix(), camera_info.distCoeffs(), rvec, tvec, false);
+		// Use Rodriques transformation to get rotation matrix.
+		Rodrigues(rvec, rotationMatrix);
 	}//: else
-	// Solve PnP for 3d-2d pairs of points.
-	solvePnP(modelPoints, imagePoints, camera_matrix, dist_coeffs, rvec, tvec, false);
 
 	// Create homogenous matrix.
-	Mat_<double> rotationMatrix;
-	Rodrigues(rvec, rotationMatrix);
-
 	cv::Mat pattern_pose = (cv::Mat_<double>(4, 4) <<
 			rotationMatrix(0,0), rotationMatrix(0,1), rotationMatrix(0,2), tvec(0),
 			rotationMatrix(1,0), rotationMatrix(1,1), rotationMatrix(1,2), tvec(1),

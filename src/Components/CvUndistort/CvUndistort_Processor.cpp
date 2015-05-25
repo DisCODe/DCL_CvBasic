@@ -34,13 +34,14 @@ CvUndistort_Processor::~CvUndistort_Processor()
 }
 
 void CvUndistort_Processor::prepareInterface() {
+	registerStream("in_img", &in_img);
+	registerStream("out_img", &out_img);
+	registerStream("in_camera_info", &in_camera_info);
+
 	registerHandler("onNewImage", boost::bind(&CvUndistort_Processor::onNewImage, this));
 	addDependency("onNewImage", &in_img);
 	addDependency("onNewImage", &in_camera_info);
 
-	registerStream("in_img", &in_img);
-	registerStream("out_img", &out_img);
-	registerStream("in_camera_info", &in_camera_info);
 }
 
 bool CvUndistort_Processor::onStart()
@@ -57,6 +58,15 @@ bool CvUndistort_Processor::onInit()
 {
 	interpolation = INTER_LINEAR;
 
+/*	// Initialize rectify matrices...
+	if (stereo) {
+		// ... with variables (including image size) taken from camera_info (!).
+		cv::initUndistortRectifyMap(camera_info.cameraMatrix(), camera_info.distCoeffs(), camera_info.rectificationMatrix(), camera_info.projectionMatrix(), camera_info.size(), CV_32FC1, map1, map2);
+	} else {
+		newK = cv::getOptimalNewCameraMatrix(camera_info.cameraMatrix(), camera_info.distCoeffs(), camera_info.size(), 0.01 * alpha);
+		cv::initUndistortRectifyMap(camera_info.cameraMatrix(), camera_info.distCoeffs(), cv::Mat(), newK, camera_info.size(), CV_32FC1, map1, map2);
+	}
+*/
 	return true;
 }
 
@@ -67,30 +77,30 @@ bool CvUndistort_Processor::onFinish()
 
 void CvUndistort_Processor::onNewImage()
 {
-	cv::Mat originalImage;
+	cv::Mat originalImage, undistortedImage;
+
+	// Read input image and camera info.
 	originalImage = in_img.read();
-	
 	Types::CameraInfo ci = in_camera_info.read();
 	
+	// Check if camera info was changed.
 	if ( (ci != camera_info) || (last_alpha != alpha) ) {
+		CLOG(LINFO) << "New camera info!";
 		camera_info = ci;
 		last_alpha = alpha;
-		CLOG(LINFO) << "New camera info!";
-		
+
+		// Reinitialize rectify matrices.
 		if (stereo) {
 			cv::initUndistortRectifyMap(camera_info.cameraMatrix(), camera_info.distCoeffs(), camera_info.rectificationMatrix(), camera_info.projectionMatrix(), originalImage.size(), CV_32FC1, map1, map2);
 		} else {
 			newK = cv::getOptimalNewCameraMatrix(camera_info.cameraMatrix(), camera_info.distCoeffs(), originalImage.size(), 0.01 * alpha);
 			cv::initUndistortRectifyMap(camera_info.cameraMatrix(), camera_info.distCoeffs(), cv::Mat(), newK, originalImage.size(), CV_32FC1, map1, map2);
 		}
-	}
+	}//: if
 
-	//cv::Mat undistortedImage = originalImage.clone();
-	cv::Mat undistortedImage;
-	
+	// Remap (undistort & rectify) input image.
 	remap(originalImage, undistortedImage, map1, map2, interpolation);
-	
-	//undistort(originalImage, undistortedImage, camera_info.cameraMatrix(), camera_info.distCoeffs());
+//	undistort(originalImage, undistortedImage, camera_info.cameraMatrix(), camera_info.distCoeffs());
 
 	out_img.write(undistortedImage.clone());
 }

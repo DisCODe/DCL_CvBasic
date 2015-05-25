@@ -18,7 +18,10 @@ namespace Processors {
 namespace DrawCoordinateSystem {
 
 DrawCoordinateSystem::DrawCoordinateSystem(const std::string & name) :
-		Base::Component(name){
+		Base::Component(name),
+	rectified("rectified", false)
+{
+	registerProperty(rectified);
 }
 
 DrawCoordinateSystem::~DrawCoordinateSystem() {
@@ -95,7 +98,13 @@ void DrawCoordinateSystem::projectPoints(){
 	object_points.push_back(cv::Point3f(0,0,0.1));
 
 	// Project points taking into account the camera properties.
-	cv::projectPoints(object_points, rvec, tvec, camera_matrix.cameraMatrix(), camera_matrix.distCoeffs(), image_points);
+	if (rectified) {
+		cv::Mat K, _r, _t;
+		cv::decomposeProjectionMatrix(camera_matrix.projectionMatrix(), K, _r, _t);
+		cv::projectPoints(object_points, rvec, tvec, K, cv::Mat(), image_points);
+	} else {
+		cv::projectPoints(object_points, rvec, tvec, camera_matrix.cameraMatrix(), camera_matrix.distCoeffs(), image_points);
+	}
 
 	// Draw lines between projected points.
 	Types::Line ax(image_points[0], image_points[1]);

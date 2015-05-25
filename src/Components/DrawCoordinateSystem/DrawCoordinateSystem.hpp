@@ -85,6 +85,8 @@ protected:
 
 	void projectPoints();
 
+	Base::Property<bool> rectified;
+
 };
 
 } //: namespace DrawCoordinateSystem
