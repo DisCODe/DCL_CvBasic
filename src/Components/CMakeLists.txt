@@ -87,4 +87,6 @@ ADD_COMPONENT(Trigger)
 
 ADD_COMPONENT(DrawCoordinateSystem)
 
+ADD_COMPONENT(FindHomography)
+
 ADD_COMPONENT(RotateImage)

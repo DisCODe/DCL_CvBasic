@@ -44,7 +44,7 @@ public:
 
 	virtual void draw(cv::Mat& image, cv::Scalar color, int offsetX = 0, int offsetY = 0)
 	{
-		cv::line(image, p1, p2, getCol(),2);
+		cv::line(image, p1, p2, getCol(), 2);
 	}
 
 	double getDistanceFromPoint(cv::Point p)
@@ -63,12 +63,31 @@ public:
 			return atan(A);
 	}
 
+	double length() {
+		return cv::norm(p1 - p2);
+	}
 
 	cv::Point getP1(){
 		return p1;
 	}
 	cv::Point getP2(){
 		return p2;
+	}
+	
+	cv::Point intersect(Line * other) {
+		cv::Point x = other->p1 - p1;
+    cv::Point d1 = p2 - p1;
+    cv::Point d2 = other->p2 - other->p1;
+    cv::Point r;
+
+    float cross = d1.x*d2.y - d1.y*d2.x;
+   
+		/* parallel case */
+    /*if (abs(cross) < 1e-8) return false; */
+    
+    double t1 = (x.x * d2.y - x.y * d2.x)/cross;
+    r = p1 + d1 * t1;
+    return r;
 	}
 
 private:

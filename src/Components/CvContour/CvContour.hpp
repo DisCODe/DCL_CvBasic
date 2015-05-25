@@ -80,6 +80,9 @@ protected:
 	/// Output data stream containing extracted contours
 	Base::DataStreamOut <vector<vector<Point> > > out_contours;
 	Base::DataStreamOut <cv::Mat> out_img;
+	Base::DataStreamOut < std::vector<cv::Moments> > out_moments;
+	
+	Base::Property<int> prop_min_size;
 
 };
 

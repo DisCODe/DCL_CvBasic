@@ -65,13 +65,13 @@ void CvORB::onNewImage()
 			cvtColor(input, input, COLOR_BGR2GRAY);
 
 		//-- Step 1: Detect the keypoints using ORB Detector.
-        cv::ORB orb( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
+		cv::ORB orb( nfeatures/*, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize*/);
 		std::vector<KeyPoint> keypoints;
 		Mat descriptors;
 		orb(input, cv::Mat(), keypoints, descriptors);
 
 		// Write features to the output.
-	    Types::Features features(keypoints);
+		Types::Features features(keypoints);
 		out_features.write(features);
 
 		// Write descriptors to the output.

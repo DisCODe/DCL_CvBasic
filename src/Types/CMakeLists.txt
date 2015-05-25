@@ -10,7 +10,7 @@ install(
 FILE(GLOB objects3d Objects3D/*.hpp)
 
 install(
-    FILES ${objects3d}
+    FILES ${objects3d} 
     DESTINATION include/Types/Objects3D
     COMPONENT sdk
 )

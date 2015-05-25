@@ -43,6 +43,7 @@ void CvCanny::prepareInterface() {
 
 	// Input and output data streams.
 	registerStream("in_img", &in_img);
+	registerStream("in_mask", &in_mask);
 	registerStream("out_img", &out_img);
 }
 
@@ -69,22 +70,25 @@ void CvCanny::onNewImage()
 	LOG(LTRACE) << "CvCanny::onNewImage\n";
 	try {
 		cv::Mat in = in_img.read();
-		cv::Mat gray;
+				
 		//cvtColor(in, gray, COLOR_BGR2GRAY);
 
 		// Create a matrix with the adequate size and depth.
-		cv::Mat out;
-		out.create(in.size(), CV_8U);
+		cv::Mat dst = cv::Mat::zeros(in.size(), CV_8U);
 
 		// Canny edge detector.
-		Canny( in, out, lowerThreshold, higherThreshold, kernelSize );
+		Canny( in, dst, lowerThreshold, higherThreshold, kernelSize );
 
-		// Use canny as mask
-		//dst = Scalar::all(0);
-		//src.copyTo( dst, detected_edges);
+		// Use mask if provided
+		if (!in_mask.empty()) {
+			cv::Mat mask = in_mask.read();
+			cv::Mat tmp = cv::Mat::zeros(in.size(), CV_8U);
+			dst.copyTo(tmp, mask);
+			dst = tmp;
+		}
 
 		// Write the result to the output.
-		out_img.write(out);
+		out_img.write(dst);
 	} catch (...) {
 		LOG(LERROR) << "CvCanny::onNewImage failed\n";
 	}

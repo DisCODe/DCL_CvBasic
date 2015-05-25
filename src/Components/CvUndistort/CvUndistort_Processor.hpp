@@ -129,9 +129,14 @@ private:
 
 	Types::CameraInfo camera_info;
 
-	cv::Mat map1;
-	cv::Mat map2;
 	int interpolation;
+	
+	cv::Mat map1, map2, newK;
+	
+	Base::Property<bool> stereo;
+	Base::Property<int> alpha;
+	
+	int last_alpha;
 };
 
 } // namespace CvUndistort

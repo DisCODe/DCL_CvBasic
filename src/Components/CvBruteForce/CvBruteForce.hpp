@@ -80,19 +80,20 @@ protected:
 	void onNewImage();
 
 	/// Input data stream containing extracted features.
-	Base::DataStreamIn <Types::Features> in_features0;
-	Base::DataStreamIn <Types::Features> in_features1;
+	Base::DataStreamIn <Types::Features, Base::DataStreamBuffer::Newest> in_features0;
+	Base::DataStreamIn <Types::Features, Base::DataStreamBuffer::Newest> in_features1;
 
 	/// Input data streams containing features descriptors
-	Base::DataStreamIn <cv::Mat> in_descriptors0;
-	Base::DataStreamIn <cv::Mat> in_descriptors1;
+	Base::DataStreamIn <cv::Mat, Base::DataStreamBuffer::Newest> in_descriptors0;
+	Base::DataStreamIn <cv::Mat, Base::DataStreamBuffer::Newest> in_descriptors1;
 
 	/// Input data streams containing images
-	Base::DataStreamIn <Mat> in_img0;
-	Base::DataStreamIn <Mat> in_img1;
+	Base::DataStreamIn <Mat, Base::DataStreamBuffer::Newest> in_img0;
+	Base::DataStreamIn <Mat, Base::DataStreamBuffer::Newest> in_img1;
 
 	/// Output data stream - "matching" image
 	Base::DataStreamOut <Mat> out_img;
+	Base::DataStreamOut < std::vector<DMatch> > out_matches;
 
 	/// Flag: automatic distance recalculation.
 	Base::Property<bool> distance_recalc;

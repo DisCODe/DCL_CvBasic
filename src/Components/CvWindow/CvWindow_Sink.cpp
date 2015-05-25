@@ -27,7 +27,8 @@ CvWindow_Sink::CvWindow_Sink(const std::string & name) :
 			&CvWindow_Sink::onTitleChanged, this, _1, _2), name), dir(
 			"save.directory", boost::bind(&CvWindow_Sink::onDirChanged, this, _1, _2), "./"),
 			filename("save.filename", boost::bind(&CvWindow_Sink::onFilenameChanged, this, _1, _2), name),
-			count("count", 1)
+			count("count", 1),
+			mouse_tracking("mouse.tracking", false)
 {
 	CLOG(LTRACE) << "Hello CvWindow_Sink\n";
 
@@ -73,7 +74,7 @@ void CvWindow_Sink::prepareInterface() {
 		in_draw.push_back(new Base::DataStreamInPtr<Types::Drawable>);
 		registerStream(std::string("in_draw") + id, in_draw[i]);
 
-		out_point.push_back(new Base::DataStreamOut<cv::Point>);
+		out_point.push_back(new Base::DataStreamOut<cv::Point2f>);
 		registerStream(std::string("out_point") + id, out_point[i]);
 
 		// save handlers
@@ -113,6 +114,12 @@ bool CvWindow_Sink::onInit() {
 
 	for (int i = 0; i < count; ++i) {
 		cv::namedWindow(titles[i]);
+		
+		// mouse callbacks
+		MouseCallbackInfo * cbi = new MouseCallbackInfo(this, i);
+		callback_info.push_back(cbi);
+		
+		cv::setMouseCallback(titles[i], &CvWindow_Sink::onMouseStatic, cbi);
 	}
 	CLOG(LTRACE) << "CvWindow_Sink::initialize done\n";
 	return true;
@@ -281,6 +288,19 @@ void CvWindow_Sink::onDirChanged(const std::string & old_dir,
 		const std::string & new_dir) {
 	dir = new_dir;
 	CLOG(LTRACE) << "onDirChanged: " << std::string(dir) << std::endl;
+}
+
+
+void CvWindow_Sink::onMouseStatic(int event, int x, int y, int flags, void * userdata) {
+	MouseCallbackInfo * cbi = (MouseCallbackInfo*)userdata;
+	cbi->parent->onMouse(event, x, y, flags, cbi->window);
+}
+	
+void CvWindow_Sink::onMouse(int event, int x, int y, int flags, int window) {
+	if (event != 0 || mouse_tracking) {
+		CLOG(LNOTICE) << "Click in " << titles[window] << " at " << x << "," << y << " [" << event << "]";
+		out_point[window]->write(cv::Point(x, y));
+	}
 }
 
 }//: namespace CvWindow
