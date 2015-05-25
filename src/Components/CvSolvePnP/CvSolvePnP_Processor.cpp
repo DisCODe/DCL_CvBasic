@@ -29,14 +29,16 @@ CvSolvePnP_Processor::CvSolvePnP_Processor(const std::string & n) :
 	prop_z("offset.z", 0),
 	prop_roll("offset.roll", 0),
 	prop_pitch("offset.pitch", 0),
-	prop_yaw("offset.yaw", 0)
-	{
-		registerProperty(prop_x);
-		registerProperty(prop_y);
-		registerProperty(prop_z);
-		registerProperty(prop_roll);
-		registerProperty(prop_pitch);
-		registerProperty(prop_yaw);
+	prop_yaw("offset.yaw", 0),
+	prop_rectified("rectified", false)
+{
+	registerProperty(prop_x);
+	registerProperty(prop_y);
+	registerProperty(prop_z);
+	registerProperty(prop_roll);
+	registerProperty(prop_pitch);
+	registerProperty(prop_yaw);
+	registerProperty(prop_rectified);
 }
 
 CvSolvePnP_Processor::~CvSolvePnP_Processor()
@@ -103,8 +105,21 @@ void CvSolvePnP_Processor::onNewObject3D()
 	Mat modelPoints(object3D->getModelPoints());
 	Mat imagePoints(object3D->getImagePoints());
 
+	Mat camera_matrix;
+	Mat rot, trans;
+	Mat dist_coeffs;
+	
+	// Check whether the image is rectified.
+	if (prop_rectified) {
+		// If so, use data after rectification and decompose the projection matrix.
+		decomposeProjectionMatrix(camera_info.projectionMatrix(), camera_matrix, rot, trans);
+		dist_coeffs = Mat ();
+	} else {
+		camera_matrix = camera_info.cameraMatrix();
+		dist_coeffs = camera_info.distCoeffs();
+	}//: else
 	// Solve PnP for 3d-2d pairs of points.
-	solvePnP(modelPoints, imagePoints, camera_info.cameraMatrix(), camera_info.distCoeffs(), rvec, tvec, false);
+	solvePnP(modelPoints, imagePoints, camera_matrix, dist_coeffs, rvec, tvec, false);
 
 	// Create homogenous matrix.
 	Mat_<double> rotationMatrix;

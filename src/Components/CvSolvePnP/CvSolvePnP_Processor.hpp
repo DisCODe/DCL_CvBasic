@@ -126,6 +126,9 @@ private:
 	Base::DataStreamOut <Types::HomogMatrix> out_homogMatrix;
 	Base::DataStreamOut <cv::Mat> out_rvec;
 	Base::DataStreamOut <cv::Mat> out_tvec;
+
+	/// Property - the input image is already rectified, thus the projection matrix will be used in SolvePnP instead of camera matrix.
+	Base::Property<bool> prop_rectified;
 };
 
 } // namespace CvSolvePnP
