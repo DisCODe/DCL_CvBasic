@@ -133,6 +133,7 @@ private:
 	
 	cv::Mat map1, map2, newK;
 	
+	Base::Property<bool> stereo;
 	Base::Property<int> alpha;
 	
 	int last_alpha;

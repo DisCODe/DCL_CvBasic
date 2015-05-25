@@ -20,10 +20,13 @@ using namespace Base;
 
 CvUndistort_Processor::CvUndistort_Processor(const std::string& n) :
 	Component(n),
-	alpha("alpha", 0, "range")
+	alpha("alpha", 0, "range"),
+	stereo("stereo", false)
 {
 	registerProperty(alpha);
 	last_alpha = -1;
+	
+	registerProperty(stereo);
 }
 
 CvUndistort_Processor::~CvUndistort_Processor()
@@ -74,8 +77,12 @@ void CvUndistort_Processor::onNewImage()
 		last_alpha = alpha;
 		CLOG(LINFO) << "New camera info!";
 		
-		newK = cv::getOptimalNewCameraMatrix(camera_info.cameraMatrix(), camera_info.distCoeffs(), originalImage.size(), 0.01 * alpha);
-		cv::initUndistortRectifyMap(camera_info.cameraMatrix(), camera_info.distCoeffs(), cv::Mat(), newK, originalImage.size(), CV_32FC1, map1, map2);
+		if (stereo) {
+			cv::initUndistortRectifyMap(camera_info.cameraMatrix(), camera_info.distCoeffs(), camera_info.rectificationMatrix(), camera_info.projectionMatrix(), originalImage.size(), CV_32FC1, map1, map2);
+		} else {
+			newK = cv::getOptimalNewCameraMatrix(camera_info.cameraMatrix(), camera_info.distCoeffs(), originalImage.size(), 0.01 * alpha);
+			cv::initUndistortRectifyMap(camera_info.cameraMatrix(), camera_info.distCoeffs(), cv::Mat(), newK, originalImage.size(), CV_32FC1, map1, map2);
+		}
 	}
 
 	//cv::Mat undistortedImage = originalImage.clone();

@@ -89,8 +89,4 @@ ADD_COMPONENT(DrawCoordinateSystem)
 
 ADD_COMPONENT(FindHomography)
 
-ADD_COMPONENT(PerspectiveTransform)
-
-ADD_COMPONENT(FeatureDetector)
-
-ADD_COMPONENT(MaskAggregator)
+ADD_COMPONENT(RotateImage)

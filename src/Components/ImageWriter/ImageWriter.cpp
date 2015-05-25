@@ -84,13 +84,15 @@ void ImageWriter::prepareInterface() {
 		formats.push_back(format);
 	}
 
-    // Register handlers - next image, can be triggered manually (from GUI) or by new data present in_load_next_image_trigger dataport.
+
+	registerStream("in_save_trigger", &in_save_trigger);
+    // Register handlers - save image, can be triggered manually (from GUI) or by new data present in_load_next_image_trigger dataport.
     // 1st version - manually.
     registerHandler("SaveImage", boost::bind(&ImageWriter::onSaveButtonPressed, this));
 
     // 2nd version - external trigger.
     registerHandler("onSaveTriggered", boost::bind(&ImageWriter::onSaveTriggered, this));
-    addDependency("onSaveTriggered", &in_trigger);
+    addDependency("onSaveTriggered", &in_save_trigger);
 
 }
 
@@ -119,7 +121,7 @@ void ImageWriter::onSaveButtonPressed() {
 
 void ImageWriter::onSaveTriggered(){
 	CLOG(LTRACE) << name() << "::onSaveTriggered()";
-    in_trigger.read();
+	in_save_trigger.read();
 	for (int i = 0; i < count; ++i)
 		save_flags[i] = true;
 }
