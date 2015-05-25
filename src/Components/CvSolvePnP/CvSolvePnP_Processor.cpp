@@ -129,7 +129,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 		// Solve PnP for 3d-2d pairs of points.
 		solvePnP(modelPoints, imagePoints, camera_matrix, dist_coeffs, rotVector2, trans2, false);
 
-		CLOG(LINFO) << "SolvePnP: rot = "<< rotVector2 << "  trans=" << trans2;
+		CLOG(LDEBUG) << "SolvePnP: rot = "<< rotVector2 << "  trans=" << trans2;
 
 		Mat_<double> rotMatrix2;
 		// Use Rodriques transformation to get rotation matrix.
@@ -138,7 +138,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 		// Update rotation and translation.
 		rotationMatrix = rotMatrix1 * rotMatrix2;
 		tvec = rotMatrix1 * trans2 + trans1.rowRange(Range(0,3));
-		CLOG(LDEBUG) << "Tvec = rotMatrix1 * trans2 = "<< tvec ;
+		CLOG(LDEBUG) << " Tvec = rotMatrix1 * trans2 + trans1 = "<< tvec ;
 		
 		// Update rotation vector.
 		Rodrigues(rotationMatrix, rvec);
@@ -150,12 +150,16 @@ void CvSolvePnP_Processor::onNewObject3D()
 		Rodrigues(rvec, rotationMatrix);
 	}//: else
 
+	CLOG(LINFO) << name() << "rvec = "<< rvec << "  tvec=" << tvec;
+
 	// Create homogenous matrix.
 	cv::Mat pattern_pose = (cv::Mat_<double>(4, 4) <<
 			rotationMatrix(0,0), rotationMatrix(0,1), rotationMatrix(0,2), tvec(0),
 			rotationMatrix(1,0), rotationMatrix(1,1), rotationMatrix(1,2), tvec(1),
 			rotationMatrix(2,0), rotationMatrix(2,1), rotationMatrix(2,2), tvec(2),
 			0, 0, 0, 1);
+
+	CLOG(LINFO) << name() << " pattern_pose:\n" << pattern_pose;
 
 	// Roll - rotation around the X (blue) axis.
 	cv::Mat roll = (cv::Mat_<double>(4, 4) <<
@@ -188,17 +192,17 @@ void CvSolvePnP_Processor::onNewObject3D()
 	//rottMatrix = rottMatrix * RX;
 	// transform
 	pattern_pose = pattern_pose * (t + yaw * pitch * roll);
+	CLOG(LINFO) << name() << " HomogMatrix:\n" << pattern_pose;
 
 	HomogMatrix hm;
 
-	stringstream ss;
+//	stringstream ss;
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 4; ++j) {
             hm.setElement(i,j, pattern_pose.at<double>(i,j));
-            ss << hm.getElement(i, j) << "  ";
+//            ss << hm.getElement(i, j) << "  ";
 		}
 	}
-	CLOG(LINFO) << "HomogMatrix:\n" << ss.str() << endl;
 
 	out_rvec.write(rvec.clone());
 	out_tvec.write(tvec.clone());

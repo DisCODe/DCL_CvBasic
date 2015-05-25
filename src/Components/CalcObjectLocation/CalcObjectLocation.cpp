@@ -126,13 +126,21 @@ void CalcObjectLocation::calculate() {
 	cv::Mat_<double> rottMatrix;
 	Rodrigues(rvec_avg, rottMatrix);
 
+	CLOG(LINFO) << name() << "rvec_avg = "<< rvec_avg << "  tvec_avg=" << tvec_avg;
+
+	// Create homogenous matrix.
+	cv::Mat pose = (cv::Mat_<double>(4, 4) <<
+			rottMatrix(0,0), rottMatrix(0,1), rottMatrix(0,2), tvec_avg(0),
+			rottMatrix(1,0), rottMatrix(1,1), rottMatrix(1,2), tvec_avg(1),
+			rottMatrix(2,0), rottMatrix(2,1), rottMatrix(2,2), tvec_avg(2),
+			0, 0, 0, 1);
+	CLOG(LINFO) << name() << " HomogMatrix:\n" << pose;
+
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
             hm.setElement(i, j, rottMatrix(i, j));
-            CLOG(LINFO) << hm.getElement(i, j) << "  ";
 		}
         hm.setElement(i, 3, tvec_avg(i, 0));
-        CLOG(LINFO) << hm.getElement(i, 3) << "\n";
 	}
 	out_homogMatrix.write(hm);
 }
