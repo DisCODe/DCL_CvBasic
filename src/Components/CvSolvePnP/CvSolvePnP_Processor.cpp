@@ -191,21 +191,14 @@ void CvSolvePnP_Processor::onNewObject3D()
 
 	//rottMatrix = rottMatrix * RX;
 	// transform
-	pattern_pose = pattern_pose * (t + yaw * pitch * roll);
-	CLOG(LINFO) << name() << " HomogMatrix:\n" << pattern_pose;
+	cv::Mat tmp = (pattern_pose * (t + yaw * pitch * roll));
+	HomogMatrix hm = tmp;
+	CLOG(LINFO) << name() << " HomogMatrix:\n" << hm;
 
-	HomogMatrix hm;
-
-//	stringstream ss;
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 4; ++j) {
-            hm.setElement(i,j, pattern_pose.at<double>(i,j));
-//            ss << hm.getElement(i, j) << "  ";
-		}
-	}
-
+/*
+	TODO: fix
 	out_rvec.write(rvec.clone());
-	out_tvec.write(tvec.clone());
+	out_tvec.write(tvec.clone());*/
 	out_homogMatrix.write(hm);
 }
 

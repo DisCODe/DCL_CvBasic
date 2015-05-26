@@ -72,15 +72,15 @@ void CalcObjectLocation::calculate() {
 		cv::Mat_<double> rvectemp;
 		homogMatrix=in_homogMatrix.read();
 
-		if (homogMatrix.getElements() == Eigen::Matrix4f::Identity()) {
+		if (homogMatrix.isIdentity()) {
 			continue;
 		}
 
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
-                rotMatrix(i,j)=homogMatrix.getElement(i, j);
+                rotMatrix(i,j)=homogMatrix(i, j);
 			}
-            tvectemp(i, 0) = homogMatrix.getElement(i, 3);
+            tvectemp(i, 0) = homogMatrix(i, 3);
 		}
 
 		Rodrigues(rotMatrix, rvectemp);
@@ -138,9 +138,9 @@ void CalcObjectLocation::calculate() {
 
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
-            hm.setElement(i, j, rottMatrix(i, j));
+            hm(i, j) =  rottMatrix(i, j);
 		}
-        hm.setElement(i, 3, tvec_avg(i, 0));
+        hm(i, 3) = tvec_avg(i, 0);
 	}
 	out_homogMatrix.write(hm);
 }

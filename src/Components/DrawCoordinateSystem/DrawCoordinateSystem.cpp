@@ -76,9 +76,9 @@ void DrawCoordinateSystem::projectPoints(){
 
 		for (int i = 0; i < 3; ++i) {
 			for (int j = 0; j < 3; ++j) {
-                rotMatrix(i,j)=homogMatrix.getElement(i, j);
+                rotMatrix(i,j)=homogMatrix(i, j);
 			}
-            tvec(i, 0) = homogMatrix.getElement(i, 3);
+            tvec(i, 0) = homogMatrix(i, 3);
 		}
 		Rodrigues(rotMatrix, rvec);
 	}
