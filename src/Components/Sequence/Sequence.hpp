@@ -123,6 +123,9 @@ protected:
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 
+	/// Sequence end
+	Base::DataStreamOut<Base::UnitType> out_end_of_sequence;
+
 	/*!
 	* Event handler function - moves image index to the next frame of the sequence.
 	*/

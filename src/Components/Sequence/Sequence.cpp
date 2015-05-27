@@ -43,17 +43,18 @@ Sequence::Sequence(const std::string & n) :
 	next_image_flag = false;
 	reload_flag = false;
 
-	CLOG(LTRACE) << name() << ": constructed";
+	CLOG(LTRACE) << "constructed";
 }
 
 Sequence::~Sequence() {
-	CLOG(LTRACE) << name() << ": destroyed";
+	CLOG(LTRACE) << "destroyed";
 }
 
 
 void Sequence::prepareInterface() {
     // Register streams.
     registerStream("out_img", &out_img);
+    registerStream("out_end_of_sequence", &out_end_of_sequence);
     registerStream("in_stream_trigger", &in_stream_trigger);
     registerStream("in_next_image_trigger", &in_next_image_trigger);
 
@@ -115,7 +116,7 @@ void Sequence::onLoadImage() {
 	if(reload_flag) {
 		// Try to reload sequence.
 		if (!findFiles()) {
-			CLOG(LERROR) << name() << ": There are no files matching the regular expression "
+			CLOG(LERROR) << "There are no files matching the regular expression "
 					<< prop_pattern << " in " << prop_directory;
 		}
 		frame = -1;
@@ -145,14 +146,13 @@ void Sequence::onLoadImage() {
 		frame = 0;
 	// Check the size of the dataset.
 	if (frame >= files.size()) {
+		out_end_of_sequence.write(Base::UnitType());
 		if (prop_loop) {
 			frame = 0;
-			CLOG(LINFO) << name() << ": loop";
-			// TODO: endOfSequence->raise();
+			CLOG(LINFO) << "loop";
 		} else {
 			frame = files.size() -1;
-			CLOG(LWARNING) << name() << ": end of sequence";
-			// TODO: endOfSequence->raise();
+			CLOG(LINFO) << "end of sequence";
 			return;
 		}
 
@@ -170,13 +170,13 @@ void Sequence::onLoadImage() {
 		}
 		else
 			img = cv::imread(files[frame], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+
+		// Write image to the output port.
+		out_img.write(img);
 	} catch (...) {
-		CLOG(LWARNING) << name() << ": image reading failed! ["
-				<< files[frame] << "]";
+		CLOG(LWARNING) << ": image reading failed! [" << files[frame] << "]";
 	}
 
-	// Write image to the output port.
-	out_img.write(img);
 }
 
 
