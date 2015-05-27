@@ -5,11 +5,6 @@
 
 #include "Sequence.hpp"
 
-//#include "Utils.hpp"
-
-//#include <algorithm>
-//#include <boost/foreach.hpp>
-
 #include <opencv2/highgui/highgui.hpp>
 
 namespace Sources {
