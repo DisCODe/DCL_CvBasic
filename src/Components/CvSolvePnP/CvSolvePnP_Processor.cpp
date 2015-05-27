@@ -150,7 +150,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 		Rodrigues(rvec, rotationMatrix);
 	}//: else
 
-	CLOG(LINFO) << name() << "rvec = "<< rvec << "  tvec=" << tvec;
+	CLOG(LINFO) << "rvec = "<< rvec << "  tvec=" << tvec;
 
 	// Create homogenous matrix.
 	cv::Mat pattern_pose = (cv::Mat_<double>(4, 4) <<
@@ -159,7 +159,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 			rotationMatrix(2,0), rotationMatrix(2,1), rotationMatrix(2,2), tvec(2),
 			0, 0, 0, 1);
 
-	CLOG(LINFO) << name() << " pattern_pose:\n" << pattern_pose;
+	CLOG(LINFO) << "pattern_pose:\n" << pattern_pose;
 
 	// Roll - rotation around the X (blue) axis.
 	cv::Mat roll = (cv::Mat_<double>(4, 4) <<
@@ -193,7 +193,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 	// transform
 	cv::Mat tmp = (pattern_pose * (t + yaw * pitch * roll));
 	HomogMatrix hm = tmp;
-	CLOG(LINFO) << name() << " HomogMatrix:\n" << hm;
+	CLOG(LINFO) << "HomogMatrix:\n" << hm;
 
 /*
 	TODO: fix
