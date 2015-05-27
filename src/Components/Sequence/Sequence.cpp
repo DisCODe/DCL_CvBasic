@@ -21,7 +21,7 @@ Sequence::Sequence(const std::string & n) :
 	prop_pattern("sequence.pattern", std::string(".*\\.(jpg|png|bmp|yaml|yml)")),
 	prop_sort("mode.sort", true),
 	prop_loop("mode.loop", false),
-	prop_auto_streaming("mode.auto_streaming", true),
+	prop_auto_publish_image("mode.auto_publish_image", true),
 	prop_auto_next_image("mode.auto_next_image", true),
 	prop_read_on_init("read_on_init", true) 
 {
@@ -29,7 +29,7 @@ Sequence::Sequence(const std::string & n) :
 	registerProperty(prop_pattern);
 	registerProperty(prop_sort);
 	registerProperty(prop_loop);
-	registerProperty(prop_auto_streaming);
+	registerProperty(prop_auto_publish_image);
 	registerProperty(prop_auto_next_image);
 	registerProperty(prop_read_on_init);
 
@@ -52,10 +52,10 @@ Sequence::~Sequence() {
 
 
 void Sequence::prepareInterface() {
-    // Register streams.
+    // Register Publishs.
     registerStream("out_img", &out_img);
     registerStream("out_end_of_sequence_trigger", &out_end_of_sequence_trigger);
-    registerStream("in_stream_trigger", &in_stream_trigger);
+    registerStream("in_publish_image_trigger", &in_publish_image_trigger);
     registerStream("in_next_image_trigger", &in_next_image_trigger);
 
     // Register handlers - loads image, NULL dependency.
@@ -73,10 +73,10 @@ void Sequence::prepareInterface() {
     // Register handlers - reloads sequence, triggered manually.
     registerHandler("Reload sequence", boost::bind(&Sequence::onSequenceReload, this));
 
-    registerHandler("Stream Image", boost::bind(&Sequence::onStreamImage, this));
+    registerHandler("Publish Image", boost::bind(&Sequence::onPublishImage, this));
 
-    registerHandler("onTriggeredStreamImage", boost::bind(&Sequence::onTriggeredStreamImage, this));
-    addDependency("onTriggeredStreamImage", &in_stream_trigger);
+    registerHandler("onTriggeredPublishImage", boost::bind(&Sequence::onTriggeredPublishImage, this));
+    addDependency("onTriggeredPublishImage", &in_publish_image_trigger);
 
 }
 
@@ -96,18 +96,18 @@ bool Sequence::onFinish() {
 	return true;
 }
 
-void Sequence::onStreamImage() {
-    CLOG(LTRACE) << "Sequence::onStreamImage";
+void Sequence::onPublishImage() {
+    CLOG(LTRACE) << "Sequence::onPublishImage";
 
-    streaming_flag = true;
+    publish_image_flag = true;
 }
 
-void Sequence::onTriggeredStreamImage() {
-    CLOG(LTRACE) << "Sequence::onTriggeredStreamImage";
+void Sequence::onTriggeredPublishImage() {
+    CLOG(LTRACE) << "Sequence::onTriggeredPublishImage";
 
-    in_stream_trigger.read();
+    in_publish_image_trigger.read();
 
-    streaming_flag = true;
+    publish_image_flag = true;
 }
 
 void Sequence::onLoadImage() {
@@ -128,11 +128,11 @@ void Sequence::onLoadImage() {
 	if(files.empty())
 		return;
 
-	// Check streaming
-	if(!prop_auto_streaming && !streaming_flag)
+	// Check Publishing
+	if(!prop_auto_publish_image && !publish_image_flag)
 		return;
 
-	streaming_flag = false;
+	publish_image_flag = false;
 
 	// Check triggering mode.
 	if ((prop_auto_next_image) || (!prop_auto_next_image && next_image_flag))

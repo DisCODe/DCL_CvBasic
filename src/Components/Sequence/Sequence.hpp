@@ -83,7 +83,7 @@ public:
 	/*!
 	 * Constructor. Sets ID and startup variables.
 	 */
-	Sequence(const std::string & name = "");
+	Sequence(const std::string & name = "Sequence");
 
 	/*!
 	 * Destructor.
@@ -114,8 +114,8 @@ protected:
 	 */
 	bool onStop();
 
-	/// Trigger - used for stream image in case of several sequences present.
-	Base::DataStreamIn<Base::UnitType, Base::DataStreamBuffer::Newest> in_stream_trigger;
+	/// Trigger - used for publishing of image in case of several sequences present.
+	Base::DataStreamIn<Base::UnitType, Base::DataStreamBuffer::Newest> in_publish_image_trigger;
 
 	/// Trigger - used for loading next image in case of several sequences present.
 	Base::DataStreamIn<Base::UnitType, Base::DataStreamBuffer::Newest> in_next_image_trigger;
@@ -127,12 +127,12 @@ protected:
 	Base::DataStreamOut<Base::UnitType> out_end_of_sequence_trigger;
 
 	/*!
-	* Event handler function - moves image index to the next frame of the sequence.
+	* Event handler function - moves image index to the next image of the sequence.
 	*/
 	void onLoadNextImage();
 
 	/*!
-	* Event handler function - moves image index to the next frame of the sequence, externally triggered version.
+	* Event handler function - moves image index to the next image of the sequence, externally triggered version.
 	*/
 	void onTriggeredLoadNextImage();
 
@@ -149,12 +149,12 @@ protected:
 	/*!
 	* Event handler function - stream image.
 	*/
-	void onStreamImage();
+	void onPublishImage();
 
 	/*!
 	* Event handler function - stream image, externally triggered version.
 	*/
-	void onTriggeredStreamImage();
+	void onTriggeredPublishImage();
 
 private:
 	/**
@@ -175,8 +175,8 @@ private:
 	/// Index of current frame.
 	int frame;
 
-	/// Flag indicating whether the image should be streamed
-	bool streaming_flag;
+	/// Flag indicating whether the image should be published.
+	bool publish_image_flag;
 
 	/// Flag indicating whether the next image should loaded or not.
 	bool next_image_flag;
@@ -191,8 +191,8 @@ private:
 	/// Files pattern (regular expression).
 	Base::Property<std::string> prop_pattern;
 
-	/// Streaming mode: auto vs triggered.
-	Base::Property<bool> prop_auto_streaming;
+	/// Publishing mode: auto vs triggered.
+	Base::Property<bool> prop_auto_publish_image;
 
 	/// Next image loading mode: next vs triggered
 	Base::Property<bool> prop_auto_next_image;
