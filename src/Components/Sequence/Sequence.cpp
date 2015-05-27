@@ -28,11 +28,11 @@ Sequence::Sequence(const std::string & n) :
 	registerProperty(prop_auto_next_image);
 	registerProperty(prop_read_on_init);
 
-	// Set first frame index number.
+	// Set index number.
 	if (prop_auto_next_image)
-		frame = -1;
+		index = -1;
 	else
-		frame = 0;
+		index = 0;
 
 	// Initialize flags
 	next_image_flag = false;
@@ -114,7 +114,7 @@ void Sequence::onLoadImage() {
 			CLOG(LERROR) << "There are no files matching the regular expression "
 					<< prop_pattern << " in " << prop_directory;
 		}
-		frame = -1;
+		index = -1;
 		reload_flag = false;
 	}
 
@@ -131,45 +131,45 @@ void Sequence::onLoadImage() {
 
 	// Check triggering mode.
 	if ((prop_auto_next_image) || (!prop_auto_next_image && next_image_flag))
-		frame++;
+		index++;
 	
 	// Anyway, reset flag.
 	next_image_flag = false;
 
-	// Check frame number.
-	if (frame <0)
-		frame = 0;
+	// Check index.
+	if (index <0)
+		index = 0;
 	// Check the size of the dataset.
-	if (frame >= files.size()) {
+	if (index >= files.size()) {
 		out_end_of_sequence_trigger.write(Base::UnitType());
 		if (prop_loop) {
-			frame = 0;
+			index = 0;
 			CLOG(LINFO) << "loop";
 		} else {
-			frame = files.size() -1;
+			index = files.size() -1;
 			CLOG(LINFO) << "end of sequence";
 			return;
 		}
 
 	}
 
-	CLOG(LINFO) << "Sequence: reading image " << files[frame];
+	CLOG(LINFO) << "Sequence: reading image " << files[index];
 	try {
 		// Get file extension.
-		std::string ext = files[frame].substr(files[frame].rfind(".")+1);
+		std::string ext = files[index].substr(files[index].rfind(".")+1);
 		CLOG(LDEBUG) << "Extracted file Extension " << ext;
 		// Read depth from yaml.
 		if ((ext == "yaml") || (ext == "yml")){
-			cv::FileStorage file(files[frame], cv::FileStorage::READ);
+			cv::FileStorage file(files[index], cv::FileStorage::READ);
 			file["img"] >> img;
 		}
 		else
-			img = cv::imread(files[frame], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+			img = cv::imread(files[index], CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
 
 		// Write image to the output port.
 		out_img.write(img);
 	} catch (...) {
-		CLOG(LWARNING) << ": image reading failed! [" << files[frame] << "]";
+		CLOG(LWARNING) << ": image reading failed! [" << files[index] << "]";
 	}
 
 }

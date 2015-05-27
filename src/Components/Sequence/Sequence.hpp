@@ -172,8 +172,8 @@ private:
 	/// Current image.
 	cv::Mat img;
 
-	/// Index of current frame.
-	int frame;
+	/// Index of current image.
+	int index;
 
 	/// Flag indicating whether the image should be published.
 	bool publish_image_flag;
