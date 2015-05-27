@@ -54,7 +54,7 @@ Sequence::~Sequence() {
 void Sequence::prepareInterface() {
     // Register streams.
     registerStream("out_img", &out_img);
-    registerStream("out_end_of_sequence", &out_end_of_sequence);
+    registerStream("out_end_of_sequence_trigger", &out_end_of_sequence_trigger);
     registerStream("in_stream_trigger", &in_stream_trigger);
     registerStream("in_next_image_trigger", &in_next_image_trigger);
 
@@ -146,7 +146,7 @@ void Sequence::onLoadImage() {
 		frame = 0;
 	// Check the size of the dataset.
 	if (frame >= files.size()) {
-		out_end_of_sequence.write(Base::UnitType());
+		out_end_of_sequence_trigger.write(Base::UnitType());
 		if (prop_loop) {
 			frame = 0;
 			CLOG(LINFO) << "loop";

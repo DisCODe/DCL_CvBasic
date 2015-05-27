@@ -68,6 +68,9 @@ protected:
 	// Output data streams
 	Base::DataStreamOut<Base::UnitType> out_trigger;
 
+	/// Inputy event - stop auto triggering.
+	Base::DataStreamIn<Base::UnitType, Base::DataStreamBuffer::Newest> in_stop_auto_trigger;
+
 	/// Auto-trigger - sends a trigger in every step.
 	Base::Property<bool> prop_auto_trigger;
 
@@ -79,6 +82,9 @@ protected:
 
 	/// Sends trigger when component is activated if auto-trigger property is set to true.
 	void onAutoTrigger();
+
+	/// Stops auto trigger (if data in in_stop_auto_trigger appears).
+	void onStopAutoTrigger();
 
 };
 

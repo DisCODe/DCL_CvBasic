@@ -27,7 +27,7 @@ ImageWriter::ImageWriter(const std::string & name) :
 		format("format", std::string("png")),
 		digits("digits", 2),
 		count("count", 1),
-		prop_auto_trigger("mode.auto_trigger", false)
+		prop_auto_trigger("auto_trigger", false)
 {
 	registerProperty(directory);
 	registerProperty(base_name);
