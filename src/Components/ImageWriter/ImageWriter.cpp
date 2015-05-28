@@ -48,9 +48,7 @@ void ImageWriter::prepareInterface() {
 	for (int i = 0; i < count; ++i) {
 		char id = '0'+i;
 		hand = new Base::EventHandler2;
-		hand->setup(boost::bind(&ImageWriter::write_image_N, this, i));
-		handlers.push_back(hand);
-		registerHandler(std::string("write_image_")+id, hand);
+		registerHandler(std::string("write_image_")+id, boost::bind(&ImageWriter::write_image_N, this, i));
 
 		Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest> * stream = new Base::DataStreamIn<cv::Mat, Base::DataStreamBuffer::Newest>;
 		in_img.push_back(stream);
@@ -64,7 +62,7 @@ void ImageWriter::prepareInterface() {
 
 
 	// register aliases for first handler and streams
-	registerHandler("write_image", handlers[0]);
+	registerHandler("write_image", boost::bind(&ImageWriter::write_image_N, this, 0));
 	registerStream("in_img", in_img[0]);
 
 	counts.resize(count, 0);
