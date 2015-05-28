@@ -120,6 +120,9 @@ protected:
 	/// Trigger - used for loading next image in case of several sequences present.
 	Base::DataStreamIn<Base::UnitType, Base::DataStreamBuffer::Newest> in_next_image_trigger;
 
+	/// Trigger - used for loading previous image in case of several sequences present.
+	Base::DataStreamIn<Base::UnitType, Base::DataStreamBuffer::Newest> in_prev_image_trigger;
+
 	/// Output data stream
 	Base::DataStreamOut<cv::Mat> out_img;
 
@@ -135,6 +138,16 @@ protected:
 	* Event handler function - moves image index to the next image of the sequence, externally triggered version.
 	*/
 	void onTriggeredLoadNextImage();
+
+	/*!
+	* Event handler function - moves image index to the previous image of the sequence.
+	*/
+	void onLoadPrevImage();
+
+	/*!
+	* Event handler function - moves image index to the previous image of the sequence, externally triggered version.
+	*/
+	void onTriggeredLoadPrevImage();
 
 	/*!
 	 * Event handler function - loads image from the sequence.
@@ -175,14 +188,21 @@ private:
 	/// Index of current image.
 	int index;
 
+	/// Index of cloud returned in the previous step.
+	int previous_index;
+
+
 	/// Flag indicating whether the image should be published.
 	bool publish_image_flag;
 
 	/// Flag indicating whether the next image should loaded or not.
 	bool next_image_flag;
 
+	/// Flag indicating whether the previous cloud should loaded or not.
+	bool prev_image_flag;
+
 	/// Flag indicating whether the sequence should be reloaded or not.
-	bool reload_flag;
+	bool reload_sequence_flag;
 
 
 	/// Directory containing the images sequence.
@@ -197,14 +217,17 @@ private:
 	/// Next image loading mode: next vs triggered
 	Base::Property<bool> prop_auto_next_image;
 
+	/// Prev image  loading mode: previous vs triggered
+	Base::Property<bool> prop_auto_prev_image;
+
 	/// Loading mode: images loaded in the loop.
 	Base::Property<bool> prop_loop;
 
 	/// Sort image sequence by their names.
 	Base::Property<bool> prop_sort;
 
-	/// Returns image right after start.
-	Base::Property<bool> prop_read_on_init;
+	/// TODO: loads whole sequence at start.
+//	Base::Property<bool> prop_read_on_init;
 
 };
 
