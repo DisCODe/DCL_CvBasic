@@ -183,6 +183,7 @@ void Sequence::onLoadImage() {
 	CLOG(LDEBUG) << "After: index=" << index << " previous_index=" << previous_index ;
 
 	try {
+		CLOG(LNOTICE) << "Returning image (" << index << "): " << files[index] ;
 		if (index == previous_index) {
 			CLOG(LDEBUG) << "Returning previous image";
 			// There is no need to load the image - return stored one.
