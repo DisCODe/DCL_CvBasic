@@ -147,7 +147,7 @@ void ImageWriter::write_image_N(int n) {
 
 			// Write to file depending on the extension.
 			// Write to yaml.
-			if ((formats[n] == "yaml") || (formats[n] == "yml")){
+			if ((formats[n] == "yaml") || (formats[n] == "yml") || (formats[n] == "xml") || (formats[n] == "yml.gz") || (formats[n] == "yaml.gz") || (formats[n] == "xml.gz")){
 				CLOG(LNOTICE) << "Writing "<< n <<"-th image to YAML file" << fname;
 			    cv::FileStorage fs(fname, cv::FileStorage::WRITE);
 				fs << "img" << in_img[n]->read();
