@@ -113,6 +113,8 @@ private:
 
 	void onNewObject3D();
 
+	/// Property - disable all property sets if you want to speed up calculations.
+	Base::Property<bool> prop_enable;
 	Base::Property<double> prop_x;
 	Base::Property<double> prop_y;
 	Base::Property<double> prop_z;
@@ -129,6 +131,9 @@ private:
 
 	/// Property - the input image is already rectified, thus the projection matrix will be used in SolvePnP instead of camera matrix.
 	Base::Property<bool> prop_rectified;
+	
+	///solvePnP flags: CV_ITERATIVE, CV_P3P, CV_EPNP
+	Base::Property<int> flags;
 };
 
 } // namespace CvSolvePnP
