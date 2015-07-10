@@ -161,7 +161,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 			rotationMatrix(2,0), rotationMatrix(2,1), rotationMatrix(2,2), tvec(2),
 			0, 0, 0, 1);
 
-	CLOG(LINFO) << "pattern_pose:\n" << pattern_pose;
+    CLOG(LINFO) << "pattern_pose:\n" << pattern_pose;
 	
 	HomogMatrix hm;
 	if (prop_enable){
@@ -196,12 +196,12 @@ void CvSolvePnP_Processor::onNewObject3D()
 		//rottMatrix = rottMatrix * RX;
 		// transform
 		cv::Mat tmp = (pattern_pose * (t + yaw * pitch * roll));
-		HomogMatrix hm = tmp;
+        hm = tmp;
 	}
-	else
-		HomogMatrix hm = pattern_pose;
+    else
+        hm = pattern_pose;
 		
-	CLOG(LINFO) << "HomogMatrix:\n" << hm;
+    CLOG(LINFO) << "HomogMatrix:\n" << hm;
 	
 
 /*
