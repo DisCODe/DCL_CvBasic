@@ -196,7 +196,7 @@ void Sequence::onLoadImage() {
 		std::string ext = files[index].substr(files[index].rfind(".")+1);
 		CLOG(LDEBUG) << "Extracted file extension " << ext;
 		// Read depth from yaml.
-		if ((ext == "xml") || (ext == "yaml") || (ext == "yml") || (ext == "gz")){
+		if ((ext == "yaml") || (ext == "yml")){
 			cv::FileStorage file(files[index], cv::FileStorage::READ);
 			file["img"] >> img;
 		}
