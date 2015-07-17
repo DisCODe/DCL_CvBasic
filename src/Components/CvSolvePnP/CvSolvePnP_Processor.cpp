@@ -24,13 +24,15 @@ using namespace Types::Objects3D;
 
 CvSolvePnP_Processor::CvSolvePnP_Processor(const std::string & n) :
 	Component(n),
+	prop_enable("enable", true),
 	prop_x("offset.x", 0),
 	prop_y("offset.y", 0),
 	prop_z("offset.z", 0),
 	prop_roll("offset.roll", 0),
 	prop_pitch("offset.pitch", 0),
 	prop_yaw("offset.yaw", 0),
-	prop_rectified("rectified", false)
+	prop_rectified("rectified", false),
+	flags("flags", CV_ITERATIVE)
 {
 	registerProperty(prop_x);
 	registerProperty(prop_y);
@@ -145,7 +147,7 @@ void CvSolvePnP_Processor::onNewObject3D()
 
 	} else {
 		// Solve PnP for 3d-2d pairs of points for camera matrix and distortion coefficients.
-		solvePnP(modelPoints, imagePoints, camera_info.cameraMatrix(), camera_info.distCoeffs(), rvec, tvec, false);
+		solvePnP(modelPoints, imagePoints, camera_info.cameraMatrix(), camera_info.distCoeffs(), rvec, tvec, false, flags);
 		// Use Rodriques transformation to get rotation matrix.
 		Rodrigues(rvec, rotationMatrix);
 	}//: else
@@ -159,41 +161,48 @@ void CvSolvePnP_Processor::onNewObject3D()
 			rotationMatrix(2,0), rotationMatrix(2,1), rotationMatrix(2,2), tvec(2),
 			0, 0, 0, 1);
 
-	CLOG(LINFO) << "pattern_pose:\n" << pattern_pose;
+    CLOG(LINFO) << "pattern_pose:\n" << pattern_pose;
+	
+	HomogMatrix hm;
+	if (prop_enable){
+		// Roll - rotation around the X (blue) axis.
+		cv::Mat roll = (cv::Mat_<double>(4, 4) <<
+					  1,          0,           0, 0,
+					  0, cos(prop_roll), -sin(prop_roll), 0,
+					  0, sin(prop_roll),  cos(prop_roll), 0,
+					  0, 0, 0, 1 );
 
-	// Roll - rotation around the X (blue) axis.
-	cv::Mat roll = (cv::Mat_<double>(4, 4) <<
-	              1,          0,           0, 0,
-	              0, cos(prop_roll), -sin(prop_roll), 0,
-	              0, sin(prop_roll),  cos(prop_roll), 0,
-	              0, 0, 0, 1 );
+		// Pitch - rotation around the Y (green) axis.
+		cv::Mat pitch = (cv::Mat_<double>(4, 4) <<
+				cos(prop_pitch), 0, sin(prop_pitch), 0,
+				0, 1, 0, 0,
+				-sin(prop_pitch),  0,	cos(prop_pitch), 0,
+				0, 0, 0, 1 );
 
-	// Pitch - rotation around the Y (green) axis.
-	cv::Mat pitch = (cv::Mat_<double>(4, 4) <<
-            cos(prop_pitch), 0, sin(prop_pitch), 0,
-            0, 1, 0, 0,
-	        -sin(prop_pitch),  0,	cos(prop_pitch), 0,
-	        0, 0, 0, 1 );
+		// Yaw - rotation around the Z (red) axis.
+		cv::Mat yaw = (cv::Mat_<double>(4, 4) <<
+				cos(prop_yaw), -sin(prop_yaw), 0, 0,
+				sin(prop_yaw),  cos(prop_yaw), 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1 );
 
-	// Yaw - rotation around the Z (red) axis.
-	cv::Mat yaw = (cv::Mat_<double>(4, 4) <<
-            cos(prop_yaw), -sin(prop_yaw), 0, 0,
-	        sin(prop_yaw),  cos(prop_yaw), 0, 0,
-            0, 0, 1, 0,
-	        0, 0, 0, 1 );
+		// translation
+		cv::Mat t = (cv::Mat_<double>(4, 4) <<
+							0, 0, 0, prop_x,
+							0, 0, 0, prop_y,
+							0, 0, 0, prop_z,
+							0, 0, 0, 0 );
 
-	// translation
-	cv::Mat t = (cv::Mat_<double>(4, 4) <<
-			            0, 0, 0, prop_x,
-				        0, 0, 0, prop_y,
-			            0, 0, 0, prop_z,
-				        0, 0, 0, 0 );
-
-	//rottMatrix = rottMatrix * RX;
-	// transform
-	cv::Mat tmp = (pattern_pose * (t + yaw * pitch * roll));
-	HomogMatrix hm = tmp;
-	CLOG(LINFO) << "HomogMatrix:\n" << hm;
+		//rottMatrix = rottMatrix * RX;
+		// transform
+		cv::Mat tmp = (pattern_pose * (t + yaw * pitch * roll));
+        hm = tmp;
+	}
+    else
+        hm = pattern_pose;
+		
+    CLOG(LINFO) << "HomogMatrix:\n" << hm;
+	
 
 /*
 	TODO: fix
