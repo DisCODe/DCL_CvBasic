@@ -56,7 +56,7 @@ bool CalcObjectLocation::onStart() {
 }
 
 void CalcObjectLocation::calculate() {
-	CLOG(LDEBUG)<<"in calculate()";
+	CLOG(LTRACE)<<"calculate()";
 
 	Types::HomogMatrix homogMatrix;
 	vector<cv::Mat_<double> > rvec;
@@ -84,7 +84,7 @@ void CalcObjectLocation::calculate() {
 		}
 
 		Rodrigues(rotMatrix, rvectemp);
-		CLOG(LINFO) << rvectemp << "\n";
+		CLOG(LDEBUG) << "rvec = " << rvectemp << " tvec = " << tvectemp;
 		rvec.push_back(rvectemp);
 		tvec.push_back(tvectemp);
 	}
@@ -94,7 +94,7 @@ void CalcObjectLocation::calculate() {
 		return;
 	}
 
-	float fi_sum=0, fi_avg;
+	double fi_sum=0.0, fi_avg;
 	cv::Mat_<double> axis_sum, axis_avg;
 	cv::Mat_<double> rvec_avg;
 	cv::Mat_<double> tvec_avg, tvec_sum;
@@ -103,7 +103,7 @@ void CalcObjectLocation::calculate() {
 	tvec_sum = cv::Mat_<double>::zeros(3,1);
 
 	for(int i = 0; i < rvec.size(); i++) {
-		float fitmp = sqrt((pow(rvec.at(i)(0,0), 2) + pow(rvec.at(i)(1,0), 2)+pow(rvec.at(i)(2,0),2)));
+		double fitmp = sqrt((pow(rvec.at(i)(0,0), 2) + pow(rvec.at(i)(1,0), 2)+pow(rvec.at(i)(2,0),2)));
 		fi.push_back(fitmp);
 
 		fi_sum+=fitmp;
@@ -112,6 +112,10 @@ void CalcObjectLocation::calculate() {
 		for(int k=0;k<3;k++) {
 				axistemp(k,0)=rvec.at(i)(k,0)/fitmp;
 		}
+
+		double tmp_axis_length = sqrt((pow(axistemp(0,0), 2) + pow(axistemp(1,0), 2)+pow(axistemp(2,0),2)));
+		CLOG(LDEBUG) << "axis_tmp = "<< axistemp << " fi_tmp=" << fitmp << " axis (vector) length = "<< tmp_axis_length;
+
 		axis.push_back(axistemp);
 		axis_sum+=axistemp;
 		tvec_sum+=tvec.at(i);
@@ -126,7 +130,7 @@ void CalcObjectLocation::calculate() {
 	cv::Mat_<double> rottMatrix;
 	Rodrigues(rvec_avg, rottMatrix);
 
-	CLOG(LINFO) << name() << "rvec_avg = "<< rvec_avg << "  tvec_avg=" << tvec_avg;
+	CLOG(LDEBUG) << "rvec_avg = "<< rvec_avg << "  tvec_avg=" << tvec_avg;
 
 	// Create homogenous matrix.
 	cv::Mat pose = (cv::Mat_<double>(4, 4) <<
@@ -134,7 +138,7 @@ void CalcObjectLocation::calculate() {
 			rottMatrix(1,0), rottMatrix(1,1), rottMatrix(1,2), tvec_avg(1),
 			rottMatrix(2,0), rottMatrix(2,1), rottMatrix(2,2), tvec_avg(2),
 			0, 0, 0, 1);
-	CLOG(LINFO) << name() << " HomogMatrix:\n" << pose;
+	CLOG(LINFO) << " HomogMatrix:\n" << pose;
 
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
