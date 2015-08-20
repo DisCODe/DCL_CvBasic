@@ -24,6 +24,8 @@ CvFindCirclesGrid_Processor::CvFindCirclesGrid_Processor(const std::string & nam
 	prop_width("grid.width", 9),
 	prop_height("grid.height", 6),
 	prop_size("grid.size", 1),
+	
+	//you should use 0/1 not true/false in *.xml task file
 	prop_inverse("image.inverse",false),
 
 	prop_interpolation_type("scale.interpolation_type", INTER_NEAREST, "combo")
