@@ -219,6 +219,7 @@ protected:
 	Base::Property<bool> mouse_tracking;
 
 	std::vector<Base::DataStreamOut<cv::Point2f> *> out_point;
+	std::vector<Base::DataStreamIn<Base::UnitType> *> in_save;
 };
 
 }//: namespace CvWindow

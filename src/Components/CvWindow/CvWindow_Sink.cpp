@@ -76,12 +76,18 @@ void CvWindow_Sink::prepareInterface() {
 
 		out_point.push_back(new Base::DataStreamOut<cv::Point2f>);
 		registerStream(std::string("out_point") + id, out_point[i]);
+		
+		
 
 		// save handlers
 		hand = new Base::EventHandler2;
 		hand->setup(boost::bind(&CvWindow_Sink::onSaveImageN, this, i));
 		handlers.push_back(hand);
 		registerHandler(std::string("onSaveImage") + id, hand);
+		
+		in_save.push_back(new Base::DataStreamIn<Base::UnitType>);
+		registerStream(std::string("in_save") + id, in_save[i]);
+		addDependency(std::string("onSaveImage") + id, in_save[i]);
 	}
 
 	h_onSaveAllImages.setup(this, &CvWindow_Sink::onSaveAllImages);
@@ -91,6 +97,11 @@ void CvWindow_Sink::prepareInterface() {
 	registerHandler("onNewImage", handlers[0]);
 	registerStream("in_img", in_img[0]);
 	registerStream("in_draw", in_draw[0]);
+	registerStream("in_save", in_save[0]);
+	registerStream("out_point", out_point[0]);
+
+
+
 
 	img.resize(count);
 	to_draw.resize(count);
@@ -229,12 +240,23 @@ void CvWindow_Sink::onSaveImageN(int n) {
 	CLOG(LTRACE) << name() << "::onSaveImageN(" << n << ")";
 
 	try {
+		char id = '0' + n;
+		std::time_t rawtime;
+		std::tm* timeinfo;
+		char buffer [80];
+
+		std::time(&rawtime);
+		timeinfo = std::localtime(&rawtime);
+
+		std::strftime(buffer,80,"%Y-%m-%d-%H-%M-%S",timeinfo);
+
+		if(!in_save[n]->empty()) in_save[n]->read();
 		// Change compression to lowest.
 	        vector<int> param;
 	        param.push_back(CV_IMWRITE_PNG_COMPRESSION);
 	        param.push_back(0); // MAX_MEM_LEVEL = 9 
 		// Save image.
-		std::string tmp_name = std::string(dir) + std::string("/") + std::string(filename) + std::string(".png");
+		std::string tmp_name = std::string(dir) + std::string("/") + std::string(filename) + id + "_" + buffer + std::string(".png");
 		imwrite(tmp_name, img[n], param);
 		CLOG(LINFO) << "Window " << name() << " saved to file " << tmp_name <<std::endl;
 
@@ -299,7 +321,7 @@ void CvWindow_Sink::onMouseStatic(int event, int x, int y, int flags, void * use
 void CvWindow_Sink::onMouse(int event, int x, int y, int flags, int window) {
 	if (event != 0 || mouse_tracking) {
 		CLOG(LNOTICE) << "Click in " << titles[window] << " at " << x << "," << y << " [" << event << "]";
-		out_point[window]->write(cv::Point(x, y));
+		if(event ==1 ) out_point[window]->write(cv::Point(x, y));
 	}
 }
 
